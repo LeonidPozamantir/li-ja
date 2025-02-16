@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: lija
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/lija
+
