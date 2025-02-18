@@ -1,12 +1,11 @@
 package leo.lija.model;
 
-
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
-
-public record Game(
+public record Player(
         @Id
         String id,
-        List<Player> players
-) {}
+        String color,
+        String ps
+) {
+}
