@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIterable;
 
 import java.util.List;
 
@@ -67,7 +68,8 @@ R   K  R
 
         @Test
         @DisplayName("import and export is non destructive")
-        public void nonDestructive() {
+        void nonDestructive() {
+            assertThatIterable(examples).isNotEmpty();
             assertThat(examples).allMatch(e -> visual.game2Str(visual.str2Game(e)).equals(e));
         }
     }

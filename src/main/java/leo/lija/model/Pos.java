@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,12 +18,12 @@ public class Pos {
             .boxed()
             .collect(Collectors.toSet());
 
-    private static final Map<String, Pos> all;
+    private static final Map<String, Pos> allKeys;
     static {
-        all = new HashMap<>();
+        allKeys = new HashMap<>();
         for (int i: values) {
             for (int j: values) {
-                all.put(i + "" + j, new Pos(i, j));
+                allKeys.put(i + "" + j, new Pos(i, j));
             }
         }
     }
@@ -36,8 +36,8 @@ public class Pos {
         this.x = x;
         this.y = y;
     }
-    public Pos(String s) {
-        this(Integer.parseInt(s.substring(0, 1)), Integer.parseInt(s.substring(1)));
+    public static Pos fromString(String s) {
+        return allKeys.get(s);
     }
 
     public static Optional<Pos> shiftUp(Optional<Pos> op) {
@@ -56,14 +56,14 @@ public class Pos {
         return op.flatMap(p -> p.shiftRight(1));
     }
 
-    public static List<List<Pos>> vectorBasedPoss(Pos from, List<List<Function<Optional<Pos>, Optional<Pos>>>> directions) {
+    public static List<List<Pos>> vectorBasedPoss(Pos from, List<List<UnaryOperator<Optional<Pos>>>> directions) {
         return directions.stream()
                 .map(d -> expand(from, d))
                 .filter(exp -> !exp.isEmpty())
                 .toList();
     }
 
-    public static List<Pos> expand(Pos from, List<Function<Optional<Pos>, Optional<Pos>>> direction) {
+    public static List<Pos> expand(Pos from, List<UnaryOperator<Optional<Pos>>> direction) {
         Optional<Pos> candidate = direction.stream().reduce(Optional.of(from), (op, f) -> f.apply(op), (a, b) -> a);
         if (candidate.isPresent()) {
             List<Pos> expanded = expand(candidate.get(), direction);
@@ -159,7 +159,7 @@ public class Pos {
         return xToString() + yToString();
     }
 
-    private List<Optional<Pos>> multShift(int n, Optional<Pos> op, Function<Optional<Pos>, Optional<Pos>> dir) {
+    private List<Optional<Pos>> multShift(int n, Optional<Pos> op, UnaryOperator<Optional<Pos>> dir) {
         List<Optional<Pos>> result = List.of();
         Optional<Pos> cur = op;
         while (n >= 0 && cur.isPresent()) {
