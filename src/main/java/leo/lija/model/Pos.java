@@ -119,28 +119,23 @@ public class Pos {
     }
 
     public List<Pos> multShiftUp(int n) {
-        return multShift(n, Optional.of(this), Pos::shiftUp)
-                .stream()
-                .map(Optional::get)
-                .toList();
+        return multShift(n, Pos::shiftUp);
     }
 
     public List<Pos> multShiftDown(int n) {
-        return multShift(n, Optional.of(this), Pos::shiftDown)
-                .stream()
-                .map(Optional::get)
-                .toList();
+        return multShift(n, Pos::shiftDown);
     }
 
     public List<Pos> multShiftLeft(int n) {
-        return multShift(n, Optional.of(this), Pos::shiftLeft)
-                .stream()
-                .map(Optional::get)
-                .toList();
+        return multShift(n, Pos::shiftLeft);
     }
 
     public List<Pos> multShiftRight(int n) {
-        return multShift(n, Optional.of(this), Pos::shiftRight)
+        return multShift(n, Pos::shiftRight);
+    }
+
+    public List<Pos> multShift(int n, UnaryOperator<Optional<Pos>> dir) {
+        return expandN(n, Optional.of(this), dir)
                 .stream()
                 .map(Optional::get)
                 .toList();
@@ -159,7 +154,7 @@ public class Pos {
         return xToString() + yToString();
     }
 
-    private List<Optional<Pos>> multShift(int n, Optional<Pos> op, UnaryOperator<Optional<Pos>> dir) {
+    private List<Optional<Pos>> expandN(int n, Optional<Pos> op, UnaryOperator<Optional<Pos>> dir) {
         List<Optional<Pos>> result = List.of();
         Optional<Pos> cur = op;
         while (n >= 0 && cur.isPresent()) {
