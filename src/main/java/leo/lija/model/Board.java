@@ -2,6 +2,7 @@ package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import static leo.lija.model.Role.ROOK;
 @AllArgsConstructor
 public class Board {
 
+    @Getter
     private Map<Pos, Piece> pieces = new HashMap<>();
     private List<Piece> taken = new ArrayList<>();
 
@@ -47,7 +49,7 @@ public class Board {
         return new Board(piecesNew, takenNew);
     }
 
-    public Board reset() {
+    public Board() {
         Map<Pos, Piece> piecesNew = new HashMap<>();
         List<Role> lineUp = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
         for (int y: List.of(1, 2, 7, 8)) {
@@ -71,6 +73,7 @@ public class Board {
                 piecesNew.put(new Pos(x, y), piece);
             }
         }
-        return new Board(piecesNew, List.of());
+        this.pieces = piecesNew;
+        this.taken = List.of();
     }
 }
