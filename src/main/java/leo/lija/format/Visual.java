@@ -1,6 +1,6 @@
 package leo.lija.format;
 
-import leo.lija.model.Game;
+import leo.lija.entities.Game;
 
 public class Visual implements Format{
 
