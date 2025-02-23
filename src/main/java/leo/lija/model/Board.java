@@ -22,6 +22,7 @@ public class Board {
 
     @Getter
     private Map<Pos, Piece> pieces = new HashMap<>();
+    @Getter
     private List<Piece> taken = new ArrayList<>();
 
     public Optional<Piece> at (Pos at) {
