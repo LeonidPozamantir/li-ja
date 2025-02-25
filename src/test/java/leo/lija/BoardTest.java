@@ -1,10 +1,8 @@
 package leo.lija;
 
 import leo.lija.model.Board;
-import leo.lija.model.Color;
 import leo.lija.model.Piece;
 import leo.lija.model.Pos;
-import leo.lija.model.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +21,17 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Should allow piece to be places")
+    @DisplayName("Should allow piece to be placed")
     void pieceCanBePlaced() {
-        Board newBoard = board.placeAt(new Piece(WHITE, ROOK), Pos.fromString("b3"));
-        assertThat(newBoard.at(Pos.fromString("b3"))).contains(new Piece(WHITE, ROOK));
+        Board newBoard = board.placeAt(new Piece(WHITE, ROOK), Pos.at("e3"));
+        assertThat(newBoard.at(Pos.at("e3"))).contains(new Piece(WHITE, ROOK));
+    }
+
+    @Test
+    @DisplayName("Should allow piece to be taken")
+    void pieceCanBeTaken() {
+        Board newBoard = board.take(Pos.at("a1"));
+        assertThat(newBoard.at(Pos.at("a1"))).isEmpty();
     }
 
 }

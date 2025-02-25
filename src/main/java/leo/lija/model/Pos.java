@@ -1,5 +1,7 @@
 package leo.lija.model;
 
+import lombok.EqualsAndHashCode;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@EqualsAndHashCode
 public class Pos {
 
     private final int x;
@@ -36,8 +39,13 @@ public class Pos {
         this.x = x;
         this.y = y;
     }
-    public static Pos fromString(String s) {
-        return allKeys.get(s);
+    public static Pos at(String s) {
+        char c1 = s.charAt(0);
+        char c2 = s.charAt(1);
+        if (!Character.isDigit(c2) || !Character.isLetter(c1)) {
+            throw new IllegalArgumentException("Invalid position");
+        }
+        return allKeys.get(c1 - 'a' + 1 + "" + c2);
     }
 
     public static Optional<Pos> shiftUp(Optional<Pos> op) {
@@ -164,4 +172,5 @@ public class Pos {
         }
         return result;
     }
+
 }
