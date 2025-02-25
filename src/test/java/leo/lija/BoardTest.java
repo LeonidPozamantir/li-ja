@@ -12,25 +12,19 @@ import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BoardTest {
+class BoardTest {
 
-    private Board board = new Board();
+    private final Board board = new Board();
 
     @Test
     @DisplayName("Should have pieces by default")
-    public void hasPieces() {
+    void hasPieces() {
         assertThat(board.getPieces()).isNotEmpty();
     }
 
     @Test
-    @DisplayName("Nothing should be taken by default")
-    public void nothingTaken() {
-        assertThat(board.getTaken()).isEmpty();
-    }
-
-    @Test
     @DisplayName("Should allow piece to be places")
-    public void pieceCanBePlaced() {
+    void pieceCanBePlaced() {
         Board newBoard = board.placeAt(new Piece(WHITE, ROOK), Pos.fromString("b3"));
         assertThat(newBoard.at(Pos.fromString("b3"))).contains(new Piece(WHITE, ROOK));
     }

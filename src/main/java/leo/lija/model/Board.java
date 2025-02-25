@@ -22,8 +22,6 @@ public class Board {
 
     @Getter
     private Map<Pos, Piece> pieces = new HashMap<>();
-    @Getter
-    private List<Piece> taken = new ArrayList<>();
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
@@ -32,18 +30,15 @@ public class Board {
     public Board placeAt(Piece piece, Pos at) {
         if (pieces.containsKey(at)) throw new ChessRulesException("Cannot move to occupied " + at);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        List<Piece> takenNew = new ArrayList<>(taken);
         piecesNew.put(at, piece);
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board take(Pos at) {
         if (!pieces.containsKey(at)) throw new ChessRulesException("No piece at " + at + " to move");
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        List<Piece> takenNew = new ArrayList<>(taken);
         piecesNew.remove(at);
-        takenNew.add(pieces.get(at));
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board moveTo(Pos orig, Pos dest) {
@@ -51,8 +46,7 @@ public class Board {
         if (pieces.containsKey(dest)) throw new ChessRulesException("Cannot move to occupied " + dest);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(dest, piecesNew.remove(orig));
-        List<Piece> takenNew = new ArrayList<>(taken);
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board() {
@@ -80,6 +74,5 @@ public class Board {
             }
         }
         this.pieces = piecesNew;
-        this.taken = List.of();
     }
 }
