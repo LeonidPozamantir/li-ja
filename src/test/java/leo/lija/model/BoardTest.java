@@ -1,4 +1,4 @@
-package leo.lija;
+package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
 import leo.lija.model.Board;

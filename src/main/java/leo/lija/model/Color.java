@@ -2,5 +2,9 @@ package leo.lija.model;
 
 public enum Color {
     WHITE,
-    BLACK
+    BLACK;
+
+    public static Color isW(boolean b) {
+        return b ? WHITE : BLACK;
+    }
 }

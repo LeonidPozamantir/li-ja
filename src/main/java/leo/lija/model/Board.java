@@ -27,6 +27,10 @@ public class Board {
         return Optional.ofNullable(pieces.get(at));
     }
 
+    public Optional<Piece> at(int x, int y) {
+        return at(new Pos(x, y));
+    }
+
     public Board placeAt(Piece piece, Pos at) {
         if (pieces.containsKey(at)) throw new ChessRulesException("Cannot move to occupied " + at);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
