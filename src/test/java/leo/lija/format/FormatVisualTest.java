@@ -1,7 +1,7 @@
-package leo.lija;
+package leo.lija.format;
 
 
-import leo.lija.format.Visual;
+import leo.lija.model.Board;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,8 @@ pppppppp
 
     P n
 PPPP   P
-RNBQK  R""", """
+RNBQK  R
+""", """
        k
        P
 
@@ -62,15 +63,36 @@ P N  Q P
 R   K  R
 """);
 
+    private final String newBoardFormat = """
+rnbqkbnr
+pppppppp
+
+
+
+
+PPPPPPPP
+RNBQKBNR
+""";
+
+    private String newLine(String str) {
+        return str + "\n";
+    }
+
     @Nested
     @DisplayName("The visual formatter")
     class VisualFormatterTest {
 
         @Test
+        @DisplayName("can export a new board")
+        void exportNewBoard() {
+            assertThat(newLine(visual.obj2Str(new Board()))).isEqualTo(newBoardFormat);
+        }
+
+        @Test
         @DisplayName("import and export is non destructive")
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();
-            assertThat(examples).allMatch(e -> visual.game2Str(visual.str2Game(e)).equals(e));
+            assertThat(examples).allMatch(e -> newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
         }
     }
 

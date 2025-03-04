@@ -1,8 +1,6 @@
 package leo.lija.format;
 
-import leo.lija.entities.Game;
-
-public interface Format {
-    public Game str2Game(String str);
-    public String game2Str(Game game);
+public interface Format<T> {
+    public T str2Obj(String source);
+    public String obj2Str(T game);
 }

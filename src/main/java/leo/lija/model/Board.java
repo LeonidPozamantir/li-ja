@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
@@ -21,23 +22,27 @@ public class Board {
 
     @Getter
     private Map<Pos, Piece> pieces = new HashMap<>();
-    private List<Piece> taken = new ArrayList<>();
+
+    public Optional<Piece> at (Pos at) {
+        return Optional.ofNullable(pieces.get(at));
+    }
+
+    public Optional<Piece> at(int x, int y) {
+        return at(new Pos(x, y));
+    }
 
     public Board placeAt(Piece piece, Pos at) {
         if (pieces.containsKey(at)) throw new ChessRulesException("Cannot move to occupied " + at);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        List<Piece> takenNew = new ArrayList<>(taken);
         piecesNew.put(at, piece);
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board take(Pos at) {
         if (!pieces.containsKey(at)) throw new ChessRulesException("No piece at " + at + " to move");
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        List<Piece> takenNew = new ArrayList<>(taken);
         piecesNew.remove(at);
-        takenNew.add(pieces.get(at));
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board moveTo(Pos orig, Pos dest) {
@@ -45,8 +50,7 @@ public class Board {
         if (pieces.containsKey(dest)) throw new ChessRulesException("Cannot move to occupied " + dest);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(dest, piecesNew.remove(orig));
-        List<Piece> takenNew = new ArrayList<>(taken);
-        return new Board(piecesNew, takenNew);
+        return new Board(piecesNew);
     }
 
     public Board() {
@@ -74,6 +78,5 @@ public class Board {
             }
         }
         this.pieces = piecesNew;
-        this.taken = List.of();
     }
 }
