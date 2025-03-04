@@ -85,14 +85,14 @@ RNBQKBNR
         @Test
         @DisplayName("can export a new board")
         void exportNewBoard() {
-            assertThat(newLine(visual.Obj2Str(new Board()))).isEqualTo(newBoardFormat);
+            assertThat(newLine(visual.obj2Str(new Board()))).isEqualTo(newBoardFormat);
         }
 
         @Test
         @DisplayName("import and export is non destructive")
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();
-            assertThat(examples).allMatch(e -> newLine(visual.Obj2Str(visual.str2Obj(e))).equals(e));
+            assertThat(examples).allMatch(e -> newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
         }
     }
 

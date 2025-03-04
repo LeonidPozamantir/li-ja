@@ -44,8 +44,8 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Should position pieces correctly")
-    void piecesPositionedCorrectly() {
+    @DisplayName("Should position white pieces correctly")
+    void whitePiecesPositionedCorrectly() {
         assertThat(board.at(Pos.at("a1"))).contains(new Piece(WHITE, ROOK));
         assertThat(board.at(Pos.at("b1"))).contains(new Piece(WHITE, KNIGHT));
         assertThat(board.at(Pos.at("c1"))).contains(new Piece(WHITE, BISHOP));
@@ -62,6 +62,11 @@ class BoardTest {
         assertThat(board.at(Pos.at("f2"))).contains(new Piece(WHITE, PAWN));
         assertThat(board.at(Pos.at("g2"))).contains(new Piece(WHITE, PAWN));
         assertThat(board.at(Pos.at("h2"))).contains(new Piece(WHITE, PAWN));
+    }
+
+    @Test
+    @DisplayName("Should position black pieces correctly")
+    void blackPiecesPositionedCorrectly() {
         assertThat(board.at(Pos.at("a7"))).contains(new Piece(BLACK, PAWN));
         assertThat(board.at(Pos.at("b7"))).contains(new Piece(BLACK, PAWN));
         assertThat(board.at(Pos.at("c7"))).contains(new Piece(BLACK, PAWN));

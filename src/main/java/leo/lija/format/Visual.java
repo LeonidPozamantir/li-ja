@@ -51,8 +51,8 @@ public class Visual implements Format<Board> {
     }
 
     @Override
-    public String Obj2Str(Board board) {
-        String s = IntStream.range(0, 8)
+    public String obj2Str(Board board) {
+        return IntStream.range(0, 8)
                 .mapToObj(y -> IntStream.range(0, 8)
                         .mapToObj(x -> board.at(new Pos(x + 1, 8 - y))
                                 .map(Piece::fen)
@@ -61,6 +61,5 @@ public class Visual implements Format<Board> {
                         .collect(Collectors.joining())
                         .replaceFirst("\\s*$", ""))
                 .collect(Collectors.joining("\n"));
-        return s;
     }
 }
