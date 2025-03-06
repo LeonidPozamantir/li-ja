@@ -89,6 +89,12 @@ RNBQKBNR
         }
 
         @Test
+        @DisplayName("can import a new board")
+        void importNewBoard() {
+            assertThat(visual.str2Obj(newBoardFormat)).isEqualTo(new Board());
+        }
+
+        @Test
         @DisplayName("import and export is non destructive")
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();

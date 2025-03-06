@@ -2,6 +2,7 @@ package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Board {
 
     @Getter
@@ -50,6 +52,15 @@ public class Board {
         if (pieces.containsKey(dest)) throw new ChessRulesException("Cannot move to occupied " + dest);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(dest, piecesNew.remove(orig));
+        return new Board(piecesNew);
+    }
+
+    public Board promoteTo(Pos at, Role role) {
+        if (role == PAWN || role == KING) throw new ChessRulesException("Cannot promote to " + role);
+        if (!pieces.containsKey(at) || pieces.get(at).role() != PAWN)
+            throw new ChessRulesException("No pawn at " + at + " to promote");
+        Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
+        piecesNew.put(at, new Piece(pieces.get(at).color(), role));
         return new Board(piecesNew);
     }
 
