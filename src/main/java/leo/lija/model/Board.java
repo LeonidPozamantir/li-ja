@@ -30,7 +30,7 @@ public class Board {
     }
 
     public Optional<Piece> at(int x, int y) {
-        return at(new Pos(x, y));
+        return Pos.at(x, y).flatMap(this::at);
     }
 
     public Board placeAt(Piece piece, Pos at) {
@@ -85,9 +85,13 @@ public class Board {
                         break;
                     default:
                 }
-                piecesNew.put(new Pos(x, y), piece);
+                piecesNew.put(Pos.atUnsafe(x, y), piece);
             }
         }
         this.pieces = piecesNew;
+    }
+
+    public static Board empty() {
+        return new Board(Map.of());
     }
 }

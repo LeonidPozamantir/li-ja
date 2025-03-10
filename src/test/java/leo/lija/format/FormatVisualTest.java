@@ -5,6 +5,11 @@ import leo.lija.model.Board;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import static leo.lija.model.Role.BISHOP;
+import static leo.lija.model.Role.KNIGHT;
+import static leo.lija.model.Role.QUEEN;
+import static leo.lija.model.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 
@@ -16,7 +21,18 @@ public class FormatVisualTest {
 
     private Visual visual = new Visual();
 
-    private List<String> examples = List.of("""
+    private final String newBoardFormat = """
+rnbqkbnr
+pppppppp
+
+
+
+
+PPPPPPPP
+RNBQKBNR
+""";
+
+    private List<String> examples = List.of(newBoardFormat, """
 rnbqkp r
 pppppppp
 
@@ -63,16 +79,6 @@ P N  Q P
 R   K  R
 """);
 
-    private final String newBoardFormat = """
-rnbqkbnr
-pppppppp
-
-
-
-
-PPPPPPPP
-RNBQKBNR
-""";
 
     private String newLine(String str) {
         return str + "\n";
@@ -100,6 +106,7 @@ RNBQKBNR
             assertThatIterable(examples).isNotEmpty();
             assertThat(examples).allMatch(e -> newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
         }
+
     }
 
 }

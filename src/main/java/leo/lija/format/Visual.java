@@ -42,7 +42,7 @@ public class Visual implements Format<Board> {
                 if (c != ' ') {
                     Role role = pieces.get(Character.toLowerCase(c));
                     if (role != null) {
-                        boardPieces.put(new Pos(x + 1, 8 - y), new Piece(Color.isW(Character.isUpperCase(c)), role));
+                        boardPieces.put(Pos.atUnsafe(x + 1, 8 - y), new Piece(Color.isW(Character.isUpperCase(c)), role));
                     }
                 }
             }

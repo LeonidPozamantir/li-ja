@@ -1,7 +1,11 @@
 package leo.lija.model;
 
+import leo.lija.exceptions.ChessRulesException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Optional;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
@@ -99,5 +103,34 @@ class BoardTest {
     @DisplayName("Should not allow to move to occupied position")
     void canNotBeMoveToOccupiedPosition() {
         assertThrows(Exception.class, () -> board.moveTo(A1, A2));
+    }
+
+    @Test
+    @DisplayName("should allow a pawn to be promoted to any role")
+    void promoteToQRBN() {
+        assertThat(List.of(QUEEN, ROOK, BISHOP, KNIGHT)).allMatch(r -> {
+            Optional<Piece> op = Board.empty().placeAt(new Piece(WHITE, PAWN), A8).promoteTo(A8, r).at(A8);
+            return op.isPresent() && op.get().role() == r;
+        });
+    }
+
+    @Test
+    @DisplayName("should not allow a pawn to be promoted to king or pawn")
+    void promoteToPK() {
+        assertThat(List.of(PAWN, KING)).allSatisfy(r -> {
+            assertThrows(ChessRulesException.class, () -> Board.empty().placeAt(new Piece(WHITE, PAWN), A8).promoteTo(A8, r));
+        });
+    }
+
+    @Test
+    @DisplayName("should not allow an empty position to be promoted")
+    void promoteEmpty() {
+        assertThrows(ChessRulesException.class, () -> board.promoteTo(A6, QUEEN));
+    }
+
+    @Test
+    @DisplayName("should not allow to promote non-pawn")
+    void promoteNonPawn() {
+        assertThrows(ChessRulesException.class, () -> board.promoteTo(A1, QUEEN));
     }
 }
