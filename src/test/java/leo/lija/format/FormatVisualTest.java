@@ -6,10 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Role.BISHOP;
-import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.QUEEN;
-import static leo.lija.model.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 

@@ -21,74 +21,74 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BoardTest {
 
-    private final Board board = new Board();
+    private final Board newGameBoard = new Board();
 
     @Test
     @DisplayName("Should have pieces by default")
     void hasPieces() {
-        assertThat(board.getPieces()).isNotEmpty();
+        assertThat(newGameBoard.getPieces()).isNotEmpty();
     }
 
     @Test
     @DisplayName("Should allow piece to be placed")
     void pieceCanBePlaced() {
-        Board newBoard = board.placeAt(new Piece(WHITE, ROOK), E3);
+        Board newBoard = newGameBoard.placeAt(new Piece(WHITE, ROOK), E3);
         assertThat(newBoard.at(E3)).contains(new Piece(WHITE, ROOK));
     }
 
     @Test
     @DisplayName("Should allow piece to be taken")
     void pieceCanBeTaken() {
-        Board newBoard = board.take(A1);
+        Board newBoard = newGameBoard.take(A1);
         assertThat(newBoard.at(A1)).isEmpty();
     }
 
     @Test
     @DisplayName("Should position white pieces correctly")
     void whitePiecesPositionedCorrectly() {
-        assertThat(board.at(A1)).contains(new Piece(WHITE, ROOK));
-        assertThat(board.at(B1)).contains(new Piece(WHITE, KNIGHT));
-        assertThat(board.at(C1)).contains(new Piece(WHITE, BISHOP));
-        assertThat(board.at(D1)).contains(new Piece(WHITE, QUEEN));
-        assertThat(board.at(E1)).contains(new Piece(WHITE, KING));
-        assertThat(board.at(F1)).contains(new Piece(WHITE, BISHOP));
-        assertThat(board.at(G1)).contains(new Piece(WHITE, KNIGHT));
-        assertThat(board.at(H1)).contains(new Piece(WHITE, ROOK));
-        assertThat(board.at(A2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(B2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(C2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(D2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(E2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(F2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(G2)).contains(new Piece(WHITE, PAWN));
-        assertThat(board.at(H2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(A1)).contains(new Piece(WHITE, ROOK));
+        assertThat(newGameBoard.at(B1)).contains(new Piece(WHITE, KNIGHT));
+        assertThat(newGameBoard.at(C1)).contains(new Piece(WHITE, BISHOP));
+        assertThat(newGameBoard.at(D1)).contains(new Piece(WHITE, QUEEN));
+        assertThat(newGameBoard.at(E1)).contains(new Piece(WHITE, KING));
+        assertThat(newGameBoard.at(F1)).contains(new Piece(WHITE, BISHOP));
+        assertThat(newGameBoard.at(G1)).contains(new Piece(WHITE, KNIGHT));
+        assertThat(newGameBoard.at(H1)).contains(new Piece(WHITE, ROOK));
+        assertThat(newGameBoard.at(A2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(B2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(C2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(D2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(E2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(F2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(G2)).contains(new Piece(WHITE, PAWN));
+        assertThat(newGameBoard.at(H2)).contains(new Piece(WHITE, PAWN));
     }
 
     @Test
     @DisplayName("Should position black pieces correctly")
     void blackPiecesPositionedCorrectly() {
-        assertThat(board.at(A7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(B7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(C7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(D7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(E7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(F7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(G7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(H7)).contains(new Piece(BLACK, PAWN));
-        assertThat(board.at(A8)).contains(new Piece(BLACK, ROOK));
-        assertThat(board.at(B8)).contains(new Piece(BLACK, KNIGHT));
-        assertThat(board.at(C8)).contains(new Piece(BLACK, BISHOP));
-        assertThat(board.at(D8)).contains(new Piece(BLACK, QUEEN));
-        assertThat(board.at(E8)).contains(new Piece(BLACK, KING));
-        assertThat(board.at(F8)).contains(new Piece(BLACK, BISHOP));
-        assertThat(board.at(G8)).contains(new Piece(BLACK, KNIGHT));
-        assertThat(board.at(H8)).contains(new Piece(BLACK, ROOK));
+        assertThat(newGameBoard.at(A7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(B7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(C7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(D7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(E7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(F7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(G7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(H7)).contains(new Piece(BLACK, PAWN));
+        assertThat(newGameBoard.at(A8)).contains(new Piece(BLACK, ROOK));
+        assertThat(newGameBoard.at(B8)).contains(new Piece(BLACK, KNIGHT));
+        assertThat(newGameBoard.at(C8)).contains(new Piece(BLACK, BISHOP));
+        assertThat(newGameBoard.at(D8)).contains(new Piece(BLACK, QUEEN));
+        assertThat(newGameBoard.at(E8)).contains(new Piece(BLACK, KING));
+        assertThat(newGameBoard.at(F8)).contains(new Piece(BLACK, BISHOP));
+        assertThat(newGameBoard.at(G8)).contains(new Piece(BLACK, KNIGHT));
+        assertThat(newGameBoard.at(H8)).contains(new Piece(BLACK, ROOK));
     }
 
     @Test
     @DisplayName("Should allow piece to be move")
     void pieceCanBeMoved() {
-        Board newBoard = board.moveTo(E2, E4);
+        Board newBoard = newGameBoard.moveTo(E2, E4);
         assertThat(newBoard.at(E2)).isEmpty();
         assertThat(newBoard.at(E4)).contains(new Piece(WHITE, PAWN));
     }
@@ -96,13 +96,13 @@ class BoardTest {
     @Test
     @DisplayName("Should not allow empty place to move")
     void emptyPlaceCannotBeMoved() {
-        assertThrows(Exception.class, () -> board.moveTo(E5, E6));
+        assertThrows(Exception.class, () -> newGameBoard.moveTo(E5, E6));
     }
 
     @Test
     @DisplayName("Should not allow to move to occupied position")
     void canNotBeMoveToOccupiedPosition() {
-        assertThrows(Exception.class, () -> board.moveTo(A1, A2));
+        assertThrows(Exception.class, () -> newGameBoard.moveTo(A1, A2));
     }
 
     @Test
@@ -118,19 +118,20 @@ class BoardTest {
     @DisplayName("should not allow a pawn to be promoted to king or pawn")
     void promoteToPK() {
         assertThat(List.of(PAWN, KING)).allSatisfy(r -> {
-            assertThrows(ChessRulesException.class, () -> Board.empty().placeAt(new Piece(WHITE, PAWN), A8).promoteTo(A8, r));
+            Board board = Board.empty().placeAt(new Piece(WHITE, PAWN), A8);
+            assertThrows(ChessRulesException.class, () -> board.promoteTo(A8, r));
         });
     }
 
     @Test
     @DisplayName("should not allow an empty position to be promoted")
     void promoteEmpty() {
-        assertThrows(ChessRulesException.class, () -> board.promoteTo(A6, QUEEN));
+        assertThrows(ChessRulesException.class, () -> newGameBoard.promoteTo(A6, QUEEN));
     }
 
     @Test
     @DisplayName("should not allow to promote non-pawn")
     void promoteNonPawn() {
-        assertThrows(ChessRulesException.class, () -> board.promoteTo(A1, QUEEN));
+        assertThrows(ChessRulesException.class, () -> newGameBoard.promoteTo(A1, QUEEN));
     }
 }

@@ -3,6 +3,7 @@ package leo.lija.model;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,19 +21,19 @@ public class Pos {
     private final int y;
 
     public Optional<Pos> shiftUp(int n) {
-        return bounds.contains(y + n) ? Optional.of(new Pos(x, y + n)) : Optional.empty();
+        return Pos.at(x, y + n);
     }
 
     public Optional<Pos> shiftDown(int n) {
-        return bounds.contains(y - n) ? Optional.of(new Pos(x, y - n)) : Optional.empty();
+        return Pos.at(x, y - n);
     }
 
     public Optional<Pos> shiftLeft(int n) {
-        return bounds.contains(x - n) ? Optional.of(new Pos(x - n, y)) : Optional.empty();
+        return Pos.at(x - n, y);
     }
 
     public Optional<Pos> shiftRight(int n) {
-        return bounds.contains(x + n) ? Optional.of(new Pos(x + n, y)) : Optional.empty();
+        return Pos.at(x + n, y);
     }
 
     public boolean isHoriz(Pos other) {
@@ -88,7 +89,7 @@ public class Pos {
     }
 
     private List<Optional<Pos>> expandN(int n, Optional<Pos> op, UnaryOperator<Optional<Pos>> dir) {
-        List<Optional<Pos>> result = List.of();
+        List<Optional<Pos>> result = new ArrayList<>();
         Optional<Pos> cur = op;
         while (n >= 0 && cur.isPresent()) {
             result.add(cur);

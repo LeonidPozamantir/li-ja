@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
@@ -16,7 +17,7 @@ public class Game {
 
     private Board board;
     private List<Pair<Pos, Pos>> history;
-    private Color nextMove;
+    private Color nextPlayer;
 
     private final List<Color> players = List.of(WHITE, BLACK);
 
@@ -24,19 +25,8 @@ public class Game {
         this(new Board(), List.of(), WHITE);
     }
 
-    public Map<Pos, Set<Pos>> possibleMoves() {
-        Map<Pos, Set<Pos>> res = new HashMap<>();
-        board.getPieces().entrySet().forEach(entry -> {
-            Pos pos = entry.getKey();
-            Piece piece = entry.getValue();
-            if (piece.color().equals(nextMove)) {
-                res.put(pos, movesFrom(pos));
-            }
-        });
-        return res;
-    }
-
-    public Set<Pos> movesFrom(Pos pos) {
-        return Set.of();
+    public Map<Pos, Set<Pos>> moves() {
+        return board.getPieces().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e ->e.getValue().moves(e.getKey(), board)));
     }
 }
