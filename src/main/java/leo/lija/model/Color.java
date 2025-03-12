@@ -1,5 +1,8 @@
 package leo.lija.model;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 import java.util.List;
 
 public enum Color {
@@ -10,7 +13,8 @@ public enum Color {
         return b ? WHITE : BLACK;
     }
 
-    public Color opposite;
+    @Getter
+    private Color opposite;
 
     static {
         WHITE.opposite = BLACK;
