@@ -3,7 +3,6 @@ package leo.lija.model;
 import lombok.AllArgsConstructor;
 import org.springframework.data.util.Pair;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +24,8 @@ public class Game {
         this(new Board(), List.of(), WHITE);
     }
 
-    public Map<Pos, Set<Pos>> moves() {
+    public Map<Pos, Set<Pos>> basicMoves() {
         return board.getPieces().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e ->e.getValue().moves(e.getKey(), board)));
+                .collect(Collectors.toMap(Map.Entry::getKey, e ->e.getValue().basicMoves(e.getKey(), board)));
     }
 }

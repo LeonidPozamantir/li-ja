@@ -1,9 +1,9 @@
 package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,12 +21,14 @@ import static leo.lija.model.Role.PAWN;
 import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode
 public class Board {
 
     @Getter
-    private Map<Pos, Piece> pieces;
+    private final Map<Pos, Piece> pieces;
+
+    private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
@@ -68,13 +70,17 @@ public class Board {
     }
 
     public Map<Color, Set<Pos>> occupation() {
-        return Arrays.stream(Color.values()).collect(Collectors.toMap(
-                Function.identity(),
-                c -> pieces.entrySet().stream()
-                        .filter(e -> e.getValue().color() == c)
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toSet())
-        ));
+        if (optOccupation.isEmpty()) {
+            Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(
+                    Function.identity(),
+                    c -> pieces.entrySet().stream()
+                            .filter(e -> e.getValue().color() == c)
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.toSet())
+            ));
+            optOccupation = Optional.of(occupation);
+        }
+        return optOccupation.get();
     }
 
     public Board() {

@@ -4,7 +4,7 @@ import java.util.Set;
 
 public record Piece(Color color, Role role) {
 
-    public Set<Pos> moves(Pos pos, Board board) {
+    public Set<Pos> basicMoves(Pos pos, Board board) {
         return Set.of();
     }
 

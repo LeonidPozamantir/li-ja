@@ -2,6 +2,7 @@ package leo.lija.model;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +14,34 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode
 public class Pos {
 
     private final int x;
     private final int y;
+
+    private Optional<Pos> optUp;
+    private Optional<Pos> optDown;
+    private Optional<Pos> optLeft;
+    private Optional<Pos> optRight;
+
+    public Optional<Pos> up() {
+        if (optUp == null) optUp = shiftUp(1);
+        return optUp;
+    }
+    public Optional<Pos> down() {
+        if (optDown == null) optDown = shiftDown(1);
+        return optDown;
+    }
+    public Optional<Pos> left() {
+        if (optLeft == null) optLeft = shiftLeft(1);
+        return optLeft;
+    }
+    public Optional<Pos> right() {
+        if (optRight == null) optRight = shiftRight(1);
+        return optRight;
+    }
 
     public Optional<Pos> shiftUp(int n) {
         return Pos.at(x, y + n);
