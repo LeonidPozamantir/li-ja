@@ -15,16 +15,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Pos {
 
+    @EqualsAndHashCode.Include
     private final int x;
+    @EqualsAndHashCode.Include
     private final int y;
 
-    private Optional<Optional<Pos>> optUp;
-    private Optional<Optional<Pos>> optDown;
-    private Optional<Optional<Pos>> optLeft;
-    private Optional<Optional<Pos>> optRight;
+    private Optional<Optional<Pos>> optUp = Optional.empty();
+    private Optional<Optional<Pos>> optDown = Optional.empty();
+    private Optional<Optional<Pos>> optLeft = Optional.empty();
+    private Optional<Optional<Pos>> optRight = Optional.empty();
 
     public Optional<Pos> up() {
         if (optUp.isEmpty()) optUp = Optional.of(shiftUp(1));

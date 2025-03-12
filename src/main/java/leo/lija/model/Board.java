@@ -22,10 +22,11 @@ import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 
 @RequiredArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Board {
 
     @Getter
+    @EqualsAndHashCode.Include
     private final Map<Pos, Piece> pieces;
 
     private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
@@ -36,6 +37,12 @@ public class Board {
 
     public Optional<Piece> at(int x, int y) {
         return Pos.at(x, y).flatMap(this::at);
+    }
+
+    public Piece pieceAt(Pos at) {
+        Optional<Piece> optPiece = at(at);
+        if (optPiece.isEmpty()) throw new ChessRulesException("No piece at " + at);
+        return optPiece.get();
     }
 
     public Board placeAt(Piece piece, Pos at) {

@@ -1,6 +1,5 @@
 package leo.lija.model;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.util.List;

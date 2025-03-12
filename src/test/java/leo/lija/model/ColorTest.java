@@ -8,7 +8,7 @@ import static leo.lija.model.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Color should")
-public class ColorTest {
+class ColorTest {
 
     @Test
     @DisplayName("have correct opposite color")

@@ -1,5 +1,6 @@
 package leo.lija.model;
 
+import leo.lija.format.Visual;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,11 @@ import static leo.lija.model.Pos.A4;
 import static leo.lija.model.Pos.A8;
 import static leo.lija.model.Pos.B4;
 import static leo.lija.model.Pos.B8;
+import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.C4;
+import static leo.lija.model.Pos.C5;
+import static leo.lija.model.Pos.C6;
+import static leo.lija.model.Pos.C7;
 import static leo.lija.model.Pos.C8;
 import static leo.lija.model.Pos.D4;
 import static leo.lija.model.Pos.D8;
@@ -38,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Rook should")
 public class RookTest {
 
+    Visual visual = new Visual();
+
     private final Piece rook = new Piece(Color.WHITE, Role.ROOK);
     private final Board board = Board.empty();
     private Board boardWithRookAt(Pos pos) {
@@ -50,12 +57,28 @@ public class RookTest {
     @Test
     @DisplayName("be able to move to any position along the same rank or file")
     void testBasicMoves() {
-        assertThat(basicMoves(E4)).containsExactly(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4);
+        assertThat(basicMoves(E4)).containsExactlyInAnyOrder(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4);
     }
 
     @Test
     @DisplayName("be able to move to any position along the same rank or file when in edge")
     void testBasicMovesEdge() {
-        assertThat(basicMoves(H8)).containsExactly(H7, H6, H5, H4, H3, H2, H1, G8, F8, E8, D8, C8, B8, A8);
+        assertThat(basicMoves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G8, F8, E8, D8, C8, B8, A8);
+    }
+
+    @Test
+    @DisplayName("require that positions can only be moved to if they aren't occupied by the same color")
+    void testOccupied() {
+        Board board = visual.str2Obj("""
+k B
+
+
+
+N R    P
+
+PPPPPPPP
+ NBQKBNR
+""");
+        assertThat(rook.basicMoves(C4, board)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
     }
 }
