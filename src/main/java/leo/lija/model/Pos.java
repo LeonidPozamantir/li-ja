@@ -21,26 +21,26 @@ public class Pos {
     private final int x;
     private final int y;
 
-    private Optional<Pos> optUp;
-    private Optional<Pos> optDown;
-    private Optional<Pos> optLeft;
-    private Optional<Pos> optRight;
+    private Optional<Optional<Pos>> optUp;
+    private Optional<Optional<Pos>> optDown;
+    private Optional<Optional<Pos>> optLeft;
+    private Optional<Optional<Pos>> optRight;
 
     public Optional<Pos> up() {
-        if (optUp == null) optUp = shiftUp(1);
-        return optUp;
+        if (optUp.isEmpty()) optUp = Optional.of(shiftUp(1));
+        return optUp.get();
     }
     public Optional<Pos> down() {
-        if (optDown == null) optDown = shiftDown(1);
-        return optDown;
+        if (optDown.isEmpty()) optDown = Optional.of(shiftDown(1));
+        return optDown.get();
     }
     public Optional<Pos> left() {
-        if (optLeft == null) optLeft = shiftLeft(1);
-        return optLeft;
+        if (optLeft.isEmpty()) optLeft = Optional.of(shiftLeft(1));
+        return optLeft.get();
     }
     public Optional<Pos> right() {
-        if (optRight == null) optRight = shiftRight(1);
-        return optRight;
+        if (optRight.isEmpty()) optRight = Optional.of(shiftRight(1));
+        return optRight.get();
     }
 
     public Optional<Pos> shiftUp(int n) {

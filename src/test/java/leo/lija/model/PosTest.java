@@ -32,37 +32,37 @@ class PosTest {
     @Test
     @DisplayName("be used to derive a relative position on the board")
     void relativePosition() {
-        assertEquals(D5.shiftUp(1), Optional.of(D6));
-        assertEquals(D5.shiftDown(1), Optional.of(D4));
-        assertEquals(D5.shiftLeft(1), Optional.of(C5));
-        assertEquals(D5.shiftRight(1), Optional.of(E5));
+        assertEquals(Optional.of(D6), D5.shiftUp(1));
+        assertEquals(Optional.of(D4), D5.shiftDown(1));
+        assertEquals(Optional.of(C5), D5.shiftLeft(1));
+        assertEquals(Optional.of(E5), D5.shiftRight(1));
     }
 
     @Test
     @DisplayName("be used to calculate a non-position off the edge of the board")
     void offTheBoard() {
-        assertEquals(D5.shiftUp(4), Optional.empty());
-        assertEquals(D5.shiftDown(5), Optional.empty());
-        assertEquals(D5.shiftLeft(5), Optional.empty());
-        assertEquals(D5.shiftRight(5), Optional.empty());
+        assertEquals(Optional.empty(), D5.shiftUp(4));
+        assertEquals(Optional.empty(), D5.shiftDown(5));
+        assertEquals(Optional.empty(), D5.shiftLeft(5));
+        assertEquals(Optional.empty(), D5.shiftRight(5));
     }
 
     @Test
     @DisplayName("be able to calculate a relative position with negative numbers")
     void relativePositionWithNegative() {
-        assertEquals(D5.shiftUp(-2), Optional.of(D3));
-        assertEquals(D5.shiftDown(-3), Optional.of(D8));
-        assertEquals(D5.shiftLeft(-3), Optional.of(G5));
-        assertEquals(D5.shiftRight(-1), Optional.of(C5));
+        assertEquals(Optional.of(D3), D5.shiftUp(-2));
+        assertEquals(Optional.of(D8), D5.shiftDown(-3));
+        assertEquals(Optional.of(G5), D5.shiftLeft(-3));
+        assertEquals(Optional.of(C5), D5.shiftRight(-1));
     }
 
     @Test
     @DisplayName("be used to calculate a non-position off the edge of the board using negative numbers")
     void offTheBoardWithNegative() {
-        assertEquals(D5.shiftUp(-6), Optional.empty());
-        assertEquals(D5.shiftDown(-6), Optional.empty());
-        assertEquals(D5.shiftLeft(-6), Optional.empty());
-        assertEquals(D5.shiftRight(-6), Optional.empty());
+        assertEquals(Optional.empty(), D5.shiftUp(-6));
+        assertEquals(Optional.empty(), D5.shiftDown(-6));
+        assertEquals(Optional.empty(), D5.shiftLeft(-6));
+        assertEquals(Optional.empty(), D5.shiftRight(-6));
     }
 
     @Test
@@ -86,6 +86,6 @@ class PosTest {
     @Test
     @DisplayName("be convertable to a string")
     void testToString() {
-        assertEquals(D5.toString(), "d5");
+        assertEquals("d5", D5.toString());
     }
 }
