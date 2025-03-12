@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
@@ -23,7 +26,7 @@ import static leo.lija.model.Role.ROOK;
 public class Board {
 
     @Getter
-    private Map<Pos, Piece> pieces = new HashMap<>();
+    private Map<Pos, Piece> pieces;
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
@@ -34,7 +37,7 @@ public class Board {
     }
 
     public Board placeAt(Piece piece, Pos at) {
-        if (pieces.containsKey(at)) throw new ChessRulesException("Cannot move to occupied " + at);
+        if (pieces.containsKey(at)) throw new ChessRulesException("Cannot place to occupied " + at);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, piece);
         return new Board(piecesNew);
@@ -62,6 +65,16 @@ public class Board {
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, new Piece(pieces.get(at).color(), role));
         return new Board(piecesNew);
+    }
+
+    public Map<Color, Set<Pos>> occupation() {
+        return Arrays.stream(Color.values()).collect(Collectors.toMap(
+                Function.identity(),
+                c -> pieces.entrySet().stream()
+                        .filter(e -> e.getValue().color() == c)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toSet())
+        ));
     }
 
     public Board() {

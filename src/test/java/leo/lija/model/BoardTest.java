@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
@@ -133,5 +135,22 @@ class BoardTest {
     @DisplayName("should not allow to promote non-pawn")
     void promoteNonPawn() {
         assertThrows(ChessRulesException.class, () -> newGameBoard.promoteTo(A1, QUEEN));
+    }
+
+    @Test
+    @DisplayName("should provide occupation map")
+    void occupationMap() {
+        Board board = new Board(Map.of(
+                A2, new Piece(WHITE, PAWN),
+                A3, new Piece(WHITE, PAWN),
+                D1, new Piece(WHITE, KING),
+                E8, new Piece(BLACK, KING),
+                H4, new Piece(BLACK, QUEEN)
+        ));
+
+        assertThat(board.occupation()).contains(
+                Map.entry(WHITE, Set.of(A2, A3, D1)),
+                Map.entry(BLACK, Set.of(E8, H4))
+        );
     }
 }
