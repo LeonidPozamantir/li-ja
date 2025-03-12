@@ -76,7 +76,7 @@ public class Pos {
     }
 
     public String xToString() {
-        return String.valueOf((char) x);
+        return String.valueOf((char) (x + 96));
     }
 
     public String yToString() {

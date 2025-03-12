@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Position should")
-public class PosTest {
+class PosTest {
 
     @Test
     @DisplayName("be used to derive a relative position on the board")
@@ -81,5 +81,11 @@ public class PosTest {
         assertThat(D4.multShiftDown(8)).contains(D4, D3, D2, D1);
         assertThat(D4.multShiftLeft(8)).contains(D4, C4, B4, A4);
         assertThat(D4.multShiftRight(8)).contains(D4, E4, F4, G4, H4);
+    }
+
+    @Test
+    @DisplayName("be convertable to a string")
+    void testToString() {
+        assertEquals(D5.toString(), "d5");
     }
 }
