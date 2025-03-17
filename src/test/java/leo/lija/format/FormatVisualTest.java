@@ -85,10 +85,6 @@ R   K  R
 """);
 
 
-    private String newLine(String str) {
-        return str + "\n";
-    }
-
     @Nested
     @DisplayName("The visual formatter")
     class VisualFormatterTest {
@@ -96,7 +92,7 @@ R   K  R
         @Test
         @DisplayName("can export a new board")
         void exportNewBoard() {
-            assertThat(newLine(visual.obj2Str(new Board()))).isEqualTo(newBoardFormat);
+            assertThat(visual.newLine(visual.obj2Str(new Board()))).isEqualTo(newBoardFormat);
         }
 
         @Test
@@ -109,7 +105,7 @@ R   K  R
         @DisplayName("import and export is non destructive")
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();
-            assertThat(examples).allMatch(e -> newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
+            assertThat(examples).allMatch(e -> visual.newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
         }
 
         @Test
@@ -125,7 +121,7 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """);
-            assertThat(newLine(visual.obj2StrWithMarks(board, Map.of(Set.of(B3, D3, B5, D5, A6, E6, F7, G8), 'x'))))
+            assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(Set.of(B3, D3, B5, D5, A6, E6, F7, G8), 'x'))))
                 .isEqualTo("""
 k B   x
      x

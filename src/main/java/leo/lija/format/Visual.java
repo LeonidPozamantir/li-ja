@@ -7,11 +7,11 @@ import leo.lija.model.Pos;
 import leo.lija.model.Role;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,6 +30,10 @@ import java.util.stream.IntStream;
 public class Visual implements Format<Board> {
 
     private final Map<Character, Role> pieces = Role.all.stream().collect(HashMap::new, (m, r) -> m.put(r.fen, r), Map::putAll);
+
+    public String newLine(String str) {
+        return str + "\n";
+    }
 
     @Override
     public Board str2Obj(String str) {
@@ -57,7 +61,7 @@ public class Visual implements Format<Board> {
         return obj2StrWithMarks(board, Map.of());
     }
 
-    public String obj2StrWithMarks(Board board, Map<Set<Pos>, Character> marks) {
+    public String obj2StrWithMarks(Board board, Map<Collection<Pos>, Character> marks) {
         Map<Pos, Character> markedPositions = marks.entrySet().stream()
             .flatMap(e -> e.getKey().stream()
                 .map(p -> Map.entry(p, e.getValue()))
