@@ -38,20 +38,18 @@ import static leo.lija.model.Pos.H5;
 import static leo.lija.model.Pos.H6;
 import static leo.lija.model.Pos.H7;
 import static leo.lija.model.Pos.H8;
+import static leo.lija.model.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Rook should")
-public class RookTest {
+class RookTest {
 
     Visual visual = new Visual();
 
-    private final Piece rook = new Piece(Color.WHITE, Role.ROOK);
-    private final Board board = Board.empty();
-    private Board boardWithRookAt(Pos pos) {
-        return board.placeAt(rook, pos);
-    }
+    private final Piece rook = new Piece(Color.WHITE, ROOK);
+    private final Board emptyBoard = Board.empty();
     private Set<Pos> basicMoves(Pos pos) {
-        return rook.basicMoves(pos, board);
+        return rook.basicMoves(pos, emptyBoard.placeAt(rook, pos));
     }
 
     @Test
@@ -79,6 +77,22 @@ N R    P
 PPPPPPPP
  NBQKBNR
 """);
-        assertThat(rook.basicMoves(C4, board)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
+        assertThat(board.pieceAt(C4).basicMoves(C4, board)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
+    }
+
+    @Test
+    @DisplayName("capture enemy pieces")
+    void testCapture() {
+        Board board = visual.str2Obj("""
+k
+  b
+
+
+n R   p
+
+PPPPPPPP
+ NBQKBNR
+""");
+        assertThat(board.pieceAt(C4).basicMoves(C4, board)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, A4, D4, E4, F4, G4);
     }
 }

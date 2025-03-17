@@ -25,6 +25,8 @@ import static leo.lija.model.Role.ROOK;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Board {
 
+    private final String NO_PIECE_AT = "No piece at";
+
     @Getter
     @EqualsAndHashCode.Include
     private final Map<Pos, Piece> pieces;
@@ -41,7 +43,7 @@ public class Board {
 
     public Piece pieceAt(Pos at) {
         Optional<Piece> optPiece = at(at);
-        if (optPiece.isEmpty()) throw new ChessRulesException("No piece at " + at);
+        if (optPiece.isEmpty()) throw new ChessRulesException(NO_PIECE_AT + " " + at);
         return optPiece.get();
     }
 
@@ -53,14 +55,14 @@ public class Board {
     }
 
     public Board take(Pos at) {
-        if (!pieces.containsKey(at)) throw new ChessRulesException("No piece at " + at + " to move");
+        if (!pieces.containsKey(at)) throw new ChessRulesException(NO_PIECE_AT + " " + at + " to move");
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.remove(at);
         return new Board(piecesNew);
     }
 
     public Board moveTo(Pos orig, Pos dest) {
-        if (!pieces.containsKey(orig)) throw new ChessRulesException("No piece at " + orig + " to move");
+        if (!pieces.containsKey(orig)) throw new ChessRulesException(NO_PIECE_AT + " " + orig + " to move");
         if (pieces.containsKey(dest)) throw new ChessRulesException("Cannot move to occupied " + dest);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(dest, piecesNew.remove(orig));
