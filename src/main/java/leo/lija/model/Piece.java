@@ -17,10 +17,11 @@ public record Piece(Color color, Role role) {
         Set<Pos> friends = board.occupation().get(color);
         Set<Pos> enemies = board.occupation().get(color.getOpposite());
 
-        return switch (role) {
-            case ROOK -> new Trajectories(ROOK.dirs, friends, enemies).from(pos);
-            default -> Set.of();
-        };
+        if (role.directed) {
+            return new Trajectories(role.dirs, friends, enemies).from(pos);
+        } else {
+            return Set.of();
+        }
     }
 
     public boolean is(Color color) {

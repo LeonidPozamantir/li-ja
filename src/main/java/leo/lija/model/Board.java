@@ -25,7 +25,7 @@ import static leo.lija.model.Role.ROOK;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Board {
 
-    private final String NO_PIECE_AT = "No piece at";
+    private static final String NO_PIECE_AT = "No piece at";
 
     @Getter
     @EqualsAndHashCode.Include

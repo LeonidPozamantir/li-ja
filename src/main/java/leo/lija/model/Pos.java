@@ -27,6 +27,10 @@ public class Pos {
     private Optional<Optional<Pos>> optDown = Optional.empty();
     private Optional<Optional<Pos>> optLeft = Optional.empty();
     private Optional<Optional<Pos>> optRight = Optional.empty();
+    private Optional<Optional<Pos>> optUpLeft = Optional.empty();
+    private Optional<Optional<Pos>> optUpRight = Optional.empty();
+    private Optional<Optional<Pos>> optDownLeft = Optional.empty();
+    private Optional<Optional<Pos>> optDownRight = Optional.empty();
 
     public Optional<Pos> up() {
         if (optUp.isEmpty()) optUp = Optional.of(shiftUp(1));
@@ -43,6 +47,22 @@ public class Pos {
     public Optional<Pos> right() {
         if (optRight.isEmpty()) optRight = Optional.of(shiftRight(1));
         return optRight.get();
+    }
+    public Optional<Pos> upLeft() {
+        if (optUpLeft.isEmpty()) optUpLeft = Optional.of(shiftUp(1).flatMap(p -> p.shiftLeft(1)));
+        return optUpLeft.get();
+    }
+    public Optional<Pos> upRight() {
+        if (optUpRight.isEmpty()) optUpRight = Optional.of(shiftUp(1).flatMap(p -> p.shiftRight(1)));
+        return optUpRight.get();
+    }
+    public Optional<Pos> downLeft() {
+        if (optDownLeft.isEmpty()) optDownLeft = Optional.of(shiftDown(1).flatMap(p -> p.shiftLeft(1)));
+        return optDownLeft.get();
+    }
+    public Optional<Pos> downRight() {
+        if (optDownRight.isEmpty()) optDownRight = Optional.of(shiftDown(1).flatMap(p -> p.shiftRight(1)));
+        return optDownRight.get();
     }
 
     public Optional<Pos> shiftUp(int n) {
