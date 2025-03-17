@@ -6,11 +6,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static leo.lija.model.Pos.A6;
+import static leo.lija.model.Pos.B3;
+import static leo.lija.model.Pos.B5;
+import static leo.lija.model.Pos.D3;
+import static leo.lija.model.Pos.D5;
+import static leo.lija.model.Pos.E6;
+import static leo.lija.model.Pos.F7;
+import static leo.lija.model.Pos.G8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 
 import java.util.List;
-
+import java.util.Map;
+import java.util.Set;
 
 
 public class FormatVisualTest {
@@ -101,6 +110,33 @@ R   K  R
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();
             assertThat(examples).allMatch(e -> newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
+        }
+
+        @Test
+        @DisplayName("export with special marks")
+        void exportWithMarks() {
+            Board board = visual.str2Obj("""
+k B
+
+
+
+N B    P
+
+PPPPPPPP
+ NBQKBNR
+""");
+            assertThat(newLine(visual.obj2StrWithMarks(board, Map.of(Set.of(B3, D3, B5, D5, A6, E6, F7, G8), 'x'))))
+                .isEqualTo("""
+k B   x
+     x
+x   x
+ x x
+N B    P
+ x x
+PPPPPPPP
+ NBQKBNR
+""");
+
         }
 
     }

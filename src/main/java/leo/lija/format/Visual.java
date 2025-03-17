@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,14 +54,23 @@ public class Visual implements Format<Board> {
 
     @Override
     public String obj2Str(Board board) {
+        return obj2StrWithMarks(board, Map.of());
+    }
+
+    public String obj2StrWithMarks(Board board, Map<Set<Pos>, Character> marks) {
+        Map<Pos, Character> markedPositions = marks.entrySet().stream()
+            .flatMap(e -> e.getKey().stream()
+                .map(p -> Map.entry(p, e.getValue()))
+            ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         return IntStream.range(0, 8)
-                .mapToObj(y -> IntStream.range(0, 8)
-                        .mapToObj(x -> board.at(new Pos(x + 1, 8 - y))
-                                .map(Piece::fen)
-                                .map(String::valueOf)
-                                .orElse(" "))
-                        .collect(Collectors.joining())
-                        .replaceFirst("\\s*$", ""))
-                .collect(Collectors.joining("\n"));
+            .mapToObj(y -> IntStream.range(0, 8)
+                .mapToObj(x -> Pos.at(x + 1, 8 - y)
+                    .flatMap(p -> Optional.ofNullable(markedPositions.get(p)).or(() -> board.at(p).map(Piece::fen)))
+                    .map(String::valueOf)
+                    .orElse(" "))
+                .collect(Collectors.joining())
+                .replaceFirst("\\s*$", ""))
+            .collect(Collectors.joining("\n"));
     }
 }
