@@ -47,25 +47,24 @@ class RookTest {
     Visual visual = new Visual();
 
     private final Piece rook = new Piece(Color.WHITE, ROOK);
-    private final Board emptyBoard = Board.empty();
     private Set<Pos> basicMoves(Pos pos) {
-        return rook.basicMoves(pos, emptyBoard.placeAt(rook, pos));
+        return rook.basicMoves(pos, Board.empty().placeAt(rook, pos));
     }
 
     @Test
-    @DisplayName("be able to move to any position along the same rank or file")
+    @DisplayName("move to any position along the same rank or file")
     void testBasicMoves() {
         assertThat(basicMoves(E4)).containsExactlyInAnyOrder(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4);
     }
 
     @Test
-    @DisplayName("be able to move to any position along the same rank or file when in edge")
+    @DisplayName("move to any position along the same rank or file when in edge")
     void testBasicMovesEdge() {
         assertThat(basicMoves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G8, F8, E8, D8, C8, B8, A8);
     }
 
     @Test
-    @DisplayName("require that positions can only be moved to if they aren't occupied by the same color")
+    @DisplayName("not move to positions that are occupied by the same color")
     void testOccupied() {
         Board board = visual.str2Obj("""
 k B
