@@ -9,18 +9,21 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static leo.lija.model.Role.ROOK;
-
 public record Piece(Color color, Role role) {
 
     public Set<Pos> basicMoves(Pos pos, Board board) {
         Set<Pos> friends = board.occupation().get(color);
         Set<Pos> enemies = board.occupation().get(color.getOpposite());
 
-        if (role.directed) {
+        if (role.trajectory) {
             return new Trajectories(role.dirs, friends, enemies).from(pos);
         } else {
-            return Set.of();
+            Set<Pos> allPoss = role.dirs.stream()
+                .map(dir -> dir.apply(pos))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toSet());
+            allPoss.removeAll(friends);
+            return allPoss;
         }
     }
 
