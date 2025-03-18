@@ -37,7 +37,7 @@ public record Piece(Color color, Role role) {
 
     @Override
     public String toString() {
-        return (color + " " + role).toLowerCase();
+        return (color + "-" + role).toLowerCase();
     }
 
     public char fen() {
