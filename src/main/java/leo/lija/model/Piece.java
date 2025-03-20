@@ -1,11 +1,13 @@
 package leo.lija.model;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static leo.lija.model.Color.BLACK;
+import static leo.lija.model.Color.WHITE;
 
 public record Piece(Color color, Role role) {
 
@@ -14,10 +16,18 @@ public record Piece(Color color, Role role) {
         Set<Pos> enemies = board.occupation().get(color.getOpposite());
 
         if (role == Role.PAWN) {
+            boolean notMoved = (color == WHITE && pos.getY() == 2) || (color == BLACK && pos.getY() == 7);
             Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
-            Set<Pos> result = dir.apply(pos).map(p -> new HashSet<>(Set.of(p))).orElse(new HashSet<>());
-            result.removeAll(friends);
-            return result;
+           return dir.apply(pos).map(one -> {
+                    List<Optional<Pos>> optPositions = List.of(
+                        Optional.of(one).filter(p -> !friends.contains(p)),
+                        notMoved ? dir.apply(one).filter(p -> !friends.contains(p)) : Optional.empty(),
+                        one.left().filter(enemies::contains),
+                        one.right().filter(enemies::contains)
+                    );
+                    return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+                }
+            ).orElse(Set.of());
         }
         else if (role.trajectory) {
             return new Trajectory(role.dirs, friends, enemies).from(pos);

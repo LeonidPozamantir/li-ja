@@ -1,7 +1,7 @@
 package leo.lija.model;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -19,8 +19,10 @@ import java.util.stream.IntStream;
 public class Pos {
 
     @EqualsAndHashCode.Include
+    @Getter
     private final int x;
     @EqualsAndHashCode.Include
+    @Getter
     private final int y;
 
     private Optional<Optional<Pos>> optUp = Optional.empty();

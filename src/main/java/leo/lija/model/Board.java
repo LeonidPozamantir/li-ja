@@ -1,6 +1,7 @@
 package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
+import leo.lija.format.Visual;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import static leo.lija.model.Role.ROOK;
 public class Board {
 
     private static final String NO_PIECE_AT = "No piece at";
+    Visual visual = new Visual();
 
     @Getter
     @EqualsAndHashCode.Include
@@ -94,6 +96,11 @@ public class Board {
             optOccupation = Optional.of(occupation);
         }
         return optOccupation.get();
+    }
+
+    @Override
+    public String toString() {
+        return visual.obj2Str(this);
     }
 
     public Board() {
