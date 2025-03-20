@@ -47,6 +47,10 @@ public class Board {
         return optPiece.get();
     }
 
+    public Set<Pos> basicMoves(Pos from) {
+        return pieceAt(from).basicMoves(from, this);
+    }
+
     public Board placeAt(Piece piece, Pos at) {
         if (pieces.containsKey(at)) throw new ChessRulesException("Cannot place to occupied " + at);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
