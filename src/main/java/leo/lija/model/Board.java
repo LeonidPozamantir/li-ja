@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static leo.lija.model.Color.BLACK;
+import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.KNIGHT;
@@ -111,16 +113,16 @@ public class Board {
                 Piece piece = null;
                 switch (y) {
                     case 1:
-                        piece = new Piece(Color.WHITE, lineUp.get(x - 1));
+                        piece = WHITE.of(lineUp.get(x - 1));
                         break;
                     case 2:
-                        piece = new Piece(Color.WHITE, PAWN);
+                        piece = WHITE.pawn();
                         break;
                     case 7:
-                        piece = new Piece(Color.BLACK, PAWN);
+                        piece = BLACK.pawn();
                         break;
                     case 8:
-                        piece = new Piece(Color.BLACK, lineUp.get(x - 1));
+                        piece = BLACK.of(lineUp.get(x - 1));
                         break;
                     default:
                 }

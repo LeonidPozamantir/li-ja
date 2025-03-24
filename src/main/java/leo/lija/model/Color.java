@@ -15,6 +15,9 @@ public enum Color {
     WHITE,
     BLACK;
 
+    public Piece of(Role role) {
+        return new Piece(this, role);
+    }
     public static Color isW(boolean b) {
         return b ? WHITE : BLACK;
     }
