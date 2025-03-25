@@ -16,14 +16,15 @@ public record Piece(Color color, Role role) {
         Set<Pos> enemies = board.occupation().get(color.getOpposite());
 
         if (role == Role.PAWN) {
-            boolean notMoved = (color == WHITE && pos.getY() == 2) || (color == BLACK && pos.getY() == 7);
-            Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
-           return dir.apply(pos).map(one -> {
+           Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
+           return dir.apply(pos).map(next -> {
+                    boolean notMoved = (color == WHITE && pos.getY() == 2) || (color == BLACK && pos.getY() == 7);
+                    Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
                     List<Optional<Pos>> optPositions = List.of(
-                        Optional.of(one).filter(p -> !friends.contains(p)),
-                        notMoved ? dir.apply(one).filter(p -> !friends.contains(p)) : Optional.empty(),
-                        one.left().filter(enemies::contains),
-                        one.right().filter(enemies::contains)
+                        one,
+                        notMoved ? one.flatMap(o -> dir.apply(o).filter(p -> !board.occupations().contains(p))) : Optional.empty(),
+                        next.left().filter(enemies::contains),
+                        next.right().filter(enemies::contains)
                     );
                     return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
                 }

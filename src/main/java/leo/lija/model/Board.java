@@ -100,6 +100,10 @@ public class Board {
         return optOccupation.get();
     }
 
+    public Set<Pos> occupations() {
+        return pieces.keySet();
+    }
+
     @Override
     public String toString() {
         return visual.obj2Str(this);
