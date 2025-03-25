@@ -8,11 +8,11 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public enum Role {
-    KING('k',false, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    QUEEN('q',true, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    ROOK('r', true, List.of(Pos::up, Pos::down, Pos::left, Pos::right)),
-    BISHOP('b', true, List.of(Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    KNIGHT('n', false,List.of(
+    KING('k',false, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight), false),
+    QUEEN('q',true, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight), true),
+    ROOK('r', true, List.of(Pos::up, Pos::down, Pos::left, Pos::right), true),
+    BISHOP('b', true, List.of(Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight), true),
+    KNIGHT('n', false, List.of(
         pos -> pos.up().flatMap(Pos::upLeft),
         pos -> pos.up().flatMap(Pos::upRight),
         pos -> pos.left().flatMap(Pos::upLeft),
@@ -21,13 +21,14 @@ public enum Role {
         pos -> pos.right().flatMap(Pos::downRight),
         pos -> pos.down().flatMap(Pos::downLeft),
         pos -> pos.down().flatMap(Pos::downRight)
-    )),
-    PAWN('p', false,null);
+    ), true),
+    PAWN('p', false,null, true);
 
     public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
 
     public final char fen;
     public final boolean trajectory;
     final List<Function<Pos, Optional<Pos>>> dirs;
+    public final boolean threatens;
 
 }

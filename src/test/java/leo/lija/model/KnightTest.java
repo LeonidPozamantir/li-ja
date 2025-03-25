@@ -29,20 +29,20 @@ class KnightTest {
 	Visual visual = new Visual();
 
 	private final Piece knight = new Piece(Color.WHITE, KNIGHT);
-	private Set<Pos> basicMoves(Pos pos) {
-		return knight.basicMoves(pos, Board.empty().placeAt(knight, pos));
+	private Set<Pos> moves(Pos pos) {
+		return Board.empty().placeAt(knight, pos).movesFrom(pos);
 	}
 
 	@Test
 	@DisplayName("make L-shaped moves in any direction")
 	void testBasicMoves() {
-		assertThat(basicMoves(E4)).containsExactlyInAnyOrder(F6, G5, G3, F2, D2, C3, C5, D6);
+		assertThat(moves(E4)).containsExactlyInAnyOrder(F6, G5, G3, F2, D2, C3, C5, D6);
 	}
 
 	@Test
 	@DisplayName("make L-shaped moves in any direction when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(basicMoves(H8)).containsExactlyInAnyOrder(G6, F7);
+		assertThat(moves(H8)).containsExactlyInAnyOrder(G6, F7);
 	}
 
 	@Test
@@ -58,7 +58,7 @@ k B
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 
@@ -84,7 +84,7 @@ b
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 

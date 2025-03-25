@@ -41,7 +41,7 @@ public class PawnTest {
 		void testBasicMoves() {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn()
-			)).basicMoves(A4)).containsExactly(A5);
+			)).movesFrom(A4)).containsExactly(A5);
 		}
 
 		@Test
@@ -50,7 +50,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn(),
 					A5, WHITE.pawn()
-			)).basicMoves(A4)).isEmpty();
+			)).movesFrom(A4)).isEmpty();
 		}
 
 		@Test
@@ -60,7 +60,7 @@ public class PawnTest {
 					D4, WHITE.pawn(),
 					C5, BLACK.pawn(),
 					E5, BLACK.bishop()
-			)).basicMoves(D4)).containsExactlyInAnyOrder(C5, D5, E5);
+			)).movesFrom(D4)).containsExactlyInAnyOrder(C5, D5, E5);
 		}
 
 		@Test
@@ -69,7 +69,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn(),
 					C5, WHITE.pawn()
-			)).basicMoves(A4)).containsExactly(A5);
+			)).movesFrom(A4)).containsExactly(A5);
 		}
 
 		@Nested
@@ -81,7 +81,7 @@ public class PawnTest {
 			void pathFree() {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn()
-				)).basicMoves(A2)).containsExactly(A3, A4);
+				)).movesFrom(A2)).containsExactly(A3, A4);
 			}
 
 			@Test
@@ -90,7 +90,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A3, WHITE.rook()
-				)).basicMoves(A2)).isEmpty();
+				)).movesFrom(A2)).isEmpty();
 			}
 
 			@Test
@@ -99,7 +99,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A4, WHITE.rook()
-				)).basicMoves(A2)).containsExactly(A3);
+				)).movesFrom(A2)).containsExactly(A3);
 			}
 
 			@Test
@@ -108,7 +108,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A3, BLACK.rook()
-				)).basicMoves(A2)).isEmpty();
+				)).movesFrom(A2)).isEmpty();
 			}
 
 			@Test
@@ -117,7 +117,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A4, BLACK.rook()
-				)).basicMoves(A2)).containsExactly(A3);
+				)).movesFrom(A2)).containsExactly(A3);
 			}
 		}
 	}
@@ -131,7 +131,7 @@ public class PawnTest {
 		void testBasicMoves() {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn()
-			)).basicMoves(A4)).containsExactly(A3);
+			)).movesFrom(A4)).containsExactly(A3);
 		}
 
 		@Test
@@ -140,7 +140,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn(),
 					A3, BLACK.pawn()
-			)).basicMoves(A4)).isEmpty();
+			)).movesFrom(A4)).isEmpty();
 		}
 
 		@Test
@@ -150,7 +150,7 @@ public class PawnTest {
 					D4, BLACK.pawn(),
 					C3, WHITE.pawn(),
 					E3, WHITE.bishop()
-			)).basicMoves(D4)).containsExactlyInAnyOrder(C3, D3, E3);
+			)).movesFrom(D4)).containsExactlyInAnyOrder(C3, D3, E3);
 		}
 
 		@Test
@@ -159,7 +159,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn(),
 					C3, BLACK.pawn()
-			)).basicMoves(A4)).containsExactlyInAnyOrder(A3);
+			)).movesFrom(A4)).containsExactlyInAnyOrder(A3);
 		}
 
 		@Nested
@@ -171,7 +171,7 @@ public class PawnTest {
 			void pathFree() {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn()
-				)).basicMoves(A7)).containsExactlyInAnyOrder(A6, A5);
+				)).movesFrom(A7)).containsExactlyInAnyOrder(A6, A5);
 			}
 
 			@Test
@@ -180,7 +180,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A6, BLACK.rook()
-				)).basicMoves(A7)).isEmpty();
+				)).movesFrom(A7)).isEmpty();
 			}
 
 			@Test
@@ -189,7 +189,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A5, BLACK.rook()
-				)).basicMoves(A7)).containsExactly(A6);
+				)).movesFrom(A7)).containsExactly(A6);
 			}
 
 			@Test
@@ -198,7 +198,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A6, WHITE.rook()
-				)).basicMoves(A7)).isEmpty();
+				)).movesFrom(A7)).isEmpty();
 			}
 
 			@Test
@@ -207,7 +207,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A5, WHITE.rook()
-				)).basicMoves(A7)).containsExactly(A6);
+				)).movesFrom(A7)).containsExactly(A6);
 			}
 		}
 	}

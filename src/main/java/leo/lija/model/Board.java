@@ -51,8 +51,19 @@ public class Board {
         return optPiece.get();
     }
 
-    public Set<Pos> basicMoves(Pos from) {
-        return pieceAt(from).basicMoves(from, this);
+    public Map<Pos, Actor> actors() {
+        return pieces.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new Actor(e.getValue(), e.getKey(), this)));
+    }
+
+    public Actor actorAt(Pos at) {
+        Actor res = actors().get(at);
+        if (res == null) throw new ChessRulesException(NO_PIECE_AT + " " + at);
+        return res;
+    }
+
+    public Set<Pos> movesFrom(Pos from) {
+        return actorAt(from).moves();
     }
 
     public Board placeAt(Piece piece, Pos at) {

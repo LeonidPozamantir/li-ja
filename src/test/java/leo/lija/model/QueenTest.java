@@ -56,20 +56,20 @@ class QueenTest {
 	Visual visual = new Visual();
 
 	private final Piece queen = new Piece(Color.WHITE, QUEEN);
-	private Set<Pos> basicMoves(Pos pos) {
-		return queen.basicMoves(pos, Board.empty().placeAt(queen, pos));
+	private Set<Pos> moves(Pos pos) {
+		return Board.empty().placeAt(queen, pos).movesFrom(pos);
 	}
 
 	@Test
 	@DisplayName("move in any direction until the edge of the board")
 	void testBasicMoves() {
-		assertThat(basicMoves(D4)).containsExactlyInAnyOrder(D5, D6, D7, D8, D3, D2, D1, E4, F4, G4, H4, C4, B4, A4, C3, B2, A1, E5, F6, G7, H8, C5, B6, A7, E3, F2, G1);
+		assertThat(moves(D4)).containsExactlyInAnyOrder(D5, D6, D7, D8, D3, D2, D1, E4, F4, G4, H4, C4, B4, A4, C3, B2, A1, E5, F6, G7, H8, C5, B6, A7, E3, F2, G1);
 	}
 
 	@Test
 	@DisplayName("move in any direction when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(basicMoves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G7, F6, E5, D4, C3, B2, A1, G8, F8, E8, D8, C8, B8, A8);
+		assertThat(moves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G7, F6, E5, D4, C3, B2, A1, G8, F8, E8, D8, C8, B8, A8);
 	}
 
 	@Test
@@ -85,7 +85,7 @@ N Q    P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B   x
   x  x
@@ -111,7 +111,7 @@ N QP   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
   x  x

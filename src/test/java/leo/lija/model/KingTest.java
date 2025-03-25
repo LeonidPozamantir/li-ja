@@ -29,20 +29,20 @@ class KingTest {
 	Visual visual = new Visual();
 
 	private final Piece king = new Piece(Color.WHITE, KING);
-	private Set<Pos> basicMoves(Pos pos) {
-		return king.basicMoves(pos, Board.empty().placeAt(king, pos));
+	private Set<Pos> moves(Pos pos) {
+		return Board.empty().placeAt(king, pos).actorAt(pos).moves();
 	}
 
 	@Test
 	@DisplayName("move 1 position in any direction")
 	void testBasicMoves() {
-		assertThat(basicMoves(D4)).containsExactlyInAnyOrder(D3, C3, C4, C5, D5, E5, E4, E3);
+		assertThat(moves(D4)).containsExactlyInAnyOrder(D3, C3, C4, C5, D5, E5, E4, E3);
 	}
 
 	@Test
 	@DisplayName("move 1 position in any direction when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(basicMoves(H8)).containsExactlyInAnyOrder(H7, G7, G8);
+		assertThat(moves(H8)).containsExactlyInAnyOrder(H7, G7, G8);
 	}
 
 	@Test
@@ -58,7 +58,7 @@ NPKP   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 
@@ -84,7 +84,7 @@ NPKp   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 

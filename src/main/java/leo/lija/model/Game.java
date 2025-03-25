@@ -24,8 +24,9 @@ public class Game {
         this(new Board(), List.of(), WHITE);
     }
 
-    public Map<Pos, Set<Pos>> basicMoves() {
-        return board.getPieces().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e ->e.getValue().basicMoves(e.getKey(), board)));
+    public Map<Pos, Set<Pos>> moves() {
+        return board.actors().entrySet().stream()
+            .filter(e -> e.getValue().is(nextPlayer))
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().moves()));
     }
 }

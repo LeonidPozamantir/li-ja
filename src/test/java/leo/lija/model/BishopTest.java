@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Set;
 
+import static leo.lija.model.Pos.A6;
 import static leo.lija.model.Pos.A8;
 import static leo.lija.model.Pos.B1;
 import static leo.lija.model.Pos.B7;
@@ -32,20 +33,20 @@ class BishopTest {
 	Visual visual = new Visual();
 
 	private final Piece bishop = new Piece(Color.WHITE, BISHOP);
-	private Set<Pos> basicMoves(Pos pos) {
-		return bishop.basicMoves(pos, Board.empty().placeAt(bishop, pos));
+	private Set<Pos> moves(Pos pos) {
+		return Board.empty().placeAt(bishop, pos).actorAt(pos).moves();
 	}
 
 	@Test
 	@DisplayName("move to any position along the diagonals")
 	void testBasicMoves() {
-		assertThat(basicMoves(E4)).containsExactlyInAnyOrder(F3, G2, H1, D5, C6, B7, A8, D3, C2, B1, F5, G6, H7);
+		assertThat(moves(E4)).containsExactlyInAnyOrder(F3, G2, H1, D5, C6, B7, A8, D3, C2, B1, F5, G6, H7);
 	}
 
 	@Test
 	@DisplayName("move to any position along the diagonals when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(basicMoves(H7)).containsExactlyInAnyOrder(G8, G6, F5, E4, D3, C2, B1);
+		assertThat(moves(H7)).containsExactlyInAnyOrder(G8, G6, F5, E4, D3, C2, B1);
 	}
 
 	@Test
@@ -61,7 +62,7 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B   x
      x
@@ -87,7 +88,7 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.pieceAt(C4).basicMoves(C4, board);
+		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
      x
@@ -98,5 +99,20 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """);
+	}
+
+	@Test
+	@DisplayName("threaten enemies")
+	void testThreatensEnemies() {
+		assertThat(visual.str2Obj("""
+k B
+     q
+p
+
+N B    P
+
+PPPPPPPP
+ NBQKBNR
+""").actorAt(C4).threatens(A6)).isTrue();
 	}
 }
