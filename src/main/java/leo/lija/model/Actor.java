@@ -57,7 +57,7 @@ public class Actor {
 
 	public boolean threatens(Pos to) {
 		Role role = piece.role();
-		Set<Pos> positions = new HashSet<>();
+		Set<Pos> positions;
 
 		if (role == Role.PAWN) {
 			positions = dir().apply(pos)
