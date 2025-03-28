@@ -35,6 +35,10 @@ public class Board {
     @EqualsAndHashCode.Include
     private final Map<Pos, Piece> pieces;
 
+    @Getter
+    @EqualsAndHashCode.Include
+    private final History history;
+
     private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
 
     public Optional<Piece> at (Pos at) {
@@ -97,6 +101,10 @@ public class Board {
         return new Board(piecesNew);
     }
 
+    public Board withHistory(History h) {
+        return new Board(pieces, h);
+    }
+
     public Map<Color, Set<Pos>> occupation() {
         if (optOccupation.isEmpty()) {
             Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(
@@ -145,6 +153,11 @@ public class Board {
             }
         }
         this.pieces = piecesNew;
+        this.history = new History();
+    }
+
+    public Board(Map<Pos, Piece> pieces) {
+        this(pieces, new History());
     }
 
     public static Board empty() {

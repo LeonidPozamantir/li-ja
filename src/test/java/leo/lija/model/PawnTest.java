@@ -4,8 +4,10 @@ import leo.lija.format.Visual;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.util.Pair;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static leo.lija.model.Color.BLACK;
@@ -18,11 +20,16 @@ import static leo.lija.model.Pos.A6;
 import static leo.lija.model.Pos.A7;
 import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.C5;
+import static leo.lija.model.Pos.C6;
+import static leo.lija.model.Pos.C7;
 import static leo.lija.model.Pos.D3;
 import static leo.lija.model.Pos.D4;
 import static leo.lija.model.Pos.D5;
+import static leo.lija.model.Pos.D6;
 import static leo.lija.model.Pos.E3;
 import static leo.lija.model.Pos.E5;
+import static leo.lija.model.Pos.E6;
+import static leo.lija.model.Pos.E7;
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.PAWN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +125,65 @@ public class PawnTest {
 					A2, WHITE.pawn(),
 					A4, BLACK.rook()
 				)).movesFrom(A2)).containsExactly(A3);
+			}
+		}
+
+		@Nested
+		@DisplayName("capture en passant")
+		class EnPassant {
+
+			@Nested
+			@DisplayName("with proper position")
+			class ProperPosition {
+				Board board = new Board(Map.of(
+					D5, WHITE.pawn(),
+					C5, BLACK.pawn(),
+					E5, BLACK.pawn()
+				));
+
+				@Test
+				@DisplayName("without history")
+				void withoutHistory() {
+					assertThat(board.movesFrom(D5)).containsExactly(D6);
+				}
+
+				@Test
+				@DisplayName("with irrelevant history")
+				void withIrrelevantHistory() {
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(A2, A4)))).movesFrom(D5)).containsExactly(D6);
+				}
+
+				@Test
+				@DisplayName("with relevant history on the left")
+				void withRelevantHistoryLeft() {
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(C7, C5)))).movesFrom(D5)).containsExactlyInAnyOrder(D6, C6);
+				}
+
+				@Test
+				@DisplayName("with relevant history on the right")
+				void withRelevantHistoryRight() {
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(E7, E5)))).movesFrom(D5)).containsExactlyInAnyOrder(D6, E6);
+				}
+			}
+
+			@Test
+			@DisplayName("enemy not-a-pawn")
+			void enemyNotPawn() {
+				Board board = new Board(Map.of(
+					D5, WHITE.pawn(),
+					E5, BLACK.rook()
+				), new History(Optional.of(Pair.of(E7, E5))));
+				assertThat(board.movesFrom(D5)).containsExactly(D6);
+			}
+
+			@Test
+			@DisplayName("friend pawn (?!)")
+			void friendPawn() {
+				Board board = new Board(Map.of(
+					D5, WHITE.pawn(),
+					E5, WHITE.pawn()
+				), new History(Optional.of(Pair.of(E7, E5))));
+				assertThat(board.movesFrom(D5)).containsExactly(D6);
 			}
 		}
 	}

@@ -15,13 +15,12 @@ import static leo.lija.model.Color.WHITE;
 public class Game {
 
     private Board board;
-    private List<Pair<Pos, Pos>> history;
     private Color nextPlayer;
 
     private final List<Color> players = List.of(WHITE, BLACK);
 
     public Game() {
-        this(new Board(), List.of(), WHITE);
+        this(new Board(), WHITE);
     }
 
     public Map<Pos, Set<Pos>> moves() {
