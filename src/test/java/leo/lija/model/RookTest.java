@@ -7,12 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static leo.lija.model.Pos.A2;
 import static leo.lija.model.Pos.A4;
 import static leo.lija.model.Pos.A6;
 import static leo.lija.model.Pos.A8;
 import static leo.lija.model.Pos.B4;
-import static leo.lija.model.Pos.B5;
 import static leo.lija.model.Pos.B8;
 import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.C4;
@@ -20,7 +18,6 @@ import static leo.lija.model.Pos.C5;
 import static leo.lija.model.Pos.C6;
 import static leo.lija.model.Pos.C7;
 import static leo.lija.model.Pos.C8;
-import static leo.lija.model.Pos.D3;
 import static leo.lija.model.Pos.D4;
 import static leo.lija.model.Pos.D8;
 import static leo.lija.model.Pos.E1;

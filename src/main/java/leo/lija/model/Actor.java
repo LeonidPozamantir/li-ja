@@ -26,23 +26,7 @@ public class Actor {
 		Role role = piece.role();
 
 		if (role == Role.PAWN) {
-			Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
-			return dir.apply(pos).map(next -> {
-					boolean notMoved = (color == WHITE && pos.getY() == 2) || (color == BLACK && pos.getY() == 7);
-					boolean passable = (color == WHITE && pos.getY() == 5) || (color == BLACK && pos.getY() == 4);
-					Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
-
-					List<Optional<Pos>> optPositions = List.of(
-						one,
-						notMoved ? one.flatMap(o -> dir.apply(o).filter(p -> !board.occupations().contains(p))) : Optional.empty(),
-						next.left().filter(enemies::contains),
-						next.right().filter(enemies::contains),
-						passable ? enpassant(dir, next, Pos::left) : Optional.empty(),
-						passable ? enpassant(dir, next, Pos::right) : Optional.empty()
-					);
-					return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
-				}
-			).orElse(Set.of());
+			return pawnMoves();
 		}
 		else if (role.trajectory) {
 			return new Trajectory(role.dirs, friends, enemies).from(pos);
@@ -54,6 +38,28 @@ public class Actor {
 			allPoss.removeAll(friends);
 			return allPoss;
 		}
+	}
+
+	private Set<Pos> pawnMoves() {
+		Color color = color();
+		Set<Pos> enemies = board.occupation().get(color.getOpposite());
+		Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
+		return dir.apply(pos).map(next -> {
+				boolean notMoved = (color == WHITE && pos.getY() == 2) || pos.getY() == 7;
+				boolean passable = (color == WHITE && pos.getY() == 5) || pos.getY() == 4;
+				Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
+
+				List<Optional<Pos>> optPositions = List.of(
+					one,
+					notMoved ? one.flatMap(o -> dir.apply(o).filter(p -> !board.occupations().contains(p))) : Optional.empty(),
+					next.left().filter(enemies::contains),
+					next.right().filter(enemies::contains),
+					passable ? enpassant(dir, next, Pos::left) : Optional.empty(),
+					passable ? enpassant(dir, next, Pos::right) : Optional.empty()
+				);
+				return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+			}
+		).orElse(Set.of());
 	}
 
 	private Optional<Pos> enpassant(Function<Pos, Optional<Pos>> dir, Pos next, Function<Pos, Optional<Pos>> horizontal) {
