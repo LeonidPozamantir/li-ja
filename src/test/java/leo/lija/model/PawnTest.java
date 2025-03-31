@@ -18,7 +18,9 @@ import static leo.lija.model.Pos.A4;
 import static leo.lija.model.Pos.A5;
 import static leo.lija.model.Pos.A6;
 import static leo.lija.model.Pos.A7;
+import static leo.lija.model.Pos.C2;
 import static leo.lija.model.Pos.C3;
+import static leo.lija.model.Pos.C4;
 import static leo.lija.model.Pos.C5;
 import static leo.lija.model.Pos.C6;
 import static leo.lija.model.Pos.C7;
@@ -26,7 +28,9 @@ import static leo.lija.model.Pos.D3;
 import static leo.lija.model.Pos.D4;
 import static leo.lija.model.Pos.D5;
 import static leo.lija.model.Pos.D6;
+import static leo.lija.model.Pos.E2;
 import static leo.lija.model.Pos.E3;
+import static leo.lija.model.Pos.E4;
 import static leo.lija.model.Pos.E5;
 import static leo.lija.model.Pos.E6;
 import static leo.lija.model.Pos.E7;
@@ -275,6 +279,45 @@ public class PawnTest {
 					A5, WHITE.rook()
 				)).movesFrom(A7)).containsExactly(A6);
 			}
+		}
+
+		@Nested
+		@DisplayName("capture en passant")
+		class EnPassant {
+
+			@Nested
+			@DisplayName("with proper position")
+			class ProperPosition {
+				Board board = new Board(Map.of(
+					D4, BLACK.pawn(),
+					C4, WHITE.pawn(),
+					E4, WHITE.pawn()
+				));
+
+				@Test
+				@DisplayName("without history")
+				void withoutHistory() {
+					assertThat(board.movesFrom(D4)).containsExactly(D3);
+				}
+
+				@Test
+				@DisplayName("with relevant history on the left")
+				void withRelevantHistoryLeft() {
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(C2, C4)))).movesFrom(D4)).containsExactlyInAnyOrder(D3, C3);
+				}
+
+			}
+
+			@Test
+			@DisplayName("enemy not-a-pawn")
+			void enemyNotPawn() {
+				Board board = new Board(Map.of(
+					D4, BLACK.pawn(),
+					E4, WHITE.rook()
+				), new History(Optional.of(Pair.of(E2, E4))));
+				assertThat(board.movesFrom(D4)).containsExactly(D3);
+			}
+
 		}
 	}
 }
