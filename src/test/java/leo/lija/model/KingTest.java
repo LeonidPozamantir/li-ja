@@ -96,4 +96,20 @@ PPPPPPPP
  NBQKBNR
 """);
 	}
+
+	@Test
+	@DisplayName("threaten nothing")
+	void testThreatenNothing() {
+		Board board = visual.str2Obj("""
+k B
+
+ b B
+bpp
+  Kb
+    Q
+PPP  PPP
+ NBQ BNR
+""");
+		assertThat(Pos.all()).noneMatch(pos -> board.actorAt(C4).threatens(pos));
+	}
 }

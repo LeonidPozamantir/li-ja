@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -281,4 +282,7 @@ public class Pos {
             Map.entry("h1", H1), Map.entry("h2", H2), Map.entry("h3", H3), Map.entry("h4", H4), Map.entry("h5", H5), Map.entry("h6", H6), Map.entry("h7", H7), Map.entry("h8", H8)
     );
 
+    public static Collection<Pos> all() {
+        return allKeys.values();
+    }
 }

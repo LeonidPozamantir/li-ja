@@ -2,16 +2,21 @@ package leo.lija.model;
 
 import leo.lija.format.Visual;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
 
+import static leo.lija.model.Pos.A5;
+import static leo.lija.model.Pos.A8;
+import static leo.lija.model.Pos.B4;
 import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.C4;
 import static leo.lija.model.Pos.C5;
 import static leo.lija.model.Pos.D2;
 import static leo.lija.model.Pos.D6;
+import static leo.lija.model.Pos.E3;
 import static leo.lija.model.Pos.E4;
 import static leo.lija.model.Pos.F2;
 import static leo.lija.model.Pos.F6;
@@ -95,5 +100,50 @@ x   x
 PPPx PPP
  NBQKBNR
 """);
+	}
+
+	@Nested
+	@DisplayName("threaten")
+	class Threatens {
+		Board board = visual.str2Obj("""
+k B
+
+ b B
+b
+  N
+    Q
+PPP  PPP
+ NBQKBNR
+""");
+
+		@Test
+		@DisplayName("reachable enemy")
+		void testReachableEnemy() {
+			assertThat(board.actorAt(C4).threatens(A5)).isTrue();
+		}
+
+		@Test
+		@DisplayName("unreachable enemy")
+		void testUnreachableEnemy() {
+			assertThat(board.actorAt(C4).threatens(A8)).isFalse();
+		}
+
+		@Test
+		@DisplayName("reachable friend")
+		void testReachableFriend() {
+			assertThat(board.actorAt(C4).threatens(E3)).isFalse();
+		}
+
+		@Test
+		@DisplayName("nothing left")
+		void testLeft() {
+			assertThat(board.actorAt(C4).threatens(B4)).isFalse();
+		}
+
+		@Test
+		@DisplayName("nothing up")
+		void testUp() {
+			assertThat(board.actorAt(C4).threatens(C5)).isFalse();
+		}
 	}
 }
