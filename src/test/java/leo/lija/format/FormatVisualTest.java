@@ -16,6 +16,7 @@ import static leo.lija.model.Pos.F7;
 import static leo.lija.model.Pos.G8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,24 @@ R   K  R
         void nonDestructive() {
             assertThatIterable(examples).isNotEmpty();
             assertThat(examples).allMatch(e -> visual.newLine(visual.obj2Str(visual.str2Obj(e))).equals(e));
+        }
+
+        @Test
+        @DisplayName("partial board representation")
+        void partialBoard() {
+            assertEquals(visual.str2Obj("""
+    P n
+PPPP   P
+RNBQK  R"""), visual.str2Obj("""
+
+
+
+
+
+    P n
+PPPP   P
+RNBQK  R
+"""));
         }
 
         @Test

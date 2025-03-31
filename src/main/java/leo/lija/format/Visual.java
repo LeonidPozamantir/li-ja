@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * r bqkb r
@@ -38,7 +39,9 @@ public class Visual implements Format<Board> {
     @Override
     public Board str2Obj(String str) {
         List<String> rawLines = List.of(str.split("\n"));
-        List<String> lines = rawLines.size() == 8 ? rawLines : rawLines.subList(0, 8);
+        List<String> lines = rawLines.size() == 8 ? rawLines
+            : rawLines.size() > 8 ? rawLines.subList(0, 8)
+            : Stream.concat(Stream.generate(() -> "").limit(8 - rawLines.size()), rawLines.stream()).toList();
 
         Map<Pos, Piece> boardPieces = new HashMap<>();
         for (int y = 0; y < lines.size(); y++) {
