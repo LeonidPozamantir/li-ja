@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +61,23 @@ public class Board {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new Actor(e.getValue(), e.getKey(), this)));
     }
 
+    public List<Actor> actorsOf(Color color) {
+        return actors().values().stream()
+            .filter(a -> a.is(color))
+            .collect(Collectors.toList());
+    }
+
     public Actor actorAt(Pos at) {
         Actor res = actors().get(at);
         if (res == null) throw new ChessRulesException(NO_PIECE_AT + " " + at);
         return res;
+    }
+
+    public Optional<Pos> kingPosOf(Color color) {
+        return pieces.entrySet().stream()
+                .filter(e -> e.getValue().equals(color.king()))
+                .map(Map.Entry::getKey)
+                .findFirst();
     }
 
     public Set<Pos> movesFrom(Pos from) {

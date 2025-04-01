@@ -91,7 +91,7 @@ k B
 
  xxP
 NPKx   P
- xxx
+ x x
 PPPPPPPP
  NBQKBNR
 """);

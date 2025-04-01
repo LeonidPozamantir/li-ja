@@ -3,7 +3,10 @@ package leo.lija.model;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -11,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
+import static leo.lija.model.Role.PAWN;
 
 @RequiredArgsConstructor
 public class Actor {
@@ -20,22 +24,37 @@ public class Actor {
 	private final Board board;
 
 	public Set<Pos> moves() {
+		return implications().keySet();
+	}
+
+	private Map<Pos, Board> implications() {
+		Set<Pos> tos = tos();
+		Map<Pos, Board> implicationsWithoutSafety;
+		if (piece.is(PAWN)) {
+			implicationsWithoutSafety = tos.stream().collect(Collectors.toMap(Function.identity(), to -> board));
+		} else {
+			implicationsWithoutSafety = tos.stream().collect(Collectors.toMap(Function.identity(), to -> enemies().contains(to)
+				? board.take(to).moveTo(pos, to)
+				: board.moveTo(pos, to)));
+		}
+		return kingSafety(implicationsWithoutSafety);
+	}
+
+	private Set<Pos> tos() {
 		Color color = color();
-		Set<Pos> friends = board.occupation().get(color);
-		Set<Pos> enemies = board.occupation().get(color.getOpposite());
 		Role role = piece.role();
 
 		if (role == Role.PAWN) {
 			return pawnMoves();
 		}
 		else if (role.trajectory) {
-			return new Trajectory(role.dirs, friends, enemies).from(pos);
+			return trajectories(role.dirs);
 		} else {
 			Set<Pos> allPoss = role.dirs.stream()
 				.map(dir -> dir.apply(pos))
 				.filter(Optional::isPresent).map(Optional::get)
 				.collect(Collectors.toSet());
-			allPoss.removeAll(friends);
+			allPoss.removeAll(friends());
 			return allPoss;
 		}
 	}
@@ -73,6 +92,13 @@ public class Actor {
 		return board.getHistory().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))
 			? optTargetPos
 			: Optional.empty();
+	}
+
+	private Map<Pos, Board> kingSafety(Map<Pos, Board> implications) {
+		return implications.entrySet().stream()
+			.filter(e -> e.getValue().actorsOf(color().getOpposite()).stream()
+				.noneMatch(a -> e.getValue().kingPosOf(color()).map(a::threatens).orElse(false)))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public boolean threatens(Pos to) {
@@ -117,5 +143,20 @@ public class Actor {
 	}
 	Function<Pos, Optional<Pos>> dir() {
 		return color() == WHITE ? Pos::up : Pos::down;
+	}
+
+	private Set<Pos> trajectories(List<Function<Pos, Optional<Pos>>> dirs) {
+		return dirs.stream().flatMap(dir -> forward(pos, dir).stream()).collect(Collectors.toSet());
+	}
+
+	private List<Pos> forward(Pos p, Function<Pos, Optional<Pos>> dir) {
+		List<Pos> res = new ArrayList<>();
+		Optional<Pos> next = dir.apply(p);
+		while (next.isPresent() && !friends().contains(next.get())) {
+			res.add(next.get());
+			if (enemies().contains(next.get())) break;
+			next = dir.apply(next.get());
+		}
+		return res;
 	}
 }

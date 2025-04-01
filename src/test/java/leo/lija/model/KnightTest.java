@@ -83,9 +83,9 @@ PPPx PPP
 k B
 
  b B
-b
+n
   N
-    q
+    b
 PPP  PPP
  NBQKBNR
 """);
@@ -109,7 +109,7 @@ PPPx PPP
 k B
 
  b B
-b
+n
   N
     Q
 PPP  PPP
