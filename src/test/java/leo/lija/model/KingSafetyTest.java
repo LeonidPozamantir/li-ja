@@ -32,7 +32,7 @@ class KingSafetyTest {
 		@DisplayName("not commit suicide")
 		void notCommitSuicide() {
 			Board board = visual.str2Obj("""
-	P n
+    P n
 PPPP   P
 RNBQK  R""");
 			assertThat(board.movesFrom(E1)).containsExactly(F2);
@@ -160,10 +160,10 @@ RNB K  R""");
 			@Test
 			void pawn() {
 				Board board = visual.str2Obj("""
-  b
- k P  r
+
+ K P  r
 PPP
-RNB K  R""");
+RNB    R""");
 				assertThat(board.movesFrom(D3)).isEmpty();
 			}
 		}

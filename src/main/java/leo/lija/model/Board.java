@@ -106,6 +106,14 @@ public class Board {
         return new Board(piecesNew);
     }
 
+    public Optional<Board> moveToOption(Pos orig, Pos dest) {
+        try {
+            return Optional.of(moveTo(orig, dest));
+        } catch (ChessRulesException e) {
+            return Optional.empty();
+        }
+    }
+
     public Board promoteTo(Pos at, Role role) {
         if (role == PAWN || role == KING) throw new ChessRulesException("Cannot promote to " + role);
         if (!pieces.containsKey(at) || pieces.get(at).role() != PAWN)

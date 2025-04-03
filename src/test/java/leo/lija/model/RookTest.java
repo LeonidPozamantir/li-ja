@@ -112,9 +112,15 @@ PPPPPPPP
 """);
 
         @Test
-        @DisplayName("reachable enemy")
-        void testReachableEnemy() {
+        @DisplayName("reachable enemy to the left")
+        void testReachableEnemyLeft() {
             assertThat(board.actorAt(C4).threatens(A4)).isTrue();
+        }
+
+        @Test
+        @DisplayName("reachable enemy to the top")
+        void testReachableEnemyTop() {
+            assertThat(board.actorAt(C4).threatens(C7)).isTrue();
         }
 
         @Test
