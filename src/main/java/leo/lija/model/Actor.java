@@ -1,5 +1,6 @@
 package leo.lija.model;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 
@@ -18,6 +19,7 @@ import static leo.lija.model.Role.PAWN;
 public class Actor {
 
 	private final Piece piece;
+	@Getter
 	private final Pos pos;
 	private final Board board;
 

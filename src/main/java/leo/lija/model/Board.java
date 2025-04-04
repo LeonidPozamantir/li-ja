@@ -40,6 +40,7 @@ public class Board {
     private final History history;
 
     private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
+    private Optional<Map<Color, List<Actor>>> optColorActors = Optional.empty();
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
@@ -60,10 +61,16 @@ public class Board {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new Actor(e.getValue(), e.getKey(), this)));
     }
 
+    public Map<Color, List<Actor>> colorActors() {
+        if (optColorActors.isEmpty()) {
+            Map<Color, List<Actor>> colorActors = actors().values().stream().collect(Collectors.groupingBy(a -> a.color()));
+            optColorActors = Optional.of(colorActors);
+        }
+        return optColorActors.get();
+    }
+
     public List<Actor> actorsOf(Color color) {
-        return actors().values().stream()
-            .filter(a -> a.is(color))
-            .toList();
+        return colorActors().getOrDefault(color, List.of());
     }
 
     public Actor actorAt(Pos at) {

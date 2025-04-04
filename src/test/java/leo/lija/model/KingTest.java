@@ -80,7 +80,7 @@ PPPPPPPP
 	}
 
 	@Test
-	@Disabled
+	@Disabled("incorrect expectation")
 	@DisplayName("capture enemy pieces")
 	void testCapture() {
 		Board board = visual.str2Obj("""
