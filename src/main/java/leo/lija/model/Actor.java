@@ -105,14 +105,12 @@ public class Actor {
 				.orElse(List.of());
 		} else if (role.trajectory) {
 			threats = posTrajectories(role.dirs);
-		} else if (role.threatens) {
+		} else {
 			threats = role.dirs.stream()
 				.map(dir -> dir.apply(pos))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.toList();
-		} else {
-			threats = List.of();
 		}
 
 		return threats.contains(to) && enemies().contains(to);

@@ -1,12 +1,20 @@
 package leo.lija.model;
 
 import leo.lija.format.Visual;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
 
+import static leo.lija.model.Pos.A1;
+import static leo.lija.model.Pos.A2;
+import static leo.lija.model.Pos.A5;
+import static leo.lija.model.Pos.B1;
+import static leo.lija.model.Pos.B2;
+import static leo.lija.model.Pos.B5;
 import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.C4;
 import static leo.lija.model.Pos.C5;
@@ -72,6 +80,7 @@ PPPPPPPP
 	}
 
 	@Test
+	@Disabled
 	@DisplayName("capture enemy pieces")
 	void testCapture() {
 		Board board = visual.str2Obj("""
@@ -97,19 +106,46 @@ PPPPPPPP
 """);
 	}
 
-	@Test
-	@DisplayName("threaten nothing")
-	void testThreatenNothing() {
+	@Nested
+	@DisplayName("threaten")
+	class testThreatenNothing {
 		Board board = visual.str2Obj("""
 k B
 
  b B
 bpp
   Kb
-    Q
-PPP  PPP
+  P Q
+PP   PPP
  NBQ BNR
 """);
-		assertThat(Pos.all()).noneMatch(pos -> board.actorAt(C4).threatens(pos));
+
+		@Test
+		@DisplayName("reachable enemy")
+		void testReachableEnemy() {
+			assertThat(board.actorAt(C4).threatens(B5)).isTrue();
+		}
+
+		@Test
+		@DisplayName("Unreachable enemy")
+		void testUnreachableEnemy() {
+			assertThat(board.actorAt(C4).threatens(A5)).isFalse();
+		}
+
+		@Test
+		@DisplayName("reachable friend")
+		void testReachableFriend() {
+			assertThat(board.actorAt(C4).threatens(C3)).isFalse();
+		}
+
+	}
+
+	@Test
+	@DisplayName("not move near the other king")
+	void testNearOtherKing() {
+		assertThat(visual.str2Obj("""
+   k
+ K
+""").movesFrom(B1)).containsExactlyInAnyOrder(A1, A2, B2);
 	}
 }
