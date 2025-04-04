@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class Board {
     public List<Actor> actorsOf(Color color) {
         return actors().values().stream()
             .filter(a -> a.is(color))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Actor actorAt(Pos at) {
@@ -91,11 +90,24 @@ public class Board {
         return new Board(piecesNew);
     }
 
-    public Board take(Pos at) {
-        if (!pieces.containsKey(at)) throw new ChessRulesException(NO_PIECE_AT + " " + at + " to move");
-        Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        piecesNew.remove(at);
-        return new Board(piecesNew);
+    public Board takeValid(Pos at) {
+        return take(at).orElseThrow(() -> new ChessRulesException(NO_PIECE_AT + " " + at + " to move"));
+    }
+
+    public Optional<Board> take(Pos at) {
+        return Optional.ofNullable(pieces.get(at)).map(p -> {
+            Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
+            piecesNew.remove(at);
+            return new Board(piecesNew);
+        });
+    }
+
+    public Optional<Board> taking(Pos orig, Pos dest) {
+        return taking(orig, dest, Optional.empty());
+    }
+
+    public Optional<Board> taking(Pos orig, Pos dest, Optional<Pos> taking) {
+        return take(taking.orElse(dest)).flatMap(b -> b.move(orig, dest));
     }
 
     public Board moveTo(Pos orig, Pos dest) {
@@ -106,7 +118,7 @@ public class Board {
         return new Board(piecesNew);
     }
 
-    public Optional<Board> moveToOption(Pos orig, Pos dest) {
+    public Optional<Board> move(Pos orig, Pos dest) {
         try {
             return Optional.of(moveTo(orig, dest));
         } catch (ChessRulesException e) {

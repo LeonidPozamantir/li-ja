@@ -41,7 +41,7 @@ class BoardTest {
     @Test
     @DisplayName("Should allow piece to be taken")
     void pieceCanBeTaken() {
-        Board newBoard = newGameBoard.take(A1);
+        Board newBoard = newGameBoard.takeValid(A1);
         assertThat(newBoard.at(A1)).isEmpty();
     }
 

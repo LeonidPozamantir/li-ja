@@ -36,10 +36,10 @@ public class Actor {
 					Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
 
 					List<Optional<Pair<Pos, Board>>> optPositions = List.of(
-						one.flatMap(p -> board.moveToOption(pos, p).map(b -> Pair.of(p, b))),
+						one.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
 						one.filter((p) -> notMoved)
 							.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
-								.flatMap(p2 -> board.moveToOption(pos, p2).map(b -> Pair.of(p2, b)))),
+								.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
 						capture(Pos::left, next),
 						capture(Pos::right, next),
 						enpassant(dir, next, Pos::left),
@@ -58,7 +58,7 @@ public class Actor {
 				.collect(Collectors.toSet());
 			tos.removeAll(friends());
 			implicationsWithoutSafety = tos.stream().collect(Collectors.toMap(Function.identity(), to -> enemies().contains(to)
-				? board.take(to).moveTo(pos, to)
+				? board.taking(pos, to).get()
 				: board.moveTo(pos, to)));
 		}
 
@@ -67,7 +67,7 @@ public class Actor {
 
 	private Optional<Pair<Pos, Board>> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
 		Optional<Pos> optPos = horizontal.apply(next).filter(enemies()::contains);
-		Optional<Board> optBoard = optPos.map(p -> board.take(p).moveTo(pos, p));
+		Optional<Board> optBoard = optPos.flatMap(p -> board.taking(pos, p));
 		return optBoard.map(b -> Pair.of(optPos.get(), b));
 	}
 
@@ -75,14 +75,13 @@ public class Actor {
 		boolean passable = (color() == WHITE && pos.getY() == 5) || pos.getY() == 4;
 		if (!passable) return Optional.empty();
 		Optional<Pos> optVictimPos = horizontal.apply(pos);
-		Optional<Piece> optVictim = optVictimPos.flatMap(board::at).filter(piece -> piece.equals(color().getOpposite().pawn()));
+		Optional<Piece> optVictim = optVictimPos.flatMap(board::at).filter(p -> p.equals(color().getOpposite().pawn()));
 		return optVictim.flatMap(victim -> {
 			Optional<Pos> optTargetPos = horizontal.apply(next);
 			Optional<Pos> optVictimFrom = optVictimPos.flatMap(dir).flatMap(dir);
 			if (!board.getHistory().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))) return Optional.empty();
-			Board b1 = board.moveToOption(pos, optTargetPos.get()).get();
-			Board b2 = b1.take(optVictimPos.get());
-			return Optional.of(Pair.of(optTargetPos.get(), b2));
+			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
+			return Optional.of(Pair.of(optTargetPos.get(), b));
 		});
 	}
 
@@ -94,30 +93,29 @@ public class Actor {
 	}
 
 	boolean threatens(Pos to) {
-		return threats().contains(to) && enemies().contains(to);
-	}
-
-	Set<Pos> threats() {
 		Role role = piece.role();
+		List<Pos> threats;
 
 		if (role == Role.PAWN) {
-			return dir().apply(pos)
-				.map(next -> Set.of(next.left(), next.right()).stream()
+			threats = dir().apply(pos)
+				.map(next -> List.of(next.left(), next.right()).stream()
 					.filter(Optional::isPresent)
 					.map(Optional::get)
-					.collect(Collectors.toSet()))
-				.orElse(Set.of());
+					.toList())
+				.orElse(List.of());
 		} else if (role.trajectory) {
-			return posTrajectories(role.dirs);
+			threats = posTrajectories(role.dirs);
 		} else if (role.threatens) {
-			return role.dirs.stream()
+			threats = role.dirs.stream()
 				.map(dir -> dir.apply(pos))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.collect(Collectors.toSet());
+				.toList();
 		} else {
-			return Set.of();
+			threats = List.of();
 		}
+
+		return threats.contains(to) && enemies().contains(to);
 	}
 
 	Color color() {
@@ -136,8 +134,8 @@ public class Actor {
 		return color() == WHITE ? Pos::up : Pos::down;
 	}
 
-	private Set<Pos> posTrajectories(List<Function<Pos, Optional<Pos>>> dirs) {
-		return dirs.stream().flatMap(dir -> forwardPos(pos, dir).stream()).collect(Collectors.toSet());
+	private List<Pos> posTrajectories(List<Function<Pos, Optional<Pos>>> dirs) {
+		return dirs.stream().flatMap(dir -> forwardPos(pos, dir).stream()).toList();
 	}
 
 	private List<Pos> forwardPos(Pos p, Function<Pos, Optional<Pos>> dir) {
@@ -161,7 +159,7 @@ public class Actor {
 		while (optNext.isPresent() && !friends().contains(optNext.get())) {
 			Pos next = optNext.get();
 			if (enemies().contains(next)) {
-				res.add(Pair.of(next, board.take(next).moveTo(p, next)));
+				res.add(Pair.of(next, board.taking(p, next).get()));
 				break;
 			}
 			res.add(Pair.of(next, board.moveTo(p, next)));
