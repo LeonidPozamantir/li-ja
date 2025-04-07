@@ -146,6 +146,10 @@ public class Board {
         return new Board(pieces, h);
     }
 
+    public Situation as(Color c) {
+        return new Situation(this, c);
+    }
+
     public Map<Color, Set<Pos>> occupation() {
         if (optOccupation.isEmpty()) {
             Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(

@@ -22,25 +22,7 @@ public class Game {
         this(new Board(), WHITE);
     }
 
-    List<Actor> actors() {
-        return board.actorsOf(player);
-    }
-
-    public Map<Pos, Set<Pos>> moves() {
-        return actors().stream()
-            .collect(Collectors.toMap(Actor::getPos, Actor::moves));
-    }
-
-    public boolean check() {
-        return board.kingPosOf(player).map(king -> board.actorsOf(player.getOpposite()).stream().noneMatch(a -> a.threatens(king)))
-            .orElse(false);
-    }
-
-    public boolean checkmate() {
-        return check() && moves().isEmpty();
-    }
-
-    public boolean stalemate() {
-        return !check() && moves().isEmpty();
+    public Situation situation() {
+        return board.as(player);
     }
 }
