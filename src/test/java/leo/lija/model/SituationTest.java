@@ -37,6 +37,70 @@ K  r
 K
 """).as(WHITE).check()).isTrue();
 			}
+
+			@Test
+			@DisplayName("not")
+			void not() {
+				assertThat(visual.str2Obj("""
+   n
+K
+""").as(WHITE).check()).isFalse();
+			}
+		}
+
+		@Nested
+		@DisplayName("checkmate")
+		class Checkmate {
+
+			@Test
+			@DisplayName("by rook")
+			void byRook() {
+				assertThat(visual.str2Obj("""
+PP
+K  r
+""").as(WHITE).check()).isTrue();
+			}
+
+			@Test
+			@DisplayName("by knight")
+			void byKnight() {
+				assertThat(visual.str2Obj("""
+PPn
+KR
+""").as(WHITE).check()).isTrue();
+			}
+
+			@Test
+			@DisplayName("not")
+			void not() {
+				assertThat(visual.str2Obj("""
+   n
+K
+""").as(WHITE).check()).isFalse();
+			}
+		}
+
+		@Nested
+		@DisplayName("stalemate")
+		class Stalemate {
+
+			@Test
+			@DisplayName("stuck in a corner")
+			void stuckInACorner() {
+				assertThat(visual.str2Obj("""
+prr
+K
+""").as(WHITE).stalemate()).isTrue();
+			}
+
+			@Test
+			@DisplayName("not")
+			void not() {
+				assertThat(visual.str2Obj("""
+  b
+K
+""").as(WHITE).stalemate()).isFalse();
+			}
 		}
 	}
 }

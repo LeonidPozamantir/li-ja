@@ -19,6 +19,7 @@ public class Situation {
 
 	public Map<Pos, Set<Pos>> moves() {
 		return actors().stream()
+			.filter(a -> !a.moves().isEmpty())
 			.collect(Collectors.toMap(Actor::getPos, Actor::moves));
 	}
 

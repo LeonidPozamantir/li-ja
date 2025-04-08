@@ -23,11 +23,15 @@ public class Actor {
 	private final Pos pos;
 	private final Board board;
 
+	private Optional<Map<Pos, Board>> cachedImplications = Optional.empty();
+
 	public Set<Pos> moves() {
 		return implications().keySet();
 	}
 
 	private Map<Pos, Board> implications() {
+		if (cachedImplications.isPresent()) return cachedImplications.get();
+
 		Map<Pos, Board> implicationsWithoutSafety;
 		Color color = color();
 		Role role = piece.role();
@@ -64,7 +68,9 @@ public class Actor {
 				: board.moveTo(pos, to)));
 		}
 
-		return kingSafety(implicationsWithoutSafety);
+		Map<Pos, Board> implications = kingSafety(implicationsWithoutSafety);
+		cachedImplications = Optional.of(implications);
+		return implications;
 	}
 
 	private Optional<Pair<Pos, Board>> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
