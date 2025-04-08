@@ -21,9 +21,11 @@ import static leo.lija.model.Pos.C5;
 import static leo.lija.model.Pos.D3;
 import static leo.lija.model.Pos.D4;
 import static leo.lija.model.Pos.D5;
+import static leo.lija.model.Pos.E1;
 import static leo.lija.model.Pos.E3;
 import static leo.lija.model.Pos.E4;
 import static leo.lija.model.Pos.E5;
+import static leo.lija.model.Pos.F1;
 import static leo.lija.model.Pos.G7;
 import static leo.lija.model.Pos.G8;
 import static leo.lija.model.Pos.H7;
@@ -51,6 +53,15 @@ class KingTest {
 	@DisplayName("move 1 position in any direction when on edge")
 	void testBasicMovesOnEdge() {
 		assertThat(moves(H8)).containsExactlyInAnyOrder(H7, G7, G8);
+	}
+
+	@Test
+	@DisplayName("move behind pawn barrier")
+	void testBehindPawnBarrier() {
+		Board board = visual.str2Obj("""
+PPPPPPPP
+R  QK NR""");
+		assertThat(board.movesFrom(E1)).containsExactly(F1);
 	}
 
 	@Test
