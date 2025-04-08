@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.WHITE;
+import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.PAWN;
 
 @RequiredArgsConstructor
@@ -25,10 +26,6 @@ public class Actor {
 
 	private Optional<Map<Pos, Board>> cachedImplications = Optional.empty();
 
-	public Set<Pos> moves() {
-		return implications().keySet();
-	}
-
 	Map<Pos, Board> implications() {
 		if (cachedImplications.isPresent()) return cachedImplications.get();
 
@@ -36,41 +33,141 @@ public class Actor {
 		Color color = color();
 		Role role = piece.role();
 		if (piece.is(PAWN)) {
-			Function<Pos, Optional<Pos>> dir = color == Color.WHITE ? Pos::up : Pos::down;
-			implicationsWithoutSafety = dir.apply(pos).map(next -> {
-					boolean notMoved = (color == WHITE && pos.getY() == 2) || pos.getY() == 7;
-					Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
-
-					List<Optional<Pair<Pos, Board>>> optPositions = List.of(
-						one.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
-						one.filter((p) -> notMoved)
-							.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
-								.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
-						capture(Pos::left, next),
-						capture(Pos::right, next),
-						enpassant(dir, next, Pos::left),
-						enpassant(dir, next, Pos::right)
-					);
-					return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-				}
-			).orElse(Map.of());
+			implicationsWithoutSafety = pawn();
+		} else if (role == KING) {
+			implicationsWithoutSafety = shortRange(KING.dirs);
+			implicationsWithoutSafety.putAll(castle());
 		} else if (role.trajectory) {
-			implicationsWithoutSafety = implicationTrajectories(role.dirs, pos);
+			implicationsWithoutSafety = trajectory(role.dirs);
 		}
 		else {
-			Set<Pos> tos = role.dirs.stream()
-				.map(dir -> dir.apply(pos))
-				.filter(Optional::isPresent).map(Optional::get)
-				.collect(Collectors.toSet());
-			tos.removeAll(friends());
-			implicationsWithoutSafety = tos.stream().collect(Collectors.toMap(Function.identity(), to -> enemies().contains(to)
-				? board.taking(pos, to).get()
-				: board.moveTo(pos, to)));
+			implicationsWithoutSafety = shortRange(role.dirs);
 		}
 
 		Map<Pos, Board> implications = kingSafety(implicationsWithoutSafety);
 		cachedImplications = Optional.of(implications);
 		return implications;
+	}
+
+	public Set<Pos> moves() {
+		return implications().keySet();
+	}
+
+	Color color() {
+		return piece.color();
+	}
+	boolean is(Color color) {
+		return piece.is(color);
+	}
+	Set<Pos> friends() {
+		return board.occupation().get(color());
+	}
+	Set<Pos> enemies() {
+		return board.occupation().get(color().getOpposite());
+	}
+	Function<Pos, Optional<Pos>> dir() {
+		return color() == WHITE ? Pos::up : Pos::down;
+	}
+
+	boolean threatens(Pos to) {
+		Role role = piece.role();
+		List<Pos> threats;
+
+		if (role == Role.PAWN) {
+			threats = dir().apply(pos)
+				.map(next -> List.of(next.left(), next.right()).stream()
+					.filter(Optional::isPresent)
+					.map(Optional::get)
+					.toList())
+				.orElse(List.of());
+		} else if (role.trajectory) {
+			threats = trajectoryPoss(role.dirs);
+		} else {
+			threats = role.dirs.stream()
+				.map(dir -> dir.apply(pos))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.toList();
+		}
+
+		return threats.contains(to) && enemies().contains(to);
+	}
+
+	private Map<Pos, Board> kingSafety(Map<Pos, Board> implications) {
+		return implications.entrySet().stream()
+			.filter(e -> e.getValue().actorsOf(color().getOpposite()).stream()
+				.noneMatch(a -> e.getValue().kingPosOf(color()).map(a::threatens).orElse(false)))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	private Map<Pos, Board> castle() {
+		return Map.of();
+	}
+
+	private Map<Pos, Board> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
+		Set<Pos> tos = dirs.stream()
+			.map(dir -> dir.apply(pos))
+			.filter(Optional::isPresent).map(Optional::get)
+			.collect(Collectors.toSet());
+		tos.removeAll(friends());
+		return tos.stream().collect(Collectors.toMap(Function.identity(), to -> enemies().contains(to)
+			? board.taking(pos, to).get()
+			: board.moveTo(pos, to)));
+	}
+
+	private List<Pos> trajectoryPoss(List<Function<Pos, Optional<Pos>>> dirs) {
+		return dirs.stream().flatMap(dir -> forwardPos(pos, dir).stream()).toList();
+	}
+
+	private List<Pos> forwardPos(Pos p, Function<Pos, Optional<Pos>> dir) {
+		List<Pos> res = new ArrayList<>();
+		Optional<Pos> next = dir.apply(p);
+		while (next.isPresent() && !friends().contains(next.get())) {
+			res.add(next.get());
+			if (enemies().contains(next.get())) break;
+			next = dir.apply(next.get());
+		}
+		return res;
+	}
+
+	private Map<Pos, Board> trajectory(List<Function<Pos, Optional<Pos>>> dirs) {
+		return dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+	}
+
+	private List<Pair<Pos, Board>> forwardImplications(Pos p, Function<Pos, Optional<Pos>> dir) {
+		List<Pair<Pos, Board>> res = new ArrayList<>();
+		Optional<Pos> optNext = dir.apply(p);
+		while (optNext.isPresent() && !friends().contains(optNext.get())) {
+			Pos next = optNext.get();
+			if (enemies().contains(next)) {
+				res.add(Pair.of(next, board.taking(p, next).get()));
+				break;
+			}
+			res.add(Pair.of(next, board.moveTo(p, next)));
+			optNext = dir.apply(optNext.get());
+		}
+		return res;
+	}
+
+	private Map<Pos, Board> pawn() {
+		Function<Pos, Optional<Pos>> dir = color() == Color.WHITE ? Pos::up : Pos::down;
+		return dir.apply(pos).map(next -> {
+				boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
+				Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
+
+				List<Optional<Pair<Pos, Board>>> optPositions = List.of(
+					one.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
+					one.filter((p) -> notMoved)
+						.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
+							.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
+					capture(Pos::left, next),
+					capture(Pos::right, next),
+					enpassant(dir, next, Pos::left),
+					enpassant(dir, next, Pos::right)
+				);
+				return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+			}
+		).orElse(Map.of());
 	}
 
 	private Optional<Pair<Pos, Board>> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
@@ -91,86 +188,5 @@ public class Actor {
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
 			return Optional.of(Pair.of(optTargetPos.get(), b));
 		});
-	}
-
-	private Map<Pos, Board> kingSafety(Map<Pos, Board> implications) {
-		return implications.entrySet().stream()
-			.filter(e -> e.getValue().actorsOf(color().getOpposite()).stream()
-				.noneMatch(a -> e.getValue().kingPosOf(color()).map(a::threatens).orElse(false)))
-			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	boolean threatens(Pos to) {
-		Role role = piece.role();
-		List<Pos> threats;
-
-		if (role == Role.PAWN) {
-			threats = dir().apply(pos)
-				.map(next -> List.of(next.left(), next.right()).stream()
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.toList())
-				.orElse(List.of());
-		} else if (role.trajectory) {
-			threats = posTrajectories(role.dirs);
-		} else {
-			threats = role.dirs.stream()
-				.map(dir -> dir.apply(pos))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.toList();
-		}
-
-		return threats.contains(to) && enemies().contains(to);
-	}
-
-	Color color() {
-		return piece.color();
-	}
-	boolean is(Color color) {
-		return piece.is(color);
-	}
-	Set<Pos> friends() {
-		return board.occupation().get(color());
-	}
-	Set<Pos> enemies() {
-		return board.occupation().get(color().getOpposite());
-	}
-	Function<Pos, Optional<Pos>> dir() {
-		return color() == WHITE ? Pos::up : Pos::down;
-	}
-
-	private List<Pos> posTrajectories(List<Function<Pos, Optional<Pos>>> dirs) {
-		return dirs.stream().flatMap(dir -> forwardPos(pos, dir).stream()).toList();
-	}
-
-	private List<Pos> forwardPos(Pos p, Function<Pos, Optional<Pos>> dir) {
-		List<Pos> res = new ArrayList<>();
-		Optional<Pos> next = dir.apply(p);
-		while (next.isPresent() && !friends().contains(next.get())) {
-			res.add(next.get());
-			if (enemies().contains(next.get())) break;
-			next = dir.apply(next.get());
-		}
-		return res;
-	}
-
-	private Map<Pos, Board> implicationTrajectories(List<Function<Pos, Optional<Pos>>> dirs, Pos from) {
-		return dirs.stream().flatMap(dir -> forwardImplications(from, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-	}
-
-	private List<Pair<Pos, Board>> forwardImplications(Pos p, Function<Pos, Optional<Pos>> dir) {
-		List<Pair<Pos, Board>> res = new ArrayList<>();
-		Optional<Pos> optNext = dir.apply(p);
-		while (optNext.isPresent() && !friends().contains(optNext.get())) {
-			Pos next = optNext.get();
-			if (enemies().contains(next)) {
-				res.add(Pair.of(next, board.taking(p, next).get()));
-				break;
-			}
-			res.add(Pair.of(next, board.moveTo(p, next)));
-			optNext = dir.apply(optNext.get());
-		}
-		return res;
 	}
 }
