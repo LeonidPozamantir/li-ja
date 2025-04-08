@@ -29,7 +29,7 @@ public class Actor {
 		return implications().keySet();
 	}
 
-	private Map<Pos, Board> implications() {
+	Map<Pos, Board> implications() {
 		if (cachedImplications.isPresent()) return cachedImplications.get();
 
 		Map<Pos, Board> implicationsWithoutSafety;

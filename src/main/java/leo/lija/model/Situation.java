@@ -1,7 +1,10 @@
 package leo.lija.model;
 
+import leo.lija.exceptions.ChessRulesException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +15,10 @@ public class Situation {
 
 	private final Board board;
 	private final Color color;
+
+	public Situation() {
+		this(Board.empty(), Color.WHITE);
+	}
 
 	List<Actor> actors() {
 		return board.actorsOf(color);
@@ -34,5 +41,22 @@ public class Situation {
 
 	public boolean stalemate() {
 		return !check() && moves().isEmpty();
+	}
+
+	public Situation playMove(Pos from, Pos to) {
+		Actor actor = board.actorAt(from);
+		Board newBoard = actor.implications().get(to);
+		if (actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
+		return new Situation(newBoard, color.getOpposite());
+	}
+
+	public Situation playMove(Pair<Pos, Pos> move) {
+		return playMove(move.getFirst(), move.getSecond());
+	}
+
+	@SafeVarargs
+	public final Situation playMoves(Pair<Pos, Pos>... moves) {
+		return Arrays.stream(moves)
+			.reduce(this, Situation::playMove, (s1, s2) -> s1);
 	}
 }

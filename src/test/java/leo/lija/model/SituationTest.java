@@ -58,7 +58,7 @@ K
 				assertThat(visual.str2Obj("""
 PP
 K  r
-""").as(WHITE).check()).isTrue();
+""").as(WHITE).checkmate()).isTrue();
 			}
 
 			@Test
@@ -67,7 +67,7 @@ K  r
 				assertThat(visual.str2Obj("""
 PPn
 KR
-""").as(WHITE).check()).isTrue();
+""").as(WHITE).checkmate()).isTrue();
 			}
 
 			@Test
@@ -76,7 +76,7 @@ KR
 				assertThat(visual.str2Obj("""
    n
 K
-""").as(WHITE).check()).isFalse();
+""").as(WHITE).checkmate()).isFalse();
 			}
 		}
 

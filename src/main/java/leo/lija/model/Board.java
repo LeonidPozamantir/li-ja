@@ -168,9 +168,12 @@ public class Board {
         return pieces.keySet();
     }
 
+    String visual() {
+        return visual.obj2Str(this);
+    }
     @Override
     public String toString() {
-        return visual.obj2Str(this);
+        return visual();
     }
 
     public Board() {
