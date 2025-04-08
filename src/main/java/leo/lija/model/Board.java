@@ -29,7 +29,7 @@ import static leo.lija.model.Role.ROOK;
 public class Board {
 
     private static final String NO_PIECE_AT = "No piece at";
-    Visual visual = new Visual();
+    private final Visual visualFormatter = new Visual();
 
     @Getter
     @EqualsAndHashCode.Include
@@ -169,7 +169,7 @@ public class Board {
     }
 
     String visual() {
-        return visual.obj2Str(this);
+        return visualFormatter.obj2Str(this);
     }
     @Override
     public String toString() {

@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class Situation {
 
-	private final Board board;
-	private final Color color;
+	final Board board;
+	final Color color;
 
 	public Situation() {
-		this(Board.empty(), Color.WHITE);
+		this(new Board(), Color.WHITE);
 	}
 
 	List<Actor> actors() {
@@ -46,7 +46,7 @@ public class Situation {
 	public Situation playMove(Pos from, Pos to) {
 		Actor actor = board.actorAt(from);
 		Board newBoard = actor.implications().get(to);
-		if (actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
+		if (!actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
 		return new Situation(newBoard, color.getOpposite());
 	}
 
