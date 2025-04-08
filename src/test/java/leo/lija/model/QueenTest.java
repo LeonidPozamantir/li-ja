@@ -1,6 +1,6 @@
 package leo.lija.model;
 
-import leo.lija.format.Visual;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Queen should")
 class QueenTest {
 
-	Visual visual = new Visual();
+	VisualFormat visual = new VisualFormat();
 
 	private final Piece queen = new Piece(Color.WHITE, QUEEN);
 	private Set<Pos> moves(Pos pos) {

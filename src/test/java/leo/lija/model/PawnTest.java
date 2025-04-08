@@ -1,6 +1,6 @@
 package leo.lija.model;
 
-import leo.lija.format.Visual;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.springframework.data.util.Pair;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
@@ -34,14 +33,12 @@ import static leo.lija.model.Pos.E4;
 import static leo.lija.model.Pos.E5;
 import static leo.lija.model.Pos.E6;
 import static leo.lija.model.Pos.E7;
-import static leo.lija.model.Role.BISHOP;
-import static leo.lija.model.Role.PAWN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class PawnTest {
 
-	Visual visual = new Visual();
+	VisualFormat visual = new VisualFormat();
 
 	@Nested
 	@DisplayName("White pawn should")

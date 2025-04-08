@@ -1,7 +1,6 @@
 package leo.lija.model;
 
-import leo.lija.format.Visual;
-import org.junit.jupiter.api.Disabled;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("playing a game should")
 public class PlayTest {
 
-	Visual visual = new Visual();
+	VisualFormat visual = new VisualFormat();
 
 	@Nested
 	@DisplayName("opening one")

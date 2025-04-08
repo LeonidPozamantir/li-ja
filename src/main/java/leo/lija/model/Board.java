@@ -1,7 +1,7 @@
 package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
-import leo.lija.format.Visual;
+import leo.lija.format.VisualFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import static leo.lija.model.Role.ROOK;
 public class Board {
 
     private static final String NO_PIECE_AT = "No piece at";
-    private final Visual visualFormatter = new Visual();
+    private final VisualFormat visualFormat = new VisualFormat();
 
     @Getter
     @EqualsAndHashCode.Include

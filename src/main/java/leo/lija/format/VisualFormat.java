@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  */
 
 @Service
-public class Visual implements Format<Board> {
+public class VisualFormat implements Format<Board> {
 
     private final Map<Character, Role> pieces = Role.all.stream().collect(HashMap::new, (m, r) -> m.put(r.fen, r), Map::putAll);
 

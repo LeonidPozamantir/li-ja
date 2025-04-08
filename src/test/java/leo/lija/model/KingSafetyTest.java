@@ -1,6 +1,6 @@
 package leo.lija.model;
 
-import leo.lija.format.Visual;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("In order to save the king should")
 class KingSafetyTest {
 
-	Visual visual = new Visual();
+	VisualFormat visual = new VisualFormat();
 
 	@Nested
 	@DisplayName("the king")

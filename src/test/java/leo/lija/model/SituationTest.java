@@ -1,6 +1,6 @@
 package leo.lija.model;
 
-import leo.lija.format.Visual;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class SituationTest {
 	@DisplayName("detect")
 	class Detect {
 
-		Visual visual = new Visual();
+		VisualFormat visual = new VisualFormat();
 
 		@Nested
 		@DisplayName("check")

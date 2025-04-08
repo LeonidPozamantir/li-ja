@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class FormatVisualTest {
 
-    private Visual visual = new Visual();
+    private VisualFormat visual = new VisualFormat();
 
     private final String newBoardFormat = """
 rnbqkbnr
