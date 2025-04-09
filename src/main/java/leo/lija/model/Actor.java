@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -103,16 +105,23 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> castle() {
+		Map<Pos, Board> res = new HashMap<>();
+		castleSide(p -> p.shiftRight(2), (x, y) -> x > y).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleSide(p -> p.shiftLeft(2), (x, y) -> x < y).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		return res;
+	}
+
+	Optional<Pair<Pos, Board>> castleSide(Function<Pos, Optional<Pos>> trans, BiPredicate<Integer, Integer> compare) {
 		Color color = color();
-		Optional<Pair<Pos, Board>> kingSide = board.kingPosOf(color)
+		return board.kingPosOf(color)
 			.filter(p -> board.getHistory().canCastleKingSide(color))
 			.flatMap(kingPos -> {
 				Piece rook = color.rook();
 				Optional<Pos> rookPos = board.actorsOf(color).stream()
-					.filter(a -> a.is(rook) && a.getPos().getX() > kingPos.getX())
+					.filter(a -> a.is(rook) && compare.test(a.getPos().getX(), kingPos.getX()))
 					.findFirst()
 					.map(Actor::getPos);
-				Optional<Pos> newKingPos = kingPos.shiftRight(2);
+				Optional<Pos> newKingPos = trans.apply(kingPos);
 				Optional<Pos> newRookPos = newKingPos.flatMap(Pos::left);
 				if (rookPos.isEmpty() || newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
 				Optional<Board> newBoard = board.take(rookPos.get())
@@ -120,8 +129,6 @@ public class Actor {
 					.flatMap(b -> b.placeAtOpt(rook, newRookPos.get()));
 				return newBoard.map(b -> Pair.of(newKingPos.get(), b));
 			});
-		return kingSide.map(p -> Map.of(p.getFirst(), p.getSecond()))
-			.orElse(Map.of());
 	}
 
 	private Map<Pos, Board> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
