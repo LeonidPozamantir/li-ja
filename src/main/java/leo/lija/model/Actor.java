@@ -58,6 +58,9 @@ public class Actor {
 	boolean is(Color color) {
 		return piece.is(color);
 	}
+	boolean is(Piece piece) {
+		return this.piece.equals(piece);
+	}
 	Set<Pos> friends() {
 		return board.occupation().get(color());
 	}
@@ -100,7 +103,25 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> castle() {
-		return Map.of();
+		Color color = color();
+		Optional<Pair<Pos, Board>> kingSide = board.kingPosOf(color)
+			.filter(p -> board.getHistory().canCastleKingSide(color))
+			.flatMap(kingPos -> {
+				Piece rook = color.rook();
+				Optional<Pos> rookPos = board.actorsOf(color).stream()
+					.filter(a -> a.is(rook) && a.getPos().getX() > kingPos.getX())
+					.findFirst()
+					.map(Actor::getPos);
+				Optional<Pos> newKingPos = kingPos.shiftRight(2);
+				Optional<Pos> newRookPos = newKingPos.flatMap(Pos::left);
+				if (rookPos.isEmpty() || newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
+				Optional<Board> newBoard = board.take(rookPos.get())
+					.flatMap(b -> b.move(kingPos, newKingPos.get()))
+					.flatMap(b -> b.placeAtOpt(rook, newRookPos.get()));
+				return newBoard.map(b -> Pair.of(newKingPos.get(), b));
+			});
+		return kingSide.map(p -> Map.of(p.getFirst(), p.getSecond()))
+			.orElse(Map.of());
 	}
 
 	private Map<Pos, Board> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {

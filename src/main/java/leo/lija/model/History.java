@@ -32,4 +32,8 @@ public record History (
 	public boolean canCastleQueenSide(Color color) {
 		return castles.get(color).getSecond();
 	}
+
+	public static History castle(Color color, boolean kingSide, boolean queenSide) {
+		return new History(Optional.empty(), Map.of(color, Pair.of(kingSide, queenSide)));
+	}
 }

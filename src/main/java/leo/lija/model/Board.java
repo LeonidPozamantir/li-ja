@@ -91,10 +91,14 @@ public class Board {
     }
 
     public Board placeAt(Piece piece, Pos at) {
-        if (pieces.containsKey(at)) throw new ChessRulesException("Cannot place to occupied " + at);
+        return placeAtOpt(piece, at).orElseThrow(() -> new ChessRulesException("Cannot place to occupied " + at));
+    }
+
+    public Optional<Board> placeAtOpt(Piece piece, Pos at) {
+        if (pieces.containsKey(at)) return Optional.empty();
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, piece);
-        return new Board(piecesNew);
+        return Optional.of(new Board(piecesNew));
     }
 
     public Board takeValid(Pos at) {
