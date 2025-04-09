@@ -1,7 +1,9 @@
 package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
+import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BoardTest {
 
     private final Board newGameBoard = new Board();
+    VisualFormat visual = new VisualFormat();
 
     @Test
     @DisplayName("Should have pieces by default")
@@ -152,5 +155,41 @@ class BoardTest {
                 Map.entry(WHITE, Set.of(A2, A3, D1)),
                 Map.entry(BLACK, Set.of(E8, H4))
         );
+    }
+
+    @Nested
+    @DisplayName("navigate in pos based on pieces")
+    class Navigate {
+        @Test
+        @DisplayName("right to end")
+        void rightToEnd() {
+            Board board = visual.str2Obj("""
+R   K  R""");
+            assertThat(E1.multShiftRight(p -> board.occupations().contains(p))).containsExactlyInAnyOrder(F1, G1, H1);
+        }
+
+        @Test
+        @DisplayName("right to next")
+        void rightToNext() {
+            Board board = visual.str2Obj("""
+R   KB R""");
+            assertThat(E1.multShiftRight(p -> board.occupations().contains(p))).containsExactly(F1);
+        }
+
+        @Test
+        @DisplayName("left to end")
+        void leftToEnd() {
+            Board board = visual.str2Obj("""
+R   K  R""");
+            assertThat(E1.multShiftLeft(p -> board.occupations().contains(p))).containsExactlyInAnyOrder(D1, C1, B1, A1);
+        }
+
+        @Test
+        @DisplayName("left to next")
+        void leftToNext() {
+            Board board = visual.str2Obj("""
+R  BK  R""");
+            assertThat(E1.multShiftLeft(p -> board.occupations().contains(p))).containsExactly(D1);
+        }
     }
 }

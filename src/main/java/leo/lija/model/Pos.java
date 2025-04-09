@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -100,27 +103,22 @@ public class Pos {
         return isHoriz(other) || isVert(other) || isDiag(other);
     }
 
-    public List<Pos> multShiftUp(int n) {
-        return multShift(n, Pos::shiftUp);
+    public List<Pos> multShiftLeft(Predicate<Pos> stop) {
+        return multShift(stop, Pos::left);
     }
 
-    public List<Pos> multShiftDown(int n) {
-        return multShift(n, Pos::shiftDown);
+    public List<Pos> multShiftRight(Predicate<Pos> stop) {
+        return multShift(stop, Pos::right);
     }
 
-    public List<Pos> multShiftLeft(int n) {
-        return multShift(n, Pos::shiftLeft);
-    }
-
-    public List<Pos> multShiftRight(int n) {
-        return multShift(n, Pos::shiftRight);
-    }
-
-    public List<Pos> multShift(int n, UnaryOperator<Optional<Pos>> dir) {
-        return expandN(n, Optional.of(this), dir)
-                .stream()
-                .map(Optional::get)
-                .toList();
+    public LinkedList<Pos> multShift(Predicate<Pos> stop, Function<Pos, Optional<Pos>> dir) {
+        return dir.apply(this)
+            .map(p -> {
+                LinkedList<Pos> res =  stop.test(p) ? new LinkedList<>() : p.multShift(stop, dir);
+                res.addFirst(p);
+                return res;
+            })
+            .orElse(new LinkedList<>());
     }
 
     public String xToString() {
@@ -135,18 +133,6 @@ public class Pos {
     public String toString() {
         return xToString() + yToString();
     }
-
-    private List<Optional<Pos>> expandN(int n, Optional<Pos> op, UnaryOperator<Optional<Pos>> dir) {
-        List<Optional<Pos>> result = new ArrayList<>();
-        Optional<Pos> cur = op;
-        while (n >= 0 && cur.isPresent()) {
-            result.add(cur);
-            cur = dir.apply(cur);
-            n--;
-        }
-        return result;
-    }
-
 
     private static final Set<Integer> bounds = IntStream.rangeClosed(1, 8)
             .boxed()

@@ -68,19 +68,10 @@ class PosTest {
     @Test
     @DisplayName("be used to derive a relative list of positions")
     void relativeList() {
-        assertThat(D4.multShiftUp(3)).contains(D4, D5, D6, D7);
-        assertThat(D4.multShiftDown(3)).contains(D4, D3, D2, D1);
-        assertThat(D4.multShiftLeft(3)).contains(D4, C4, B4, A4);
-        assertThat(D4.multShiftRight(3)).contains(D4, E4, F4, G4);
-    }
-
-    @Test
-    @DisplayName("be used to derive a relative list of positions not including those off the board")
-    void relativeListNotOffTheBoard() {
-        assertThat(D4.multShiftUp(8)).contains(D4, D5, D6, D7, D8);
-        assertThat(D4.multShiftDown(8)).contains(D4, D3, D2, D1);
-        assertThat(D4.multShiftLeft(8)).contains(D4, C4, B4, A4);
-        assertThat(D4.multShiftRight(8)).contains(D4, E4, F4, G4, H4);
+        assertThat(D4.multShiftLeft((p) -> false)).containsExactlyInAnyOrder(C4, B4, A4);
+        assertThat(D4.multShiftRight((p) -> false)).containsExactlyInAnyOrder(E4, F4, G4, H4);
+        assertThat(D4.multShiftLeft((p) -> p.equals(C4))).containsExactly(C4);
+        assertThat(D4.multShiftRight((p) -> p.equals(G4))).containsExactlyInAnyOrder(E4, F4, G4);
     }
 
     @Test
