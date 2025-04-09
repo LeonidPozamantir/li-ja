@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,22 +86,6 @@ public class Pos {
         return Pos.at(x + n, y);
     }
 
-    public boolean isHoriz(Pos other) {
-        return y == other.y;
-    }
-
-    public boolean isVert(Pos other) {
-        return x == other.x;
-    }
-
-    public boolean isDiag(Pos other) {
-        return Math.abs(x - other.x) == Math.abs(y - other.y);
-    }
-
-    public boolean isLinear(Pos other) {
-        return isHoriz(other) || isVert(other) || isDiag(other);
-    }
-
     public List<Pos> multShiftLeft(Predicate<Pos> stop) {
         return multShift(stop, Pos::left);
     }
@@ -111,10 +94,10 @@ public class Pos {
         return multShift(stop, Pos::right);
     }
 
-    public LinkedList<Pos> multShift(Predicate<Pos> stop, Function<Pos, Optional<Pos>> dir) {
+    public List<Pos> multShift(Predicate<Pos> stop, Function<Pos, Optional<Pos>> dir) {
         return dir.apply(this)
             .map(p -> {
-                LinkedList<Pos> res =  stop.test(p) ? new LinkedList<>() : p.multShift(stop, dir);
+                LinkedList<Pos> res =  stop.test(p) ? new LinkedList<>() : (LinkedList<Pos>) p.multShift(stop, dir);
                 res.addFirst(p);
                 return res;
             })
