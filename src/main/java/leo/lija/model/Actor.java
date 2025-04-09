@@ -30,15 +30,14 @@ public class Actor {
 		if (cachedImplications.isPresent()) return cachedImplications.get();
 
 		Map<Pos, Board> implicationsWithoutSafety;
-		Color color = color();
 		Role role = piece.role();
 		if (piece.is(PAWN)) {
 			implicationsWithoutSafety = pawn();
 		} else if (role == KING) {
 			implicationsWithoutSafety = shortRange(KING.dirs);
 			implicationsWithoutSafety.putAll(castle());
-		} else if (role.trajectory) {
-			implicationsWithoutSafety = trajectory(role.dirs);
+		} else if (role.longRange) {
+			implicationsWithoutSafety = longRange(role.dirs);
 		}
 		else {
 			implicationsWithoutSafety = shortRange(role.dirs);
@@ -80,8 +79,8 @@ public class Actor {
 					.map(Optional::get)
 					.toList())
 				.orElse(List.of());
-		} else if (role.trajectory) {
-			threats = trajectoryPoss(role.dirs);
+		} else if (role.longRange) {
+			threats = longRangePoss(role.dirs);
 		} else {
 			threats = role.dirs.stream()
 				.map(dir -> dir.apply(pos))
@@ -115,7 +114,7 @@ public class Actor {
 			: board.moveTo(pos, to)));
 	}
 
-	private List<Pos> trajectoryPoss(List<Function<Pos, Optional<Pos>>> dirs) {
+	private List<Pos> longRangePoss(List<Function<Pos, Optional<Pos>>> dirs) {
 		return dirs.stream().flatMap(dir -> forwardPos(pos, dir).stream()).toList();
 	}
 
@@ -130,7 +129,7 @@ public class Actor {
 		return res;
 	}
 
-	private Map<Pos, Board> trajectory(List<Function<Pos, Optional<Pos>>> dirs) {
+	private Map<Pos, Board> longRange(List<Function<Pos, Optional<Pos>>> dirs) {
 		return dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 	}
 

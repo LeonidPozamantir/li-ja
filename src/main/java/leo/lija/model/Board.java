@@ -169,7 +169,7 @@ public class Board {
     }
 
     String visual() {
-        return visualFormatter.obj2Str(this);
+        return visualFormat.obj2Str(this);
     }
     @Override
     public String toString() {

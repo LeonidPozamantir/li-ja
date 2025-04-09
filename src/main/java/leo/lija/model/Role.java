@@ -27,7 +27,7 @@ public enum Role {
     public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
 
     public final char fen;
-    public final boolean trajectory;
+    public final boolean longRange;
     final List<Function<Pos, Optional<Pos>>> dirs;
 
 }

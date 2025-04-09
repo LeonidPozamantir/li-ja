@@ -56,7 +56,7 @@ import static leo.lija.model.Pos.H7;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("playing a game should")
-public class PlayTest {
+class PlayTest {
 
 	VisualFormat visual = new VisualFormat();
 
