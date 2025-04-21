@@ -2,6 +2,7 @@ package leo.lija.format;
 
 import leo.lija.model.Board;
 import leo.lija.model.Color;
+import leo.lija.model.History;
 import leo.lija.model.Piece;
 import leo.lija.model.Pos;
 import leo.lija.model.Role;
@@ -57,7 +58,7 @@ public class VisualFormat implements Format<Board> {
                 }
             }
         }
-        return new Board(boardPieces);
+        return new Board(boardPieces).withHistory(History.noCastle());
     }
 
     @Override

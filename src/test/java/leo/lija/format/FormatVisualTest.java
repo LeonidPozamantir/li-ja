@@ -2,6 +2,7 @@ package leo.lija.format;
 
 
 import leo.lija.model.Board;
+import leo.lija.model.History;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,7 @@ R   K  R
         @Test
         @DisplayName("can import a new board")
         void importNewBoard() {
-            assertThat(visual.str2Obj(newBoardFormat)).isEqualTo(new Board());
+            assertThat(visual.str2Obj(newBoardFormat)).isEqualTo(new Board().withHistory(History.noCastle()));
         }
 
         @Test
