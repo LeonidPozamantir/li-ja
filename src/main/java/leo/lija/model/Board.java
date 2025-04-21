@@ -123,7 +123,15 @@ public class Board {
     }
 
     public Optional<Board> taking(Pos orig, Pos dest, Optional<Pos> taking) {
-        return take(taking.orElse(dest)).flatMap(b -> b.move(orig, dest));
+        Piece piece = pieces.get(orig);
+        if (piece == null) return Optional.empty();
+        Pos takenPos = taking.orElse(dest);
+        if (!pieces.containsKey(takenPos)) return Optional.empty();
+        Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
+        piecesNew.remove(takenPos);
+        piecesNew.remove(orig);
+        piecesNew.put(dest, piece);
+        return Optional.of(new Board(piecesNew));
     }
 
     public Board moveTo(Pos orig, Pos dest) {
