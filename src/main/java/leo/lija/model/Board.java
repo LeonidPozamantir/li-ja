@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
+import static leo.lija.model.Pos.makePos;
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.KNIGHT;
@@ -41,13 +42,14 @@ public class Board {
 
     private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
     private Optional<Map<Color, List<Actor>>> optColorActors = Optional.empty();
+    private Optional<Map<Color, Pos>> optKingPos = Optional.empty();
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
     }
 
     public Optional<Piece> at(int x, int y) {
-        return Pos.at(x, y).flatMap(this::at);
+        return makePos(x, y).flatMap(this::at);
     }
 
     public Piece pieceAt(Pos at) {
@@ -80,10 +82,13 @@ public class Board {
     }
 
     public Optional<Pos> kingPosOf(Color color) {
-        return pieces.entrySet().stream()
-                .filter(e -> e.getValue().equals(color.king()))
-                .map(Map.Entry::getKey)
-                .findFirst();
+        if (optKingPos.isEmpty()) {
+            Map<Color, Pos> kingPos = pieces.entrySet().stream()
+                .filter(e -> e.getValue().role() == KING)
+                .collect(Collectors.toMap(e -> e.getValue().color(), Map.Entry::getKey));
+            optKingPos = Optional.of(kingPos);
+        }
+        return Optional.ofNullable(optKingPos.get().get(color));
     }
 
     public Set<Pos> movesFrom(Pos from) {

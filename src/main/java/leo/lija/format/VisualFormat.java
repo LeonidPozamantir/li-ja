@@ -73,7 +73,7 @@ public class VisualFormat implements Format<Board> {
 
         return IntStream.range(0, 8)
             .mapToObj(y -> IntStream.range(0, 8)
-                .mapToObj(x -> Pos.at(x + 1, 8 - y)
+                .mapToObj(x -> Pos.makePos(x + 1, 8 - y)
                     .flatMap(p -> Optional.ofNullable(markedPositions.get(p)).or(() -> board.at(p).map(Piece::fen)))
                     .map(String::valueOf)
                     .orElse(" "))

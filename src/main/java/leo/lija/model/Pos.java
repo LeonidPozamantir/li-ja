@@ -71,19 +71,19 @@ public class Pos {
     }
 
     public Optional<Pos> shiftUp(int n) {
-        return Pos.at(x, y + n);
+        return makePos(x, y + n);
     }
 
     public Optional<Pos> shiftDown(int n) {
-        return Pos.at(x, y - n);
+        return makePos(x, y - n);
     }
 
     public Optional<Pos> shiftLeft(int n) {
-        return Pos.at(x - n, y);
+        return makePos(x - n, y);
     }
 
     public Optional<Pos> shiftRight(int n) {
-        return Pos.at(x + n, y);
+        return makePos(x + n, y);
     }
 
     public List<Pos> multShiftLeft(Predicate<Pos> stop) {
@@ -121,7 +121,7 @@ public class Pos {
             .boxed()
             .collect(Collectors.toSet());
 
-    public static Optional<Pos> at(int x, int y) {
+    public static Optional<Pos> makePos(int x, int y) {
         if (bounds.contains(x) && bounds.contains(y)) return Optional.of(new Pos(x, y)); else return Optional.empty();
     }
 

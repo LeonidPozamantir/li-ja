@@ -36,21 +36,45 @@ R  QK  R""").withHistory(History.castle(WHITE, false, false));
 		@DisplayName("impossible")
 		class Impossible {
 
-			@Test
-			@DisplayName("bishop in the way")
-			void bishopInTheWay() {
-				assertThat(goodHist.placeAt(WHITE.bishop(), F1).movesFrom(E1)).isEmpty();
+			@Nested
+			@DisplayName("standard chess")
+			class StandardChess {
+				@Test
+				@DisplayName("bishop in the way")
+				void bishopInTheWay() {
+					assertThat(goodHist.placeAt(WHITE.bishop(), F1).movesFrom(E1)).isEmpty();
+				}
+				@Test
+				@DisplayName("knight in the way")
+				void knightInTheWay() {
+					assertThat(goodHist.placeAt(WHITE.knight(), G1).movesFrom(E1)).containsExactly(F1);
+				}
+				@Test
+				@DisplayName("not allowed by history")
+				void badHistory() {
+					assertThat(badHist.movesFrom(E1)).containsExactly(F1);
+				}
 			}
-			@Test
-			@DisplayName("knight in the way")
-			void knightInTheWay() {
-				assertThat(goodHist.placeAt(WHITE.knight(), G1).movesFrom(E1)).containsExactly(F1);
+
+			@Nested
+			@DisplayName("chess960")
+			class Chess960 {
+				Board board960 = visual.str2Obj("""
+PPPPPPPP
+RQK   R """).withHistory(History.castle(WHITE, true, true));
+
+				@Test
+				@DisplayName("bishop in the way")
+				void bishopInTheWay() {
+					assertThat(board960.placeAt(WHITE.bishop(), D1).movesFrom(C1)).isEmpty();
+				}
+				@Test
+				@DisplayName("knight in the way")
+				void knightInTheWay() {
+					assertThat(board960.placeAt(WHITE.knight(), F1).movesFrom(C1)).containsExactly(D1);
+				}
 			}
-			@Test
-			@DisplayName("not allowed by history")
-			void badHistory() {
-				assertThat(badHist.movesFrom(E1)).containsExactly(F1);
-			}
+
 		}
 
 		@Nested
@@ -114,13 +138,13 @@ R   KB R""").withHistory(History.castle(WHITE, false, false));
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
-				assertThat(goodHist.movesFrom(E1)).containsExactlyInAnyOrder(D1, B1);
+				assertThat(goodHist.movesFrom(E1)).containsExactlyInAnyOrder(D1, C1);
 			}
 
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				beSituation(goodHist.as(WHITE).playMove(E1, B1), """
+				beSituation(goodHist.as(WHITE).playMove(E1, C1), """
 PPPPPPPP
   KR B R""");
 			}

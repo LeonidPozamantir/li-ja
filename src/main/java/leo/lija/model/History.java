@@ -18,19 +18,15 @@ public record History (
 	}
 
 	public History(Optional<Pair<Pos, Pos>> lastMove) {
-		this(lastMove, Map.of(WHITE, Pair.of(false, false), BLACK, Pair.of(false, false)));
+		this(lastMove, Map.of());
 	}
 
-	public boolean isLastMove(Pos p1, Pos p2) {
-		return lastMove.map(p -> p.getFirst().equals(p1) && p.getSecond().equals(p2)).orElse(false);
-	}
-
-	public boolean canCastleKingSide(Color color) {
-		return castles.get(color).getFirst();
-	}
-
-	public boolean canCastleQueenSide(Color color) {
-		return castles.get(color).getSecond();
+	public boolean canCastle(Color color, Side side) {
+		Pair<Boolean, Boolean> castlesColor = castles.get(color);
+		if (castlesColor == null) {
+			return false;
+		}
+		return side == Side.KingSide ? castlesColor.getFirst() : castlesColor.getSecond();
 	}
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {

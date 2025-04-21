@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.PAWN;
+import static leo.lija.model.Side.KingSide;
+import static leo.lija.model.Side.QueenSide;
 
 @RequiredArgsConstructor
 public class Actor {
@@ -106,27 +108,26 @@ public class Actor {
 
 	private Map<Pos, Board> castle() {
 		Map<Pos, Board> res = new HashMap<>();
-		castleSide(p -> p.shiftRight(2), (x, y) -> x > y).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
-		castleSide(p -> p.shiftLeft(2), (x, y) -> x < y).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(KingSide).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(QueenSide).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
 		return res;
 	}
 
-	Optional<Pair<Pos, Board>> castleSide(Function<Pos, Optional<Pos>> trans, BiPredicate<Integer, Integer> compare) {
+	Optional<Pair<Pos, Board>> castleOn(Side side) {
 		Color color = color();
 		return board.kingPosOf(color)
-			.filter(p -> board.getHistory().canCastleKingSide(color))
+			.filter(p -> board.getHistory().canCastle(color, side))
 			.flatMap(kingPos -> {
-				Piece rook = color.rook();
-				Optional<Pos> rookPos = board.actorsOf(color).stream()
-					.filter(a -> a.is(rook) && compare.test(a.getPos().getX(), kingPos.getX()))
-					.findFirst()
-					.map(Actor::getPos);
-				Optional<Pos> newKingPos = trans.apply(kingPos);
-				Optional<Pos> newRookPos = newKingPos.flatMap(Pos::left);
-				if (rookPos.isEmpty() || newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
-				Optional<Board> newBoard = board.take(rookPos.get())
+				List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
+				if (tripToRook.isEmpty()) return Optional.empty();
+				Pos rookPos = tripToRook.getLast();
+				if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
+				Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
+				Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
+				if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
+				Optional<Board> newBoard = board.take(rookPos)
 					.flatMap(b -> b.move(kingPos, newKingPos.get()))
-					.flatMap(b -> b.placeAtOpt(rook, newRookPos.get()));
+					.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
 				return newBoard.map(b -> Pair.of(newKingPos.get(), b));
 			});
 	}
