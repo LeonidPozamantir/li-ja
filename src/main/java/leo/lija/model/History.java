@@ -6,9 +6,6 @@ import org.springframework.data.util.Pair;
 import java.util.Map;
 import java.util.Optional;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
-
 public record History (
 	Optional<Pair<Pos, Pos>> lastMove,
 	Map<Color, Pair<Boolean, Boolean>> castles
@@ -26,7 +23,7 @@ public record History (
 		if (castlesColor == null) {
 			return false;
 		}
-		return side == Side.KingSide ? castlesColor.getFirst() : castlesColor.getSecond();
+		return side == Side.KING_SIDE ? castlesColor.getFirst() : castlesColor.getSecond();
 	}
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {

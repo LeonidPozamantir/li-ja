@@ -68,9 +68,6 @@ R  QK NR""");
 	@DisplayName("not move to positions that are occupied by the same color")
 	void testOccupied() {
 		Board board = visual.str2Obj("""
-k B
-
-
    P
 NPKP   P
 
@@ -79,7 +76,7 @@ PPPPPPPP
 """);
 		Set<Pos> possibleMoves = board.movesFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
-k B
+
 
 
  xxP
@@ -91,29 +88,24 @@ PPPPPPPP
 	}
 
 	@Test
-	@Disabled("incorrect expectation")
-	@DisplayName("capture enemy pieces")
+	@DisplayName("capture hanging opponent pieces")
 	void testCapture() {
 		Board board = visual.str2Obj("""
-k B
-
-
-  pP
-NPKp   P
+ bpp   k
+  Kp
  p
-PPPPPPPP
- NBQ BNR
+N
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.movesFrom(C3);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
-k B
 
 
- xxP
-NPKx   P
- x x
-PPPPPPPP
- NBQ BNR
+
+
+ xxx   k
+  Kp
+ x
+N
 """);
 	}
 

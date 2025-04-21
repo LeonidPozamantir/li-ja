@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.PAWN;
-import static leo.lija.model.Side.KingSide;
-import static leo.lija.model.Side.QueenSide;
+import static leo.lija.model.Side.KING_SIDE;
+import static leo.lija.model.Side.QUEEN_SIDE;
 
 @RequiredArgsConstructor
 public class Actor {
@@ -108,8 +107,8 @@ public class Actor {
 
 	private Map<Pos, Board> castle() {
 		Map<Pos, Board> res = new HashMap<>();
-		castleOn(KingSide).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
-		castleOn(QueenSide).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(KING_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(QUEEN_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
 		return res;
 	}
 
