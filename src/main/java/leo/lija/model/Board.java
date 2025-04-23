@@ -103,7 +103,7 @@ public class Board {
         if (pieces.containsKey(at)) return Optional.empty();
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, piece);
-        return Optional.of(new Board(piecesNew));
+        return Optional.of(new Board(piecesNew, history));
     }
 
     public Board takeValid(Pos at) {
@@ -114,7 +114,7 @@ public class Board {
         return Optional.ofNullable(pieces.get(at)).map(p -> {
             Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
             piecesNew.remove(at);
-            return new Board(piecesNew);
+            return new Board(piecesNew, history);
         });
     }
 
@@ -131,7 +131,7 @@ public class Board {
         piecesNew.remove(takenPos);
         piecesNew.remove(orig);
         piecesNew.put(dest, piece);
-        return Optional.of(new Board(piecesNew));
+        return Optional.of(new Board(piecesNew, history));
     }
 
     public Board moveTo(Pos orig, Pos dest) {
@@ -139,7 +139,7 @@ public class Board {
         if (pieces.containsKey(dest)) throw new ChessRulesException("Cannot move to occupied " + dest);
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(dest, piecesNew.remove(orig));
-        return new Board(piecesNew);
+        return new Board(piecesNew, history);
     }
 
     public Optional<Board> move(Pos orig, Pos dest) {
@@ -156,11 +156,15 @@ public class Board {
             throw new ChessRulesException("No pawn at " + at + " to promote");
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, new Piece(pieces.get(at).color(), role));
-        return new Board(piecesNew);
+        return new Board(piecesNew, history);
     }
 
     public Board withHistory(History h) {
         return new Board(pieces, h);
+    }
+
+    public Board updateHistory(Function<History, History> f) {
+        return new Board(pieces, f.apply(history));
     }
 
     public Situation as(Color c) {

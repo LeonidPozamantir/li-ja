@@ -104,6 +104,14 @@ public class Pos {
             .orElse(new LinkedList<>());
     }
 
+    public boolean toLeft(Pos other) {
+        return x < other.x;
+    }
+
+    public boolean toRight(Pos other) {
+        return x > other.x;
+    }
+
     public String xToString() {
         return String.valueOf((char) (x + 96));
     }

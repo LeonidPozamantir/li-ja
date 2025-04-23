@@ -59,4 +59,8 @@ public class Situation {
 		return Arrays.stream(moves)
 			.reduce(this, Situation::playMove, (s1, s2) -> s1);
 	}
+
+	public Situation as(Color newColor) {
+		return new Situation(board, newColor);
+	}
 }

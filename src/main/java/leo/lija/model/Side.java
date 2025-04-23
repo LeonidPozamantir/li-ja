@@ -3,6 +3,7 @@ package leo.lija.model;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
@@ -13,4 +14,13 @@ public enum Side {
 	public final int castledKingX;
 	public final int castledRookX;
 	public final BiFunction<Pos, Board, List<Pos>> tripToRook;
+
+	public static final List<Side> ALL = List.of(KING_SIDE, QUEEN_SIDE);
+
+	public static Optional<Side> kingRookSide(Pos kingPos, Pos rookPos) {
+		if (kingPos.getY() != rookPos.getY()) {
+			return Optional.empty();
+		}
+		return Optional.of(kingPos.getX() > rookPos.getX() ? QUEEN_SIDE : KING_SIDE);
+	}
 }

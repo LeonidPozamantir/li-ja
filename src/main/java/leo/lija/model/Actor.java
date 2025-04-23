@@ -12,10 +12,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.PAWN;
+import static leo.lija.model.Role.ROOK;
 import static leo.lija.model.Side.KING_SIDE;
 import static leo.lija.model.Side.QUEEN_SIDE;
 
@@ -127,7 +129,7 @@ public class Actor {
 				Optional<Board> newBoard = board.take(rookPos)
 					.flatMap(b -> b.move(kingPos, newKingPos.get()))
 					.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
-				return newBoard.map(b -> Pair.of(newKingPos.get(), b));
+				return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
 			});
 	}
 
@@ -158,7 +160,17 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> longRange(List<Function<Pos, Optional<Pos>>> dirs) {
-		return dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+		Map<Pos, Board> implications = dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+		if (!piece.is(ROOK)) return implications;
+		Color color = color();
+		return board.kingPosOf(color)
+			.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
+			.filter(side -> board.getHistory().canCastle(color, side))
+			.map(side -> {
+				History h = board.getHistory().withoutCastle(color, side);
+				return implications.entrySet().stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().withHistory(h)));
+			}).orElse(implications);
 	}
 
 	private List<Pair<Pos, Board>> forwardImplications(Pos p, Function<Pos, Optional<Pos>> dir) {
@@ -179,22 +191,21 @@ public class Actor {
 	private Map<Pos, Board> pawn() {
 		Function<Pos, Optional<Pos>> dir = color() == Color.WHITE ? Pos::up : Pos::down;
 		return dir.apply(pos).map(next -> {
-				boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
-				Optional<Pos> one = Optional.of(next).filter(p -> !board.occupations().contains(p));
+			boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
+			Optional<Pos> fwd = Optional.of(next).filter(p -> !board.occupations().contains(p));
 
-				List<Optional<Pair<Pos, Board>>> optPositions = List.of(
-					one.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
-					one.filter((p) -> notMoved)
-						.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
-							.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
-					capture(Pos::left, next),
-					capture(Pos::right, next),
-					enpassant(dir, next, Pos::left),
-					enpassant(dir, next, Pos::right)
-				);
-				return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-			}
-		).orElse(Map.of());
+			List<Optional<Pair<Pos, Board>>> optPositions = List.of(
+				fwd.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
+				fwd.filter((p) -> notMoved)
+					.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
+						.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
+				capture(Pos::left, next),
+				capture(Pos::right, next),
+				enpassant(dir, next, Pos::left),
+				enpassant(dir, next, Pos::right)
+			);
+			return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+		}).orElse(Map.of());
 	}
 
 	private Optional<Pair<Pos, Board>> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {

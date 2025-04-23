@@ -6,12 +6,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static leo.lija.model.Color.WHITE;
+import static leo.lija.model.Pos.A1;
 import static leo.lija.model.Pos.B1;
 import static leo.lija.model.Pos.C1;
 import static leo.lija.model.Pos.D1;
 import static leo.lija.model.Pos.E1;
 import static leo.lija.model.Pos.F1;
 import static leo.lija.model.Pos.G1;
+import static leo.lija.model.Pos.H1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a king should castle")
@@ -27,10 +29,10 @@ public class CastleTest {
 	@DisplayName("king side")
 	class Kingside {
 
-		Board badHist = visual.str2Obj("""
+		Board goodHist = visual.str2Obj("""
 PPPPPPPP
-R  QK  R""").withHistory(History.castle(WHITE, false, false));
-		Board goodHist = badHist.withHistory(History.castle(WHITE, true, true));
+R  QK  R""");
+		Board badHist = goodHist.updateHistory(h -> h.withoutCastles(WHITE));
 
 		@Nested
 		@DisplayName("impossible")
@@ -101,10 +103,10 @@ R  Q RK """);
 	@DisplayName("queen side")
 	class Queenside {
 
-		Board badHist = visual.str2Obj("""
+		Board goodHist = visual.str2Obj("""
 PPPPPPPP
-R   KB R""").withHistory(History.castle(WHITE, false, false));
-		Board goodHist = badHist.withHistory(History.castle(WHITE, true, true));
+R   KB R""");
+		Board badHist = goodHist.updateHistory(h -> h.withoutCastles(WHITE));
 
 		@Nested
 		@DisplayName("impossible")
@@ -147,6 +149,103 @@ R   KB R""").withHistory(History.castle(WHITE, false, false));
 				beSituation(goodHist.as(WHITE).playMove(E1, C1), """
 PPPPPPPP
   KR B R""");
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("impact history")
+	class ImpactHistory {
+		Board board = visual.str2Obj("""
+PPPPPPPP
+R   K  R""").withHistory(History.castle(WHITE, true, true));
+		Situation situation = board.as(WHITE);
+
+		@Nested
+		@DisplayName("if king castles kingside")
+		class CastlesKingside {
+			Situation s2 = situation.playMove(E1, G1);
+
+			@Test
+			@DisplayName("correct new board")
+			void correctNewBoard() {
+				beSituation(s2, """
+PPPPPPPP
+R    RK """);
+			}
+
+			@Test
+			@DisplayName("cannot castle queenside anymore")
+			void cantCastleQueenside() {
+				assertThat(s2.board.movesFrom(G1)).containsExactly(H1);
+			}
+
+			@Test
+			@DisplayName("cannot castle kingside anymore even if the position looks good")
+			void cantCastleKingside() {
+				assertThat(s2.board.moveTo(F1, H1).moveTo(G1, E1).movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+			}
+		}
+
+		@Nested
+		@DisplayName("if king castles queenside")
+		class CastlesQueenside {
+			Situation s2 = situation.playMove(E1, C1);
+
+			@Test
+			@DisplayName("correct new board")
+			void correctNewBoard() {
+				beSituation(s2, """
+PPPPPPPP
+  KR   R""");
+			}
+
+			@Test
+			@DisplayName("cannot castle kingside anymore")
+			void cantCastleKingside() {
+				assertThat(s2.board.movesFrom(C1)).containsExactly(B1);
+			}
+
+			@Test
+			@DisplayName("cannot castle queenside anymore even if the position looks good")
+			void cantCastleQueenside() {
+				assertThat(s2.board.moveTo(D1, A1).moveTo(C1, E1).movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+			}
+		}
+
+		@Nested
+		@DisplayName("if kingside rook moves")
+		class KingsideRookMoves {
+			Situation s2 = situation.playMove(H1, G1).as(WHITE);
+
+			@Test
+			@DisplayName("can only castle queenside")
+			void castleQueenside() {
+				assertThat(s2.board.movesFrom(E1)).containsExactlyInAnyOrder(C1, D1, F1);
+			}
+
+			@Test
+			@DisplayName("can't castle at all if queenside rook moves")
+			void cantCastle() {
+				assertThat(s2.playMove(A1, B1).board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+			}
+		}
+
+		@Nested
+		@DisplayName("if queenside rook moves")
+		class QueensideRookMoves {
+			Situation s2 = situation.playMove(A1, B1).as(WHITE);
+
+			@Test
+			@DisplayName("can only castle kingside")
+			void castleKingside() {
+				assertThat(s2.board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1, G1);
+			}
+
+			@Test
+			@DisplayName("can't castle at all if kingside rook moves")
+			void cantCastle() {
+				assertThat(s2.playMove(H1, G1).board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 	}
