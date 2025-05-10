@@ -214,6 +214,43 @@ PPPPPPPP
 		}
 
 		@Nested
+		@DisplayName("if king moves")
+		class KingMoves {
+			@Nested
+			@DisplayName("to the right")
+			class ToRight {
+				Situation s2 = situation.playMove(E1, F1).as(WHITE);
+				@Test
+				@DisplayName("cannot castle anymore")
+				void cantCastle() {
+					assertThat(s2.board.movesFrom(F1)).containsExactlyInAnyOrder(E1, G1);
+				}
+				@Test
+				@DisplayName("neither if the king comes back")
+				void comesBack() {
+					Situation s3 = s2.playMove(F1, E1).as(WHITE);
+					assertThat(s3.board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				}
+			}
+			@Nested
+			@DisplayName("to the left")
+			class ToLeft {
+				Situation s2 = situation.playMove(E1, D1).as(WHITE);
+				@Test
+				@DisplayName("cannot castle anymore")
+				void cantCastle() {
+					assertThat(s2.board.movesFrom(D1)).containsExactlyInAnyOrder(C1, E1);
+				}
+				@Test
+				@DisplayName("neither if the king comes back")
+				void comesBack() {
+					Situation s3 = s2.playMove(D1, E1).as(WHITE);
+					assertThat(s3.board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				}
+			}
+		}
+
+		@Nested
 		@DisplayName("if kingside rook moves")
 		class KingsideRookMoves {
 			Situation s2 = situation.playMove(H1, G1).as(WHITE);

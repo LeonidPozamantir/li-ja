@@ -15,8 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static leo.lija.model.Color.WHITE;
+import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
+import static leo.lija.model.Role.KNIGHT;
 import static leo.lija.model.Role.PAWN;
+import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 import static leo.lija.model.Side.KING_SIDE;
 import static leo.lija.model.Side.QUEEN_SIDE;
@@ -34,18 +37,29 @@ public class Actor {
 	Map<Pos, Board> implications() {
 		if (cachedImplications.isPresent()) return cachedImplications.get();
 
-		Map<Pos, Board> implicationsWithoutSafety;
+		Map<Pos, Board> implicationsWithoutSafety = Map.of();
 		Role role = piece.role();
-		if (piece.is(PAWN)) {
-			implicationsWithoutSafety = pawn();
+		if (piece.is(BISHOP)) {
+			implicationsWithoutSafety = longRange(BISHOP.dirs);
+		} else if (piece.is(QUEEN)) {
+			implicationsWithoutSafety = longRange(QUEEN.dirs);
+		} else if (piece.is(KNIGHT)) {
+			implicationsWithoutSafety = shortRange(KNIGHT.dirs);
 		} else if (role == KING) {
-			implicationsWithoutSafety = shortRange(KING.dirs);
+			implicationsWithoutSafety = preventsCastle(shortRange(KING.dirs));
 			implicationsWithoutSafety.putAll(castle());
-		} else if (role.longRange) {
-			implicationsWithoutSafety = longRange(role.dirs);
-		}
-		else {
-			implicationsWithoutSafety = shortRange(role.dirs);
+		} else if (role == ROOK) {
+			Color color = color();
+			implicationsWithoutSafety = board.kingPosOf(color)
+				.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
+				.filter(side -> board.getHistory().canCastle(color, side))
+				.map(side -> {
+					History h = board.getHistory().withoutCastle(color, side);
+					return longRange(ROOK.dirs).entrySet().stream()
+						.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().withHistory(h)));
+				}).orElse(longRange(ROOK.dirs));
+		} else if (piece.is(PAWN)) {
+			implicationsWithoutSafety = pawn();
 		}
 
 		Map<Pos, Board> implications = kingSafety(implicationsWithoutSafety);
@@ -66,21 +80,13 @@ public class Actor {
 	boolean is(Piece piece) {
 		return this.piece.equals(piece);
 	}
-	Set<Pos> friends() {
-		return board.occupation().get(color());
-	}
-	Set<Pos> enemies() {
-		return board.occupation().get(color().getOpposite());
-	}
-	Function<Pos, Optional<Pos>> dir() {
-		return color() == WHITE ? Pos::up : Pos::down;
-	}
+
 
 	boolean threatens(Pos to) {
 		Role role = piece.role();
 		List<Pos> threats;
 
-		if (role == Role.PAWN) {
+		if (role == PAWN) {
 			threats = dir().apply(pos)
 				.map(next -> List.of(next.left(), next.right()).stream()
 					.filter(Optional::isPresent)
@@ -133,6 +139,15 @@ public class Actor {
 			});
 	}
 
+	private Map<Pos, Board> preventsCastle(Map<Pos, Board> implications) {
+		if (history().canCastle(color())) {
+			History newHistory = history().withoutCastles(color());
+			return implications.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().withHistory(newHistory)));
+		}
+		return implications;
+	}
+
 	private Map<Pos, Board> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
 		Set<Pos> tos = dirs.stream()
 			.map(dir -> dir.apply(pos))
@@ -160,17 +175,7 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> longRange(List<Function<Pos, Optional<Pos>>> dirs) {
-		Map<Pos, Board> implications = dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-		if (!piece.is(ROOK)) return implications;
-		Color color = color();
-		return board.kingPosOf(color)
-			.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
-			.filter(side -> board.getHistory().canCastle(color, side))
-			.map(side -> {
-				History h = board.getHistory().withoutCastle(color, side);
-				return implications.entrySet().stream()
-					.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().withHistory(h)));
-			}).orElse(implications);
+		return dirs.stream().flatMap(dir -> forwardImplications(pos, dir).stream()).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 	}
 
 	private List<Pair<Pos, Board>> forwardImplications(Pos p, Function<Pos, Optional<Pos>> dir) {
@@ -189,7 +194,7 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> pawn() {
-		Function<Pos, Optional<Pos>> dir = color() == Color.WHITE ? Pos::up : Pos::down;
+		Function<Pos, Optional<Pos>> dir = color() == WHITE ? Pos::up : Pos::down;
 		return dir.apply(pos).map(next -> {
 			boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
 			Optional<Pos> fwd = Optional.of(next).filter(p -> !board.occupations().contains(p));
@@ -226,5 +231,18 @@ public class Actor {
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
 			return Optional.of(Pair.of(optTargetPos.get(), b));
 		});
+	}
+
+	private History history() {
+		return board.getHistory();
+	}
+	private Set<Pos> friends() {
+		return board.occupation().get(color());
+	}
+	private Set<Pos> enemies() {
+		return board.occupation().get(color().getOpposite());
+	}
+	private Function<Pos, Optional<Pos>> dir() {
+		return color() == WHITE ? Pos::up : Pos::down;
 	}
 }

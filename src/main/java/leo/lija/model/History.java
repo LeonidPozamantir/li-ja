@@ -32,6 +32,10 @@ public record History (
 		return side == Side.KING_SIDE ? castlesColor.getFirst() : castlesColor.getSecond();
 	}
 
+	public boolean canCastle(Color color) {
+		return canCastle(color, KING_SIDE) || canCastle(color, QUEEN_SIDE);
+	}
+
 	public History withoutCastle(Color color, Side side) {
 		Pair<Boolean, Boolean> castlesColor = colorCastles(color);
 		Map<Color, Pair<Boolean, Boolean>> newCastles = new HashMap<>(castles);
