@@ -1,7 +1,6 @@
 package leo.lija.model;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.BISHOP;
@@ -24,13 +22,19 @@ import static leo.lija.model.Role.ROOK;
 import static leo.lija.model.Side.KING_SIDE;
 import static leo.lija.model.Side.QUEEN_SIDE;
 
-@RequiredArgsConstructor
 public class Actor {
 
 	private final Piece piece;
 	@Getter
 	private final Pos pos;
 	private final Board board;
+
+	public Actor(Piece piece, Pos pos, Board board) {
+		this.piece = piece;
+		this.pos = pos;
+		this.board = board;
+		this.pawnDir = color() == WHITE ? Pos::up : Pos::down;
+	}
 
 	private Optional<Map<Pos, Board>> cachedImplications = Optional.empty();
 
@@ -87,7 +91,7 @@ public class Actor {
 		List<Pos> threats;
 
 		if (role == PAWN) {
-			threats = dir().apply(pos)
+			threats = pawnDir.apply(pos)
 				.map(next -> List.of(next.left(), next.right()).stream()
 					.filter(Optional::isPresent)
 					.map(Optional::get)
@@ -194,20 +198,19 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> pawn() {
-		Function<Pos, Optional<Pos>> dir = color() == WHITE ? Pos::up : Pos::down;
-		return dir.apply(pos).map(next -> {
+		return pawnDir.apply(pos).map(next -> {
 			boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
 			Optional<Pos> fwd = Optional.of(next).filter(p -> !board.occupations().contains(p));
 
 			List<Optional<Pair<Pos, Board>>> optPositions = List.of(
 				fwd.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
 				fwd.filter((p) -> notMoved)
-					.flatMap(p -> dir.apply(p).filter(p2 -> !board.occupations().contains(p2))
+					.flatMap(p -> pawnDir.apply(p).filter(p2 -> !board.occupations().contains(p2))
 						.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
 				capture(Pos::left, next),
 				capture(Pos::right, next),
-				enpassant(dir, next, Pos::left),
-				enpassant(dir, next, Pos::right)
+				enpassant(pawnDir, next, Pos::left),
+				enpassant(pawnDir, next, Pos::right)
 			);
 			return optPositions.stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 		}).orElse(Map.of());
@@ -242,7 +245,5 @@ public class Actor {
 	private Set<Pos> enemies() {
 		return board.occupation().get(color().getOpposite());
 	}
-	private Function<Pos, Optional<Pos>> dir() {
-		return color() == WHITE ? Pos::up : Pos::down;
-	}
+	private final Function<Pos, Optional<Pos>> pawnDir;
 }
