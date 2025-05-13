@@ -5,15 +5,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Pos.A1;
+import static leo.lija.model.Pos.A3;
 import static leo.lija.model.Pos.B1;
 import static leo.lija.model.Pos.C1;
+import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.D1;
+import static leo.lija.model.Pos.D2;
+import static leo.lija.model.Pos.D3;
 import static leo.lija.model.Pos.E1;
+import static leo.lija.model.Pos.E2;
+import static leo.lija.model.Pos.E3;
 import static leo.lija.model.Pos.F1;
+import static leo.lija.model.Pos.F2;
+import static leo.lija.model.Pos.F3;
 import static leo.lija.model.Pos.G1;
+import static leo.lija.model.Pos.G3;
 import static leo.lija.model.Pos.H1;
+import static leo.lija.model.Pos.H3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a king should castle")
@@ -284,6 +295,78 @@ PPPPPPPP
 			void cantCastle() {
 				assertThat(s2.playMove(H1, G1).board.movesFrom(E1)).containsExactlyInAnyOrder(D1, F1);
 			}
+		}
+	}
+
+	@Nested
+	@DisplayName("threat to king prevents castling")
+	class ThreatToKing {
+		Board board = visual.str2Obj("""
+R   K  R""");
+
+		@Test
+		@DisplayName("by rook")
+		void byRook() {
+			assertThat(board.placeAt(BLACK.rook(), E3).movesFrom(E1)).containsExactlyInAnyOrder(D1, D2, F1, F2);
+		}
+
+		@Test
+		@DisplayName("by knight")
+		void byKnight() {
+			assertThat(board.placeAt(BLACK.knight(), D3).movesFrom(E1)).containsExactlyInAnyOrder(D1, D2, E2, F1);
+		}
+	}
+
+	@Nested
+	@DisplayName("threat on castle trip prevents castling")
+	class ThreatOnCastleTrip {
+
+		@Nested
+		@DisplayName("king side")
+		class KingSide {
+			Board board = visual.str2Obj("""
+R  QK  R""");
+			@Test
+			void close() {
+				assertThat(board.placeAt(BLACK.rook(), F3).movesFrom(E1)).containsExactlyInAnyOrder(D2, E2);
+			}
+			@Test
+			void far() {
+				assertThat(board.placeAt(BLACK.rook(), G3).movesFrom(E1)).containsExactlyInAnyOrder(D2, E2, F2, F1);
+			}
+		}
+		@Nested
+		@DisplayName("queen side")
+		class QueenSide {
+			Board board = visual.str2Obj("""
+R   KB R""");
+			@Test
+			void close() {
+				assertThat(board.placeAt(BLACK.rook(), D3).movesFrom(E1)).containsExactlyInAnyOrder(E2, F2);
+			}
+			@Test
+			void far() {
+				assertThat(board.placeAt(BLACK.rook(), C3).movesFrom(E1)).containsExactlyInAnyOrder(D1, D2, E2, F2);
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("threat to rook does not prevent castling")
+	class ThreatToRook {
+		@Test
+		@DisplayName("king side")
+		void kingSide() {
+			Board board = visual.str2Obj("""
+R  QK  R""");
+			assertThat(board.placeAt(BLACK.rook(), H3).movesFrom(E1)).containsExactlyInAnyOrder(D2, E2, F1, F2, G1);
+		}
+		@Test
+		@DisplayName("queen side")
+		void queenSide() {
+			Board board = visual.str2Obj("""
+R   KB R""");
+			assertThat(board.placeAt(BLACK.rook(), A3).movesFrom(E1)).containsExactlyInAnyOrder(C1, D1, D2, E2, F2);
 		}
 	}
 }
