@@ -3,7 +3,7 @@ package leo.lija.model;
 
 import org.springframework.data.util.Pair;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,17 +14,17 @@ import static leo.lija.model.Side.QUEEN_SIDE;
 
 public record History (
 	Optional<Pair<Pos, Pos>> lastMove,
-	Map<Color, Pair<Boolean, Boolean>> castles
+	EnumMap<Color, Pair<Boolean, Boolean>> castles
 ) {
 	public History() {
 		this(Optional.empty());
 	}
 
 	public History(Optional<Pair<Pos, Pos>> lastMove) {
-		this(lastMove, Map.of(
+		this(lastMove, new EnumMap<>(Map.of(
 			WHITE, Pair.of(true, true),
 			BLACK, Pair.of(true, true)
-		));
+		)));
 	}
 
 	public boolean canCastle(Color color, Side side) {
@@ -38,7 +38,7 @@ public record History (
 
 	public History withoutCastle(Color color, Side side) {
 		Pair<Boolean, Boolean> castlesColor = colorCastles(color);
-		Map<Color, Pair<Boolean, Boolean>> newCastles = new HashMap<>(castles);
+		EnumMap<Color, Pair<Boolean, Boolean>> newCastles = new EnumMap<>(castles);
 		newCastles.put(color, Pair.of(
 			!side.equals(KING_SIDE) && castlesColor.getFirst(),
 			!side.equals(QUEEN_SIDE) && castlesColor.getSecond()
@@ -47,7 +47,7 @@ public record History (
 	}
 
 	public History withoutCastles(Color color) {
-		Map<Color, Pair<Boolean, Boolean>> newCastles = new HashMap<>(castles);
+		EnumMap<Color, Pair<Boolean, Boolean>> newCastles = new EnumMap<>(castles);
 		newCastles.put(color, Pair.of(false, false));
 		return new History(lastMove, newCastles);
 	}
@@ -57,10 +57,10 @@ public record History (
 	}
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {
-		return new History(Optional.empty(), Map.of(color, Pair.of(kingSide, queenSide)));
+		return new History(Optional.empty(), new EnumMap<>(Map.of(color, Pair.of(kingSide, queenSide))));
 	}
 
 	public static History noCastle() {
-		return new History(Optional.empty(), Map.of());
+		return new History(Optional.empty(), new EnumMap<>(Color.class));
 	}
 }

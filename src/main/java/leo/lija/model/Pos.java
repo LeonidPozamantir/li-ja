@@ -112,6 +112,14 @@ public class Pos {
         return x > other.x;
     }
 
+    public List<Pos> horizontalPath(Pos other) {
+        return IntStream.range(Math.min(x, other.x), Math.max(x, other.x) + 1)
+            .mapToObj(i -> makePos(i, y))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
+    }
+
     public String xToString() {
         return String.valueOf((char) (x + 96));
     }

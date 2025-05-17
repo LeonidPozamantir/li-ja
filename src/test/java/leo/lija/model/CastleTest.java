@@ -8,9 +8,12 @@ import org.junit.jupiter.api.Test;
 import static leo.lija.model.Color.BLACK;
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Pos.A1;
+import static leo.lija.model.Pos.A2;
 import static leo.lija.model.Pos.A3;
 import static leo.lija.model.Pos.B1;
+import static leo.lija.model.Pos.B2;
 import static leo.lija.model.Pos.C1;
+import static leo.lija.model.Pos.C2;
 import static leo.lija.model.Pos.C3;
 import static leo.lija.model.Pos.D1;
 import static leo.lija.model.Pos.D2;
@@ -347,6 +350,26 @@ R   KB R""");
 			@Test
 			void far() {
 				assertThat(board.placeAt(BLACK.rook(), C3).movesFrom(E1)).containsExactlyInAnyOrder(D1, D2, E2, F2);
+			}
+		}
+		@Nested
+		@DisplayName("chess 960")
+		class Chess960 {
+			@Nested
+			@DisplayName("far kingside")
+			class FarKingside {
+				Board board = visual.str2Obj("""
+BK     R""");
+				@Test
+				@DisplayName("rook threat")
+				void rookThreat() {
+					assertThat(board.placeAt(BLACK.rook(), F3).movesFrom(B1)).containsExactlyInAnyOrder(A2, B2, C2, C1);
+				}
+				@Test
+				@DisplayName("enemy king threat")
+				void enemyKingThreat() {
+					assertThat(board.placeAt(BLACK.king(), E2).movesFrom(B1)).containsExactlyInAnyOrder(A2, B2, C2, C1);
+				}
 			}
 		}
 	}

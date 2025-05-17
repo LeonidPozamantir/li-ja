@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,27 +88,28 @@ public class Actor {
 
 
 	boolean threatens(Pos to) {
+		return threats().contains(to) && enemies().contains(to);
+	}
+
+	Set<Pos> threats() {
 		Role role = piece.role();
-		List<Pos> threats;
 
 		if (role == PAWN) {
-			threats = pawnDir.apply(pos)
+			return pawnDir.apply(pos)
 				.map(next -> List.of(next.left(), next.right()).stream()
 					.filter(Optional::isPresent)
 					.map(Optional::get)
-					.toList())
-				.orElse(List.of());
+					.collect(Collectors.toSet()))
+				.orElse(Set.of());
 		} else if (role.longRange) {
-			threats = longRangePoss(role.dirs);
+			return Set.copyOf(longRangePoss(role.dirs));
 		} else {
-			threats = role.dirs.stream()
+			return role.dirs.stream()
 				.map(dir -> dir.apply(pos))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.toList();
+				.collect(Collectors.toSet());
 		}
-
-		return threats.contains(to) && enemies().contains(to);
 	}
 
 	private Map<Pos, Board> kingSafety(Map<Pos, Board> implications) {
@@ -118,29 +120,38 @@ public class Actor {
 	}
 
 	private Map<Pos, Board> castle() {
-		Map<Pos, Board> res = new HashMap<>();
-		castleOn(KING_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
-		castleOn(QUEEN_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
-		return res;
-	}
+		if (history().canCastle(color())) {
 
-	Optional<Pair<Pos, Board>> castleOn(Side side) {
-		Color color = color();
-		return board.kingPosOf(color)
-			.filter(p -> board.getHistory().canCastle(color, side))
-			.flatMap(kingPos -> {
-				List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
-				if (tripToRook.isEmpty()) return Optional.empty();
-				Pos rookPos = tripToRook.getLast();
-				if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
-				Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
-				Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
-				if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
-				Optional<Board> newBoard = board.take(rookPos)
-					.flatMap(b -> b.move(kingPos, newKingPos.get()))
-					.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
-				return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
-			});
+			Set<Pos> enemyThreats = board.threatsOf(color().getOpposite());
+			Function<Side, Optional<Pair<Pos, Board>>> on = side -> {
+				Color color = color();
+				return board.kingPosOf(color)
+					.filter(p -> board.getHistory().canCastle(color, side))
+					.flatMap(kingPos -> {
+						List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
+						if (tripToRook.isEmpty()) return Optional.empty();
+						Pos rookPos = tripToRook.getLast();
+						if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
+						Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
+						Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
+						if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
+
+						List<Pos> securedPoss = kingPos.horizontalPath(newKingPos.get());
+						if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
+
+						Optional<Board> newBoard = board.take(rookPos)
+							.flatMap(b -> b.move(kingPos, newKingPos.get()))
+							.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
+						return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
+					});
+			};
+
+			Map<Pos, Board> res = new HashMap<>();
+			on.apply(KING_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+			on.apply(QUEEN_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+			return res;
+		} else return Map.of();
+
 	}
 
 	private Map<Pos, Board> preventsCastle(Map<Pos, Board> implications) {

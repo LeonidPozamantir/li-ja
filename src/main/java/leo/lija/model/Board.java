@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static leo.lija.model.Color.BLACK;
@@ -95,6 +96,12 @@ public class Board {
         return actorAt(from).moves();
     }
 
+    public Set<Pos> threatsOf(Color c) {
+        return actorsOf(c).stream()
+            .flatMap(actor -> actor.threats().stream())
+            .collect(Collectors.toSet());
+    }
+
     public Board placeAt(Piece piece, Pos at) {
         return placeAtOpt(piece, at).orElseThrow(() -> new ChessRulesException("Cannot place to occupied " + at));
     }
@@ -163,7 +170,7 @@ public class Board {
         return new Board(pieces, h);
     }
 
-    public Board updateHistory(Function<History, History> f) {
+    public Board updateHistory(UnaryOperator<History> f) {
         return new Board(pieces, f.apply(history));
     }
 
