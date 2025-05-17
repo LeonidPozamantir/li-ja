@@ -96,12 +96,6 @@ public class Board {
         return actorAt(from).moves();
     }
 
-    public Set<Pos> threatsOf(Color c) {
-        return actorsOf(c).stream()
-            .flatMap(actor -> actor.threats().stream())
-            .collect(Collectors.toSet());
-    }
-
     public Board placeAt(Piece piece, Pos at) {
         return placeAtOpt(piece, at).orElseThrow(() -> new ChessRulesException("Cannot place to occupied " + at));
     }
