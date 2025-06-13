@@ -101,7 +101,7 @@ public class Actor {
 					.map(Optional::get)
 					.collect(Collectors.toSet()))
 				.orElse(Set.of());
-		} else if (role.longRange) {
+		} else if (role == QUEEN || role == BISHOP || role == ROOK) {
 			return Set.copyOf(longRangePoss(role.dirs));
 		} else {
 			return role.dirs.stream()
