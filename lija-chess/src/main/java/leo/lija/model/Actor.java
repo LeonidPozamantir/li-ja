@@ -1,7 +1,7 @@
 package leo.lija.model;
 
+import leo.lija.utils.Pair;
 import lombok.Getter;
-import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,39 +122,38 @@ public class Actor {
 	Set<Pos> enemyThreats = null;
 
 	private Map<Pos, Board> castle() {
-
-		Function<Side, Optional<Pair<Pos, Board>>> on = side -> {
-			Color color = color();
-			return board.kingPosOf(color)
-				.filter(p -> board.getHistory().canCastle(color, side))
-				.flatMap(kingPos -> {
-					List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
-					if (tripToRook.isEmpty()) return Optional.empty();
-					Pos rookPos = tripToRook.getLast();
-					if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
-					Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
-					Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
-					if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
-
-					List<Pos> securedPoss = kingPos.horizontalPath(newKingPos.get());
-					if (enemyThreats == null) {
-						enemyThreats = board.actorsOf(color().getOpposite()).stream()
-							.flatMap(actor -> actor.threats().stream())
-							.collect(Collectors.toSet());
-					}
-					if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
-
-					Optional<Board> newBoard = board.take(rookPos)
-						.flatMap(b -> b.move(kingPos, newKingPos.get()))
-						.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
-					return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
-				});
-		};
-
 		Map<Pos, Board> res = new HashMap<>();
-		on.apply(KING_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
-		on.apply(QUEEN_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(KING_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
+		castleOn(QUEEN_SIDE).ifPresent(pair -> res.put(pair.getFirst(), pair.getSecond()));
 		return res;
+	}
+
+	Optional<Pair<Pos, Board>> castleOn(Side side) {
+		Color color = color();
+		return board.kingPosOf(color)
+			.filter(p -> board.getHistory().canCastle(color, side))
+			.flatMap(kingPos -> {
+				List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
+				if (tripToRook.isEmpty()) return Optional.empty();
+				Pos rookPos = tripToRook.getLast();
+				if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
+				Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
+				Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
+				if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
+
+				List<Pos> securedPoss = kingPos.horizontalPath(newKingPos.get());
+				if (enemyThreats == null) {
+					enemyThreats = board.actorsOf(color().getOpposite()).stream()
+						.flatMap(actor -> actor.threats().stream())
+						.collect(Collectors.toSet());
+				}
+				if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
+
+				Optional<Board> newBoard = board.take(rookPos)
+					.flatMap(b -> b.move(kingPos, newKingPos.get()))
+					.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
+				return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
+			});
 	}
 
 	private Map<Pos, Board> preventsCastle(Map<Pos, Board> implications) {

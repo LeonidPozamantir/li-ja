@@ -1,10 +1,10 @@
 package leo.lija.model;
 
 import leo.lija.format.VisualFormat;
+import leo.lija.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.util.Pair;
 
 import static leo.lija.model.Pos.A1;
 import static leo.lija.model.Pos.A2;

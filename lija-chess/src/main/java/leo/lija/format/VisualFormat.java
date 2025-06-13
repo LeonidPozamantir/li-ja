@@ -6,7 +6,6 @@ import leo.lija.model.History;
 import leo.lija.model.Piece;
 import leo.lija.model.Pos;
 import leo.lija.model.Role;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
  * RN  K  R
  */
 
-@Service
+
 public class VisualFormat implements Format<Board> {
 
     private final Map<Character, Role> pieces = Role.all.stream().collect(HashMap::new, (m, r) -> m.put(r.fen, r), Map::putAll);

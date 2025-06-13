@@ -1,7 +1,7 @@
 package leo.lija.model;
 
 
-import org.springframework.data.util.Pair;
+import leo.lija.utils.Pair;
 
 import java.util.EnumMap;
 import java.util.Map;

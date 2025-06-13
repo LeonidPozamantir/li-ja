@@ -1,8 +1,8 @@
 package leo.lija.model;
 
 import leo.lija.exceptions.ChessRulesException;
+import leo.lija.utils.Pair;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
 
 import java.util.Arrays;
 import java.util.List;
