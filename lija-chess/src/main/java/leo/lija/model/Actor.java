@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static leo.lija.model.Color.WHITE;
 import static leo.lija.model.Role.BISHOP;
@@ -96,7 +97,7 @@ public class Actor {
 
 		if (role == PAWN) {
 			return pawnDir.apply(pos)
-				.map(next -> List.of(next.left(), next.right()).stream()
+				.map(next -> Stream.of(next.left(), next.right())
 					.filter(Optional::isPresent)
 					.map(Optional::get)
 					.collect(Collectors.toSet()))
@@ -151,7 +152,7 @@ public class Actor {
 
 				Optional<Board> newBoard = board.take(rookPos)
 					.flatMap(b -> b.move(kingPos, newKingPos.get()))
-					.flatMap(b -> b.placeAtOpt(color.rook(), newRookPos.get()));
+					.flatMap(b -> b.place(color.rook(), newRookPos.get()));
 				return newBoard.map(b -> Pair.of(newKingPos.get(), b.updateHistory(b1 -> b1.withoutCastles(color))));
 			});
 	}
@@ -160,7 +161,7 @@ public class Actor {
 		if (history().canCastle(color())) {
 			History newHistory = history().withoutCastles(color());
 			return implications.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().withHistory(newHistory)));
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().withHistory(newHistory)));
 		}
 		return implications;
 	}
@@ -212,12 +213,11 @@ public class Actor {
 
 	private Map<Pos, Board> pawn() {
 		return pawnDir.apply(pos).map(next -> {
-			boolean notMoved = (color() == WHITE && pos.getY() == 2) || pos.getY() == 7;
 			Optional<Pos> fwd = Optional.of(next).filter(p -> !board.occupations().contains(p));
 
 			List<Optional<Pair<Pos, Board>>> optPositions = List.of(
-				fwd.flatMap(p -> board.move(pos, p).map(b -> Pair.of(p, b))),
-				fwd.filter((p) -> notMoved)
+				fwd.flatMap(p -> forward(p).map(b -> Pair.of(p, b))),
+				fwd.filter((p) -> pos.getY() == color().getUnmovedPawnY())
 					.flatMap(p -> pawnDir.apply(p).filter(p2 -> !board.occupations().contains(p2))
 						.flatMap(p2 -> board.move(pos, p2).map(b -> Pair.of(p2, b)))),
 				capture(Pos::left, next),
@@ -229,6 +229,11 @@ public class Actor {
 		}).orElse(Map.of());
 	}
 
+	private Optional<Board> forward(Pos p) {
+		if (pos.getY() == color().getPromotablePawnY()) return board.promote(pos, p);
+		return board.move(pos, p);
+	}
+
 	private Optional<Pair<Pos, Board>> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
 		Optional<Pos> optPos = horizontal.apply(next).filter(enemies()::contains);
 		Optional<Board> optBoard = optPos.flatMap(p -> board.taking(pos, p));
@@ -236,8 +241,7 @@ public class Actor {
 	}
 
 	private Optional<Pair<Pos, Board>> enpassant(Function<Pos, Optional<Pos>> dir, Pos next, Function<Pos, Optional<Pos>> horizontal) {
-		boolean passable = (color() == WHITE && pos.getY() == 5) || pos.getY() == 4;
-		if (!passable) return Optional.empty();
+		if (pos.getY() != color().getPassablePawnY()) return Optional.empty();
 		Optional<Pos> optVictimPos = horizontal.apply(pos);
 		Optional<Piece> optVictim = optVictimPos.flatMap(board::at).filter(p -> p.equals(color().getOpposite().pawn()));
 		return optVictim.flatMap(victim -> {

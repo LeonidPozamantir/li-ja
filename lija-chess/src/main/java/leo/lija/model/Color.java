@@ -11,9 +11,10 @@ import static leo.lija.model.Role.PAWN;
 import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 
+@Getter
 public enum Color {
-    WHITE,
-    BLACK;
+    WHITE(2, 5, 7),
+    BLACK(7, 4, 2);
 
     public Piece of(Role role) {
         return new Piece(this, role);
@@ -22,8 +23,16 @@ public enum Color {
         return b ? WHITE : BLACK;
     }
 
-    @Getter
     private Color opposite;
+    private int unmovedPawnY;
+    private int passablePawnY;
+    private int promotablePawnY;
+
+    Color(int unmovedPawnY, int passablePawnY, int promotablePawnY) {
+        this.unmovedPawnY = unmovedPawnY;
+        this.passablePawnY = passablePawnY;
+        this.promotablePawnY = promotablePawnY;
+    }
 
     static {
         WHITE.opposite = BLACK;

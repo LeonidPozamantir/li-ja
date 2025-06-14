@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static leo.lija.model.Role.QUEEN;
 
 @RequiredArgsConstructor
 public class Situation {
@@ -43,21 +46,29 @@ public class Situation {
 		return !check() && moves().isEmpty();
 	}
 
-	public Situation playMove(Pos from, Pos to) {
-		Actor actor = board.actorAt(from);
-		Board newBoard = actor.implications().get(to);
-		if (!actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
-		return new Situation(newBoard, color.getOpposite());
-	}
-
-	public Situation playMove(Pair<Pos, Pos> move) {
-		return playMove(move.getFirst(), move.getSecond());
-	}
-
 	@SafeVarargs
 	public final Situation playMoves(Pair<Pos, Pos>... moves) {
 		return Arrays.stream(moves)
-			.reduce(this, Situation::playMove, (s1, s2) -> s1);
+			.reduce(this, (s, m) -> s.playMove(m.getFirst(), m.getSecond()), (s1, s2) -> s1);
+	}
+
+	public Situation playMove(Pos from, Pos to) {
+		return playMove(from, to, QUEEN);
+	}
+
+	public Situation playMove(Pos from, Pos to, Role promotion) {
+		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
+		Actor actor = board.actorAt(from);
+		Board newBoard = actor.implications().get(to);
+		if (!actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
+
+		if (promotion == QUEEN) return newBoard.as(color.getOpposite());
+		return Optional.of(newBoard)
+			.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
+			.flatMap(b1 -> b1.take(to))
+			.flatMap(b2 -> b2.place(color.of(promotion), to))
+			.map(b3 -> b3.as(color.getOpposite()))
+			.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 	}
 
 	public Situation as(Color newColor) {

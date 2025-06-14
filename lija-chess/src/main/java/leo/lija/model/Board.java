@@ -22,7 +22,6 @@ import static leo.lija.model.Pos.makePos;
 import static leo.lija.model.Role.BISHOP;
 import static leo.lija.model.Role.KING;
 import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.PAWN;
 import static leo.lija.model.Role.QUEEN;
 import static leo.lija.model.Role.ROOK;
 
@@ -66,7 +65,7 @@ public class Board {
 
     public Map<Color, List<Actor>> colorActors() {
         if (optColorActors.isEmpty()) {
-            Map<Color, List<Actor>> colorActors = actors().values().stream().collect(Collectors.groupingBy(a -> a.color()));
+            Map<Color, List<Actor>> colorActors = actors().values().stream().collect(Collectors.groupingBy(Actor::color));
             optColorActors = Optional.of(colorActors);
         }
         return optColorActors.get();
@@ -97,10 +96,10 @@ public class Board {
     }
 
     public Board placeAt(Piece piece, Pos at) {
-        return placeAtOpt(piece, at).orElseThrow(() -> new ChessRulesException("Cannot place to occupied " + at));
+        return place(piece, at).orElseThrow(() -> new ChessRulesException("Cannot place to occupied " + at));
     }
 
-    public Optional<Board> placeAtOpt(Piece piece, Pos at) {
+    public Optional<Board> place(Piece piece, Pos at) {
         if (pieces.containsKey(at)) return Optional.empty();
         Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
         piecesNew.put(at, piece);
@@ -151,13 +150,14 @@ public class Board {
         }
     }
 
-    public Board promoteTo(Pos at, Role role) {
-        if (role == PAWN || role == KING) throw new ChessRulesException("Cannot promote to " + role);
-        if (!pieces.containsKey(at) || pieces.get(at).role() != PAWN)
-            throw new ChessRulesException("No pawn at " + at + " to promote");
-        Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
-        piecesNew.put(at, new Piece(pieces.get(at).color(), role));
-        return new Board(piecesNew, history);
+    public Optional<Board> promote(Pos orig, Pos dest) {
+        return Optional.ofNullable(pieces.get(orig))
+            .flatMap(pawn -> {
+                Optional<Board> b1 = move(orig, dest);
+                Optional<Board> b2 = b1.flatMap(b -> b.take(dest));
+                Optional<Board> b3 = b2.map(b -> b.placeAt(pawn.color().queen(), dest));
+                return b3;
+            });
     }
 
     public Board withHistory(History h) {
@@ -170,6 +170,12 @@ public class Board {
 
     public Situation as(Color c) {
         return new Situation(this, c);
+    }
+
+    public long count(Piece p) {
+        return pieces.entrySet().stream()
+            .filter(e -> e.getValue().equals(p))
+            .count();
     }
 
     public Map<Color, Set<Pos>> occupation() {

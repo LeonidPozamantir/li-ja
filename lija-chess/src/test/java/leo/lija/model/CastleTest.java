@@ -33,12 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("a king should castle")
 public class CastleTest {
 
-	private void beSituation(Situation situation, String visualString) {
-		assertThat(visual.obj2Str(situation.board))
-			.isEqualTo(visual.obj2Str(visual.str2Obj(visualString)));
-	}
+
 
 	VisualFormat visual = new VisualFormat();
+	Utils utils = new Utils();
 	@Nested
 	@DisplayName("king side")
 	class Kingside {
@@ -105,7 +103,7 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				beSituation(goodHist.as(WHITE).playMove(E1, G1), """
+				utils.beSituation(goodHist.as(WHITE).playMove(E1, G1), """
 PPPPPPPP
 R  Q RK """);
 			}
@@ -160,7 +158,7 @@ R   KB R""");
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				beSituation(goodHist.as(WHITE).playMove(E1, C1), """
+				utils.beSituation(goodHist.as(WHITE).playMove(E1, C1), """
 PPPPPPPP
   KR B R""");
 			}
@@ -183,7 +181,7 @@ R   K  R""").withHistory(History.castle(WHITE, true, true));
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				beSituation(s2, """
+				utils.beSituation(s2, """
 PPPPPPPP
 R    RK """);
 			}
@@ -209,7 +207,7 @@ R    RK """);
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				beSituation(s2, """
+				utils.beSituation(s2, """
 PPPPPPPP
   KR   R""");
 			}

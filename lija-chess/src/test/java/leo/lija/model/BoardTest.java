@@ -111,33 +111,10 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("should allow a pawn to be promoted to any role")
-    void promoteToQRBN() {
-        assertThat(List.of(QUEEN, ROOK, BISHOP, KNIGHT)).allMatch(r -> {
-            Optional<Piece> op = Board.empty().placeAt(new Piece(WHITE, PAWN), A8).promoteTo(A8, r).at(A8);
-            return op.isPresent() && op.get().role() == r;
-        });
-    }
-
-    @Test
-    @DisplayName("should not allow a pawn to be promoted to king or pawn")
-    void promoteToPK() {
-        assertThat(List.of(PAWN, KING)).allSatisfy(r -> {
-            Board board = Board.empty().placeAt(new Piece(WHITE, PAWN), A8);
-            assertThrows(ChessRulesException.class, () -> board.promoteTo(A8, r));
-        });
-    }
-
-    @Test
-    @DisplayName("should not allow an empty position to be promoted")
-    void promoteEmpty() {
-        assertThrows(ChessRulesException.class, () -> newGameBoard.promoteTo(A6, QUEEN));
-    }
-
-    @Test
-    @DisplayName("should not allow to promote non-pawn")
-    void promoteNonPawn() {
-        assertThrows(ChessRulesException.class, () -> newGameBoard.promoteTo(A1, QUEEN));
+    @DisplayName("should allow a pawn to be promoted to a queen")
+    void promoteToQueen() {
+        Board b = Board.empty().placeAt(new Piece(WHITE, PAWN), A7).promote(A7, A8).get();
+        assertThat(b.at(A8)).contains(WHITE.queen());
     }
 
     @Test

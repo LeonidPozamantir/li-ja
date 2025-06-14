@@ -12,7 +12,7 @@ public enum Role {
     QUEEN('q',true, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
     ROOK('r', true, List.of(Pos::up, Pos::down, Pos::left, Pos::right)),
     BISHOP('b', true, List.of(Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    KNIGHT('n', false, List.of(
+    KNIGHT('n', true, List.of(
         pos -> pos.up().flatMap(Pos::upLeft),
         pos -> pos.up().flatMap(Pos::upRight),
         pos -> pos.left().flatMap(Pos::upLeft),
@@ -27,7 +27,7 @@ public enum Role {
     public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
 
     public final char fen;
-    public final boolean longRange;
+    public final boolean promotable;
     final List<Function<Pos, Optional<Pos>>> dirs;
 
 }
