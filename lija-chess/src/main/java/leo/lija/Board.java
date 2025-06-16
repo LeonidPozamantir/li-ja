@@ -91,7 +91,7 @@ public class Board {
         return Optional.ofNullable(optKingPos.get().get(color));
     }
 
-    public Set<Pos> movesFrom(Pos from) {
+    public List<Pos> destsFrom(Pos from) {
         return actorAt(from).destinations();
     }
 

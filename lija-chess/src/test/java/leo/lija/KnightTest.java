@@ -35,7 +35,7 @@ class KnightTest {
 
 	private final Piece knight = new Piece(Color.WHITE, KNIGHT);
 	private Set<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(knight, pos).movesFrom(pos);
+		return Board.empty().placeAt(knight, pos).destsFrom(pos);
 	}
 
 	@Test
@@ -63,7 +63,7 @@ k B
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 
@@ -89,7 +89,7 @@ n
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 

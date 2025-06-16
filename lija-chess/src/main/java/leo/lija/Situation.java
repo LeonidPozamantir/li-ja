@@ -27,10 +27,10 @@ public class Situation {
 		return board.actorsOf(color);
 	}
 
-	public Map<Pos, Set<Pos>> moves() {
+	public Map<Pos, List<Move>> moves() {
 		return actors().stream()
 			.filter(a -> !a.destinations().isEmpty())
-			.collect(Collectors.toMap(Actor::getPos, Actor::destinations));
+			.collect(Collectors.toMap(Actor::getPos, Actor::moves));
 	}
 
 	public boolean check() {
@@ -46,28 +46,24 @@ public class Situation {
 		return !check() && moves().isEmpty();
 	}
 
-	@SafeVarargs
-	public final Situation playMoves(Pair<Pos, Pos>... moves) {
-		return Arrays.stream(moves)
-			.reduce(this, (s, m) -> s.playMove(m.getFirst(), m.getSecond()), (s1, s2) -> s1);
-	}
-
-	public Situation playMove(Pos from, Pos to) {
+	public Move playMove(Pos from, Pos to) {
 		return playMove(from, to, QUEEN);
 	}
 
-	public Situation playMove(Pos from, Pos to, Role promotion) {
+	public Move playMove(Pos from, Pos to, Role promotion) {
 		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 		Actor actor = board.actorAt(from);
-		Board newBoard = actor.moves().get(to);
-		if (!actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
+		if (!actor.is(color)) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
+		Move move = actor.moves().stream()
+			.filter(m -> m.dest().equals(to))
+			.findFirst().orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 
-		if (promotion == QUEEN) return newBoard.as(color.getOpposite());
-		return Optional.of(newBoard)
+		if (promotion == QUEEN) return move;
+		return Optional.of(move.after())
 			.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
 			.flatMap(b1 -> b1.take(to))
 			.flatMap(b2 -> b2.place(color.of(promotion), to))
-			.map(b3 -> b3.as(color.getOpposite()))
+			.map(b3 -> move.withAfter(b3).withPromotion(Optional.of(promotion)))
 			.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 	}
 

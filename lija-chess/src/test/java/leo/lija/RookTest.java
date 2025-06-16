@@ -50,7 +50,7 @@ class RookTest {
 
     private final Piece rook = new Piece(Color.WHITE, ROOK);
     private Set<Pos> moves(Pos pos) {
-        return Board.empty().placeAt(rook, pos).movesFrom(pos);
+        return Board.empty().placeAt(rook, pos).destsFrom(pos);
     }
 
     @Test
@@ -78,7 +78,7 @@ N R    P
 PPPPPPPP
  NBQKBNR
 """);
-        assertThat(board.movesFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
+        assertThat(board.destsFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
     }
 
     @Test
@@ -94,7 +94,7 @@ n R   p
 PPPPPPPP
  NBQKBNR
 """);
-        assertThat(board.movesFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, A4, D4, E4, F4, G4);
+        assertThat(board.destsFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, A4, D4, E4, F4, G4);
     }
 
     @Nested

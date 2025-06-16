@@ -61,7 +61,7 @@ class KingTest {
 		Board board = visual.str2Obj("""
 PPPPPPPP
 R  QK NR""");
-		assertThat(board.movesFrom(E1)).containsExactly(F1);
+		assertThat(board.destsFrom(E1)).containsExactly(F1);
 	}
 
 	@Test
@@ -75,7 +75,7 @@ NPKP   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 
@@ -97,7 +97,7 @@ PPPPPPPP
  p
 N
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C3);
+		Set<Pos> possibleMoves = board.destsFrom(C3);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 
@@ -150,6 +150,6 @@ PP   PPP
 		assertThat(visual.str2Obj("""
    k
  K
-""").movesFrom(B1)).containsExactlyInAnyOrder(A1, A2, B2);
+""").destsFrom(B1)).containsExactlyInAnyOrder(A1, A2, B2);
 	}
 }

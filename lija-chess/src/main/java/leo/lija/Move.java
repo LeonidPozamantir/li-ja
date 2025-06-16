@@ -1,6 +1,7 @@
 package leo.lija;
 
 import leo.lija.exceptions.ChessRulesException;
+import lombok.With;
 
 import java.util.Optional;
 
@@ -9,9 +10,9 @@ public record Move(
     Pos orig,
     Pos dest,
     Board before,
-    Board after,
+    @With Board after,
     Optional<Pos> capture,
-    Optional<Role> promotion,
+    @With Optional<Role> promotion,
     boolean castle,
     boolean enpassant
 ) {

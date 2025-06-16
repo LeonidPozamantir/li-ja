@@ -35,7 +35,7 @@ class KingSafetyTest {
     P n
 PPPP   P
 RNBQK  R""");
-			assertThat(board.movesFrom(E1)).containsExactly(F2);
+			assertThat(board.destsFrom(E1)).containsExactly(F2);
 		}
 
 		@Test
@@ -45,7 +45,7 @@ RNBQK  R""");
     b n
 PPPP   P
 RNBQK  R""");
-			assertThat(board.movesFrom(E1)).isEmpty();
+			assertThat(board.destsFrom(E1)).isEmpty();
 		}
 
 		@Test
@@ -56,7 +56,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK  R""");
-			assertThat(board.movesFrom(E1)).containsExactlyInAnyOrder(F1, F2);
+			assertThat(board.destsFrom(E1)).containsExactlyInAnyOrder(F1, F2);
 		}
 
 	}
@@ -75,7 +75,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK  R""");
-				assertThat(board.movesFrom(D1)).containsExactly(E2);
+				assertThat(board.destsFrom(D1)).containsExactly(E2);
 			}
 
 			@Test
@@ -85,7 +85,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK NR""");
-				assertThat(board.movesFrom(G1)).containsExactly(E2);
+				assertThat(board.destsFrom(G1)).containsExactly(E2);
 			}
 
 			@Test
@@ -94,7 +94,7 @@ RNBQK NR""");
   K    r
 PPPP   P
 RNBQ  NR""");
-				assertThat(board.movesFrom(D2)).containsExactly(D3);
+				assertThat(board.destsFrom(D2)).containsExactly(D3);
 			}
 
 			@Test
@@ -105,7 +105,7 @@ RNBQ  NR""");
 
 PPPP   P
 RNBQ  NR""");
-				assertThat(board.movesFrom(D2)).containsExactly(D4);
+				assertThat(board.destsFrom(D2)).containsExactly(D4);
 			}
 		}
 
@@ -119,7 +119,7 @@ RNBQ  NR""");
 
 PPPPK Q
 RNB    R""");
-				assertThat(board.movesFrom(G2)).containsExactly(E4);
+				assertThat(board.destsFrom(G2)).containsExactly(E4);
 			}
 
 			@Test
@@ -130,7 +130,7 @@ RNB    R""");
 
 PPPPQ
 RNB K  R""");
-				assertThat(board.movesFrom(E2)).containsExactlyInAnyOrder(E3, E4);
+				assertThat(board.destsFrom(E2)).containsExactlyInAnyOrder(E3, E4);
 			}
 
 			@Test
@@ -140,7 +140,7 @@ RNB K  R""");
      P
 PPPP
 RNB K  R""");
-				assertThat(board.movesFrom(F3)).containsExactly(E4);
+				assertThat(board.destsFrom(F3)).containsExactly(E4);
 			}
 		}
 
@@ -154,7 +154,7 @@ RNB K  R""");
 
 PPPPB
 RNB K  R""");
-				assertThat(board.movesFrom(E2)).isEmpty();
+				assertThat(board.destsFrom(E2)).isEmpty();
 			}
 
 			@Test
@@ -164,7 +164,7 @@ RNB K  R""");
  K P  r
 PPP
 RNB    R""");
-				assertThat(board.movesFrom(D3)).isEmpty();
+				assertThat(board.destsFrom(D3)).isEmpty();
 			}
 		}
 	}

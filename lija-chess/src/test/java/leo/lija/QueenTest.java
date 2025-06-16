@@ -60,7 +60,7 @@ class QueenTest {
 
 	private final Piece queen = new Piece(Color.WHITE, QUEEN);
 	private Set<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(queen, pos).movesFrom(pos);
+		return Board.empty().placeAt(queen, pos).destsFrom(pos);
 	}
 
 	@Test
@@ -88,7 +88,7 @@ N Q    P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B   x
   x  x
@@ -114,7 +114,7 @@ N QP   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.movesFrom(C4);
+		Set<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
   x  x

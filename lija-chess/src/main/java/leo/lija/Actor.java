@@ -72,8 +72,8 @@ public class Actor {
 		return moves;
 	}
 
-	public Set<Pos> destinations() {
-		return moves().stream().map(Move::dest).collect(Collectors.toSet());
+	public List<Pos> destinations() {
+		return moves().stream().map(Move::dest).toList();
 	}
 
 	Color color() {
