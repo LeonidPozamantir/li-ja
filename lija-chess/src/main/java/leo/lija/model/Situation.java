@@ -29,8 +29,8 @@ public class Situation {
 
 	public Map<Pos, Set<Pos>> moves() {
 		return actors().stream()
-			.filter(a -> !a.moves().isEmpty())
-			.collect(Collectors.toMap(Actor::getPos, Actor::moves));
+			.filter(a -> !a.destinations().isEmpty())
+			.collect(Collectors.toMap(Actor::getPos, Actor::destinations));
 	}
 
 	public boolean check() {
@@ -59,7 +59,7 @@ public class Situation {
 	public Situation playMove(Pos from, Pos to, Role promotion) {
 		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 		Actor actor = board.actorAt(from);
-		Board newBoard = actor.implications().get(to);
+		Board newBoard = actor.moves().get(to);
 		if (!actor.is(color) || newBoard == null) throw new ChessRulesException("Illegal move %s->%s".formatted(from, to));
 
 		if (promotion == QUEEN) return newBoard.as(color.getOpposite());

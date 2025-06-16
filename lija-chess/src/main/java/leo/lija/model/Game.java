@@ -15,9 +15,13 @@ public class Game {
 
     private Board board;
     private Color player;
+    private List<String> pgnMoves;
 
     private final List<Color> players = List.of(WHITE, BLACK);
 
+    public Game(Board board, Color player) {
+        this(board, player, List.of());
+    }
     public Game() {
         this(new Board(), WHITE);
     }

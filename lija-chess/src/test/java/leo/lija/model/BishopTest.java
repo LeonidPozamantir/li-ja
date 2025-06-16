@@ -38,7 +38,7 @@ class BishopTest {
 
 	private final Piece bishop = new Piece(Color.WHITE, BISHOP);
 	private Set<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(bishop, pos).actorAt(pos).moves();
+		return Board.empty().placeAt(bishop, pos).actorAt(pos).destinations();
 	}
 
 	@Test

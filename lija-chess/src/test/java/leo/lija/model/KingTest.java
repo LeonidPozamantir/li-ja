@@ -40,7 +40,7 @@ class KingTest {
 
 	private final Piece king = new Piece(Color.WHITE, KING);
 	private Set<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(king, pos).actorAt(pos).moves();
+		return Board.empty().placeAt(king, pos).actorAt(pos).destinations();
 	}
 
 	@Test

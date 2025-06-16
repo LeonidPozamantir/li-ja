@@ -92,7 +92,7 @@ public class Board {
     }
 
     public Set<Pos> movesFrom(Pos from) {
-        return actorAt(from).moves();
+        return actorAt(from).destinations();
     }
 
     public Board placeAt(Piece piece, Pos at) {
@@ -155,8 +155,7 @@ public class Board {
             .flatMap(pawn -> {
                 Optional<Board> b1 = move(orig, dest);
                 Optional<Board> b2 = b1.flatMap(b -> b.take(dest));
-                Optional<Board> b3 = b2.map(b -> b.placeAt(pawn.color().queen(), dest));
-                return b3;
+                return b2.map(b -> b.placeAt(pawn.color().queen(), dest));
             });
     }
 
