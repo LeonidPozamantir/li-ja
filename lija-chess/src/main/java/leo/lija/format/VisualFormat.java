@@ -1,11 +1,11 @@
 package leo.lija.format;
 
-import leo.lija.model.Board;
-import leo.lija.model.Color;
-import leo.lija.model.History;
-import leo.lija.model.Piece;
-import leo.lija.model.Pos;
-import leo.lija.model.Role;
+import leo.lija.Board;
+import leo.lija.Color;
+import leo.lija.History;
+import leo.lija.Piece;
+import leo.lija.Pos;
+import leo.lija.Role;
 
 import java.util.Collection;
 import java.util.HashMap;

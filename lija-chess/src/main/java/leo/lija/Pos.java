@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

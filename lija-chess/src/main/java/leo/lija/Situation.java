@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.exceptions.ChessRulesException;
 import leo.lija.utils.Pair;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static leo.lija.model.Role.QUEEN;
+import static leo.lija.Role.QUEEN;
 
 @RequiredArgsConstructor
 public class Situation {

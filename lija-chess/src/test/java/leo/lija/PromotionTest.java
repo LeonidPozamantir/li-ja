@@ -1,14 +1,14 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Pos.C1;
-import static leo.lija.model.Pos.C2;
-import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.QUEEN;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Pos.C1;
+import static leo.lija.Pos.C2;
+import static leo.lija.Role.KNIGHT;
+import static leo.lija.Role.QUEEN;
 
 @DisplayName("pawn promotion should")
 class PromotionTest {

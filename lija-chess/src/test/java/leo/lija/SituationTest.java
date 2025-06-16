@@ -1,11 +1,11 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Color.WHITE;
+import static leo.lija.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a game should")

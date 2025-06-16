@@ -1,14 +1,11 @@
-package leo.lija.model;
+package leo.lija;
 
 import lombok.AllArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Color.WHITE;
 
 @AllArgsConstructor
 public class Game {

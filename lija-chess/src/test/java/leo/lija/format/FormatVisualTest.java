@@ -1,20 +1,20 @@
 package leo.lija.format;
 
 
-import leo.lija.model.Board;
-import leo.lija.model.History;
+import leo.lija.Board;
+import leo.lija.History;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Pos.A6;
-import static leo.lija.model.Pos.B3;
-import static leo.lija.model.Pos.B5;
-import static leo.lija.model.Pos.D3;
-import static leo.lija.model.Pos.D5;
-import static leo.lija.model.Pos.E6;
-import static leo.lija.model.Pos.F7;
-import static leo.lija.model.Pos.G8;
+import static leo.lija.Pos.A6;
+import static leo.lija.Pos.B3;
+import static leo.lija.Pos.B5;
+import static leo.lija.Pos.D3;
+import static leo.lija.Pos.D5;
+import static leo.lija.Pos.E6;
+import static leo.lija.Pos.F7;
+import static leo.lija.Pos.G8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 import static org.junit.jupiter.api.Assertions.assertEquals;

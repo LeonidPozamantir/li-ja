@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.Disabled;
@@ -9,28 +9,28 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Set;
 
-import static leo.lija.model.Pos.A1;
-import static leo.lija.model.Pos.A2;
-import static leo.lija.model.Pos.A5;
-import static leo.lija.model.Pos.B1;
-import static leo.lija.model.Pos.B2;
-import static leo.lija.model.Pos.B5;
-import static leo.lija.model.Pos.C3;
-import static leo.lija.model.Pos.C4;
-import static leo.lija.model.Pos.C5;
-import static leo.lija.model.Pos.D3;
-import static leo.lija.model.Pos.D4;
-import static leo.lija.model.Pos.D5;
-import static leo.lija.model.Pos.E1;
-import static leo.lija.model.Pos.E3;
-import static leo.lija.model.Pos.E4;
-import static leo.lija.model.Pos.E5;
-import static leo.lija.model.Pos.F1;
-import static leo.lija.model.Pos.G7;
-import static leo.lija.model.Pos.G8;
-import static leo.lija.model.Pos.H7;
-import static leo.lija.model.Pos.H8;
-import static leo.lija.model.Role.KING;
+import static leo.lija.Pos.A1;
+import static leo.lija.Pos.A2;
+import static leo.lija.Pos.A5;
+import static leo.lija.Pos.B1;
+import static leo.lija.Pos.B2;
+import static leo.lija.Pos.B5;
+import static leo.lija.Pos.C3;
+import static leo.lija.Pos.C4;
+import static leo.lija.Pos.C5;
+import static leo.lija.Pos.D3;
+import static leo.lija.Pos.D4;
+import static leo.lija.Pos.D5;
+import static leo.lija.Pos.E1;
+import static leo.lija.Pos.E3;
+import static leo.lija.Pos.E4;
+import static leo.lija.Pos.E5;
+import static leo.lija.Pos.F1;
+import static leo.lija.Pos.G7;
+import static leo.lija.Pos.G8;
+import static leo.lija.Pos.H7;
+import static leo.lija.Pos.H8;
+import static leo.lija.Role.KING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("King should")

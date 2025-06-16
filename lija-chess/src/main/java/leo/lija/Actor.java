@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.utils.Pair;
 import lombok.Getter;
@@ -12,15 +12,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static leo.lija.model.Color.WHITE;
-import static leo.lija.model.Role.BISHOP;
-import static leo.lija.model.Role.KING;
-import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.PAWN;
-import static leo.lija.model.Role.QUEEN;
-import static leo.lija.model.Role.ROOK;
-import static leo.lija.model.Side.KING_SIDE;
-import static leo.lija.model.Side.QUEEN_SIDE;
+import static leo.lija.Color.WHITE;
+import static leo.lija.Role.BISHOP;
+import static leo.lija.Role.KING;
+import static leo.lija.Role.KNIGHT;
+import static leo.lija.Role.PAWN;
+import static leo.lija.Role.QUEEN;
+import static leo.lija.Role.ROOK;
+import static leo.lija.Side.KING_SIDE;
+import static leo.lija.Side.QUEEN_SIDE;
 
 public class Actor {
 

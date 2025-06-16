@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.exceptions.ChessRulesException;
 import leo.lija.format.VisualFormat;
@@ -16,14 +16,14 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
-import static leo.lija.model.Pos.makePos;
-import static leo.lija.model.Role.BISHOP;
-import static leo.lija.model.Role.KING;
-import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.QUEEN;
-import static leo.lija.model.Role.ROOK;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Color.WHITE;
+import static leo.lija.Pos.makePos;
+import static leo.lija.Role.BISHOP;
+import static leo.lija.Role.KING;
+import static leo.lija.Role.KNIGHT;
+import static leo.lija.Role.QUEEN;
+import static leo.lija.Role.ROOK;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

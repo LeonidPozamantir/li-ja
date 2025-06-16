@@ -1,33 +1,33 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
-import static leo.lija.model.Pos.A1;
-import static leo.lija.model.Pos.A2;
-import static leo.lija.model.Pos.A3;
-import static leo.lija.model.Pos.B1;
-import static leo.lija.model.Pos.B2;
-import static leo.lija.model.Pos.C1;
-import static leo.lija.model.Pos.C2;
-import static leo.lija.model.Pos.C3;
-import static leo.lija.model.Pos.D1;
-import static leo.lija.model.Pos.D2;
-import static leo.lija.model.Pos.D3;
-import static leo.lija.model.Pos.E1;
-import static leo.lija.model.Pos.E2;
-import static leo.lija.model.Pos.E3;
-import static leo.lija.model.Pos.F1;
-import static leo.lija.model.Pos.F2;
-import static leo.lija.model.Pos.F3;
-import static leo.lija.model.Pos.G1;
-import static leo.lija.model.Pos.G3;
-import static leo.lija.model.Pos.H1;
-import static leo.lija.model.Pos.H3;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Color.WHITE;
+import static leo.lija.Pos.A1;
+import static leo.lija.Pos.A2;
+import static leo.lija.Pos.A3;
+import static leo.lija.Pos.B1;
+import static leo.lija.Pos.B2;
+import static leo.lija.Pos.C1;
+import static leo.lija.Pos.C2;
+import static leo.lija.Pos.C3;
+import static leo.lija.Pos.D1;
+import static leo.lija.Pos.D2;
+import static leo.lija.Pos.D3;
+import static leo.lija.Pos.E1;
+import static leo.lija.Pos.E2;
+import static leo.lija.Pos.E3;
+import static leo.lija.Pos.F1;
+import static leo.lija.Pos.F2;
+import static leo.lija.Pos.F3;
+import static leo.lija.Pos.G1;
+import static leo.lija.Pos.G3;
+import static leo.lija.Pos.H1;
+import static leo.lija.Pos.H3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a king should castle")

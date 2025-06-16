@@ -1,4 +1,4 @@
-package leo.lija.model;
+package leo.lija;
 
 public record Piece(Color color, Role role) {
 

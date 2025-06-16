@@ -1,10 +1,10 @@
-package leo.lija.model;
+package leo.lija;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PieceTest {

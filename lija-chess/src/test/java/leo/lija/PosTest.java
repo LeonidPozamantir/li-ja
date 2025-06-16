@@ -1,25 +1,25 @@
-package leo.lija.model;
+package leo.lija;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static leo.lija.model.Pos.A4;
-import static leo.lija.model.Pos.B4;
-import static leo.lija.model.Pos.C4;
-import static leo.lija.model.Pos.C5;
-import static leo.lija.model.Pos.D3;
-import static leo.lija.model.Pos.D4;
-import static leo.lija.model.Pos.D5;
-import static leo.lija.model.Pos.D6;
-import static leo.lija.model.Pos.D8;
-import static leo.lija.model.Pos.E4;
-import static leo.lija.model.Pos.E5;
-import static leo.lija.model.Pos.F4;
-import static leo.lija.model.Pos.G4;
-import static leo.lija.model.Pos.G5;
-import static leo.lija.model.Pos.H4;
+import static leo.lija.Pos.A4;
+import static leo.lija.Pos.B4;
+import static leo.lija.Pos.C4;
+import static leo.lija.Pos.C5;
+import static leo.lija.Pos.D3;
+import static leo.lija.Pos.D4;
+import static leo.lija.Pos.D5;
+import static leo.lija.Pos.D6;
+import static leo.lija.Pos.D8;
+import static leo.lija.Pos.E4;
+import static leo.lija.Pos.E5;
+import static leo.lija.Pos.F4;
+import static leo.lija.Pos.G4;
+import static leo.lija.Pos.G5;
+import static leo.lija.Pos.H4;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,23 +1,23 @@
-package leo.lija.model;
+package leo.lija;
 
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static leo.lija.model.Pos.D1;
-import static leo.lija.model.Pos.D2;
-import static leo.lija.model.Pos.D3;
-import static leo.lija.model.Pos.D4;
-import static leo.lija.model.Pos.E1;
-import static leo.lija.model.Pos.E2;
-import static leo.lija.model.Pos.E3;
-import static leo.lija.model.Pos.E4;
-import static leo.lija.model.Pos.F1;
-import static leo.lija.model.Pos.F2;
-import static leo.lija.model.Pos.F3;
-import static leo.lija.model.Pos.G1;
-import static leo.lija.model.Pos.G2;
+import static leo.lija.Pos.D1;
+import static leo.lija.Pos.D2;
+import static leo.lija.Pos.D3;
+import static leo.lija.Pos.D4;
+import static leo.lija.Pos.E1;
+import static leo.lija.Pos.E2;
+import static leo.lija.Pos.E3;
+import static leo.lija.Pos.E4;
+import static leo.lija.Pos.F1;
+import static leo.lija.Pos.F2;
+import static leo.lija.Pos.F3;
+import static leo.lija.Pos.G1;
+import static leo.lija.Pos.G2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("In order to save the king should")

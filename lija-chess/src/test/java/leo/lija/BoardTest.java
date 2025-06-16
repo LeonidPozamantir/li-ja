@@ -1,25 +1,22 @@
-package leo.lija.model;
+package leo.lija;
 
-import leo.lija.exceptions.ChessRulesException;
 import leo.lija.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
-import static leo.lija.model.Color.BLACK;
-import static leo.lija.model.Color.WHITE;
-import static leo.lija.model.Pos.*;
-import static leo.lija.model.Role.BISHOP;
-import static leo.lija.model.Role.KING;
-import static leo.lija.model.Role.KNIGHT;
-import static leo.lija.model.Role.PAWN;
-import static leo.lija.model.Role.QUEEN;
-import static leo.lija.model.Role.ROOK;
+import static leo.lija.Color.BLACK;
+import static leo.lija.Color.WHITE;
+import static leo.lija.Pos.*;
+import static leo.lija.Role.BISHOP;
+import static leo.lija.Role.KING;
+import static leo.lija.Role.KNIGHT;
+import static leo.lija.Role.PAWN;
+import static leo.lija.Role.QUEEN;
+import static leo.lija.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
