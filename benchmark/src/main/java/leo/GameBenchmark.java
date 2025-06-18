@@ -1,6 +1,6 @@
 package leo;
 
-import leo.lija.Situation;
+import leo.lija.Game;
 import leo.lija.utils.Pair;
 import org.openjdk.jmh.annotations.Benchmark;
 
@@ -50,7 +50,7 @@ public class GameBenchmark {
 
     @Benchmark
     public void timeImmortal() {
-        new Situation().playMoves(
+        Game.newGame().playMoves(
             Pair.of(E2, E4),
             Pair.of(D7, D5),
             Pair.of(E4, D5),
@@ -83,7 +83,7 @@ public class GameBenchmark {
 
     @Benchmark
     public void timeDeepBlue() {
-        new Situation().playMoves(
+        Game.newGame().playMoves(
             Pair.of(E2, E4),
             Pair.of(C7, C5),
             Pair.of(C2, C3),
