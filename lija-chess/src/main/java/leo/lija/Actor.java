@@ -4,6 +4,7 @@ import leo.lija.utils.Pair;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,31 +42,26 @@ public class Actor {
 	List<Move> moves() {
 		if (cachedMoves.isPresent()) return cachedMoves.get();
 
-		List<Move> movesWithoutSafety = List.of();
 		Role role = piece.role();
-		if (piece.is(BISHOP)) {
-			movesWithoutSafety = longRange(BISHOP.dirs);
-		} else if (piece.is(QUEEN)) {
-			movesWithoutSafety = longRange(QUEEN.dirs);
-		} else if (piece.is(KNIGHT)) {
-			movesWithoutSafety = shortRange(KNIGHT.dirs);
-		} else if (role == KING) {
-			movesWithoutSafety = preventsCastle(shortRange(KING.dirs));
-			movesWithoutSafety.addAll(castle());
-		} else if (role == ROOK) {
-			Color color = color();
-			movesWithoutSafety = board.kingPosOf(color)
-				.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
-				.filter(side -> board.getHistory().canCastle(color, side))
-				.map(side -> {
-					History h = board.getHistory().withoutCastle(color, side);
-					return longRange(ROOK.dirs).stream()
-						.map(m -> m.withHistory(h))
-						.toList();
-				}).orElse(longRange(ROOK.dirs));
-		} else if (piece.is(PAWN)) {
-			movesWithoutSafety = pawn();
-		}
+		List<Move> movesWithoutSafety = switch(role) {
+			case BISHOP -> longRange(BISHOP.dirs);
+			case QUEEN -> longRange(QUEEN.dirs);
+			case KNIGHT -> shortRange(KNIGHT.dirs);
+			case KING -> Stream.concat(preventsCastle(shortRange(KING.dirs)).stream(), castle().stream()).toList();
+			case ROOK -> {
+				Color color = color();
+				yield board.kingPosOf(color)
+					.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
+					.filter(side -> board.getHistory().canCastle(color, side))
+					.map(side -> {
+						History h = board.getHistory().withoutCastle(color, side);
+						return longRange(ROOK.dirs).stream()
+							.map(m -> m.withHistory(h))
+							.toList();
+					}).orElse(longRange(ROOK.dirs));
+			}
+			case PAWN -> pawn();
+		};
 
 		List<Move> moves = kingSafety(movesWithoutSafety);
 		cachedMoves = Optional.of(moves);

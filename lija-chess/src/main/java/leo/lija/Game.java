@@ -41,6 +41,10 @@ public record Game(
         return board.as(player);
     }
 
+    public Game as(Color c) {
+        return new Game(board, c, pgnMoves);
+    }
+
     public static Game newGame() {
         return new Game(new Board(), WHITE);
     }

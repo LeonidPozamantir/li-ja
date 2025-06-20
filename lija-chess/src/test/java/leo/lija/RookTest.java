@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.List;
 
 import static leo.lija.Pos.A4;
 import static leo.lija.Pos.A6;
@@ -49,7 +49,7 @@ class RookTest {
     VisualFormat visual = new VisualFormat();
 
     private final Piece rook = new Piece(Color.WHITE, ROOK);
-    private Set<Pos> moves(Pos pos) {
+    private List<Pos> moves(Pos pos) {
         return Board.empty().placeAt(rook, pos).destsFrom(pos);
     }
 

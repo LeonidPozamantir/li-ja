@@ -16,14 +16,15 @@ class PromotionTest {
     VisualFormat visual = new VisualFormat();
     Utils utils = new Utils();
 
-    Situation situation = visual.str2Obj("""
+    Board board = visual.str2Obj("""
   p
-K      """).as(BLACK);
+K      """);
+    Game game = new Game(board, BLACK);
 
     @Test
     @DisplayName("promote to a queen")
     void promoteToQueen() {
-        utils.beSituation(situation.playMove(C2, C1, QUEEN), """
+        utils.beGame(game.playMove(C2, C1, QUEEN), """
 
 K q    """);
     }
@@ -31,7 +32,7 @@ K q    """);
     @Test
     @DisplayName("promote to a queen by default")
     void promoteToQueenByDefault() {
-        utils.beSituation(situation.playMove(C2, C1), """
+        utils.beGame(game.playMove(C2, C1), """
 
 K q    """);
     }
@@ -39,7 +40,7 @@ K q    """);
     @Test
     @DisplayName("promote to a knight")
     void promoteToKnight() {
-        utils.beSituation(situation.playMove(C2, C1, KNIGHT), """
+        utils.beGame(game.playMove(C2, C1, KNIGHT), """
 
 K n    """);
     }

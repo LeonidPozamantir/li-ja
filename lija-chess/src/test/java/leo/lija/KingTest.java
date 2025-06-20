@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static leo.lija.Pos.A1;
 import static leo.lija.Pos.A2;
@@ -39,7 +39,7 @@ class KingTest {
 	VisualFormat visual = new VisualFormat();
 
 	private final Piece king = new Piece(Color.WHITE, KING);
-	private Set<Pos> moves(Pos pos) {
+	private List<Pos> moves(Pos pos) {
 		return Board.empty().placeAt(king, pos).actorAt(pos).destinations();
 	}
 
@@ -75,7 +75,7 @@ NPKP   P
 PPPPPPPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 
@@ -97,7 +97,7 @@ PPPPPPPP
  p
 N
 """);
-		Set<Pos> possibleMoves = board.destsFrom(C3);
+		List<Pos> possibleMoves = board.destsFrom(C3);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 

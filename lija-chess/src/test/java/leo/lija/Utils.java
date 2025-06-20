@@ -12,4 +12,9 @@ public class Utils {
         assertThat(visual.obj2Str(situation.board))
             .isEqualTo(visual.obj2Str(visual.str2Obj(visualString)));
     }
+
+    public void beGame(Game game, String visualString) {
+        assertThat(visual.obj2Str(game.board()))
+            .isEqualTo(visual.obj2Str(visual.str2Obj(visualString)));
+    }
 }

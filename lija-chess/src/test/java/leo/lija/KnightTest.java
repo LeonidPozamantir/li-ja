@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static leo.lija.Pos.A5;
 import static leo.lija.Pos.A8;
@@ -34,7 +34,7 @@ class KnightTest {
 	VisualFormat visual = new VisualFormat();
 
 	private final Piece knight = new Piece(Color.WHITE, KNIGHT);
-	private Set<Pos> moves(Pos pos) {
+	private List<Pos> moves(Pos pos) {
 		return Board.empty().placeAt(knight, pos).destsFrom(pos);
 	}
 
@@ -63,7 +63,7 @@ k B
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 
@@ -89,7 +89,7 @@ n
 PPP  PPP
  NBQKBNR
 """);
-		Set<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4);
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
 
