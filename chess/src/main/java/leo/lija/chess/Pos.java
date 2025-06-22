@@ -120,17 +120,9 @@ public class Pos {
             .toList();
     }
 
-    public String xToString() {
-        return String.valueOf((char) (x + 96));
-    }
-
-    public String yToString() {
-        return String.valueOf(y);
-    }
-
     @Override
     public String toString() {
-        return xToString() + yToString();
+        return (char) (x + 96) + String.valueOf(y);
     }
 
     private static final Set<Integer> bounds = IntStream.rangeClosed(1, 8)
@@ -143,52 +135,6 @@ public class Pos {
 
     public static Pos atUnsafe(int x, int y) {
         return new Pos(x, y);
-    }
-
-    public static Optional<Pos> shiftUp(Optional<Pos> op) {
-        return op.flatMap(p -> p.shiftUp(1));
-    }
-
-    public static Optional<Pos> shiftDown(Optional<Pos> op) {
-        return op.flatMap(p -> p.shiftDown(1));
-    }
-
-    public static Optional<Pos> shiftLeft(Optional<Pos> op) {
-        return op.flatMap(p -> p.shiftLeft(1));
-    }
-
-    public static Optional<Pos> shiftRight(Optional<Pos> op) {
-        return op.flatMap(p -> p.shiftRight(1));
-    }
-
-    public static List<List<Pos>> vectorBasedPoss(Pos from, List<List<UnaryOperator<Optional<Pos>>>> directions) {
-        return directions.stream()
-                .map(d -> expand(from, d))
-                .filter(exp -> !exp.isEmpty())
-                .toList();
-    }
-
-    public static List<Pos> expand(Pos from, List<UnaryOperator<Optional<Pos>>> direction) {
-        Optional<Pos> candidate = direction.stream().reduce(Optional.of(from), (op, f) -> f.apply(op), (a, b) -> a);
-        if (candidate.isPresent()) {
-            List<Pos> expanded = expand(candidate.get(), direction);
-            expanded.add(candidate.get());
-            return expanded.reversed();
-        }
-        return List.of();
-    }
-
-    public static List<Pos> radialBasedPoss(Pos from, Iterable<Integer> offsets, BiPredicate<Integer, Integer> filter) {
-        List<Pos> result = List.of();
-        for (int y: offsets) {
-            for (int x: offsets) {
-                if (filter.test(y, x)) {
-                    Optional<Pos> candidate = from.shiftUp(y).flatMap(p -> p.shiftRight(x));
-                    candidate.ifPresent(result::add);
-                }
-            }
-        }
-        return result;
     }
 
     public static final Pos A1 = new Pos(1, 1);
