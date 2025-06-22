@@ -18,8 +18,8 @@
 	<description>Java chess</description>
 
 	<modules>
-		<module>lija-chess</module>
-		<module>lija-http</module>
+		<module>chess</module>
+		<module>http</module>
 		<module>benchmark</module>
 	</modules>
 

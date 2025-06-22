@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>leo</groupId>
-            <artifactId>lija-chess</artifactId>
+            <artifactId>chess</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
