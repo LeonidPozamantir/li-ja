@@ -32,7 +32,7 @@ public record Game(
     }
 
     public Game playMove(Pos from, Pos to, Role promotion) {
-        Move move =  situation().playMove(from, to, promotion);
+        Move move =  situation().move(from, to, promotion);
         return new Game(move.after(), player.getOpposite());
 
     }

@@ -43,25 +43,21 @@ public class Situation {
 		return !check() && moves().isEmpty();
 	}
 
-	public Move playMove(Pos from, Pos to) {
-		return playMove(from, to, QUEEN);
-	}
-
-	public Move playMove(Pos from, Pos to, Role promotion) {
+	public Move move(Pos from, Pos to, Role promotion) {
 		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 		String illegalMoveException = "Illegal move %s->%s".formatted(from, to);
 		Actor actor = board.actorAt(from);
 		if (!actor.is(color)) throw new ChessRulesException(illegalMoveException);
-		Move move = actor.moves().stream()
+		Move someMove = actor.moves().stream()
 			.filter(m -> m.dest().equals(to))
 			.findFirst().orElseThrow(() -> new ChessRulesException(illegalMoveException));
 
-		if (promotion == QUEEN) return move;
-		return Optional.of(move.after())
+		if (promotion == QUEEN) return someMove;
+		return Optional.of(someMove.after())
 			.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
 			.flatMap(b1 -> b1.take(to))
 			.flatMap(b2 -> b2.place(color.of(promotion), to))
-			.map(b3 -> move.withAfter(b3).withPromotion(Optional.of(promotion)))
+			.map(b3 -> someMove.withAfter(b3).withPromotion(Optional.of(promotion)))
 			.orElseThrow(() -> new ChessRulesException(illegalMoveException));
 	}
 
