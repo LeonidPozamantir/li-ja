@@ -52,12 +52,6 @@ public class Board {
         return makePos(x, y).flatMap(this::at);
     }
 
-    public Piece pieceAt(Pos at) {
-        Optional<Piece> optPiece = at(at);
-        if (optPiece.isEmpty()) throw new ChessRulesException(NO_PIECE_AT + " " + at);
-        return optPiece.get();
-    }
-
     public Map<Pos, Actor> actors() {
         return pieces.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new Actor(e.getValue(), e.getKey(), this)));
