@@ -33,7 +33,7 @@ import static leo.lija.chess.Role.KING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("King should")
-class KingTest extends BaseTest {
+class KingTest extends Base {
 
 	private final Piece king = new Piece(Color.WHITE, KING);
 

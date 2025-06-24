@@ -41,7 +41,7 @@ import static leo.lija.chess.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Rook should")
-class RookTest extends BaseTest {
+class RookTest extends Base {
 
     private final Piece rook = new Piece(Color.WHITE, ROOK);
 

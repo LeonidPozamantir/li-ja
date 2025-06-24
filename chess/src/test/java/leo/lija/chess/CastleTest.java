@@ -30,7 +30,7 @@ import static leo.lija.chess.Pos.H3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a king should castle")
-public class CastleTest extends BaseTest {
+public class CastleTest extends Base {
 
 
 	

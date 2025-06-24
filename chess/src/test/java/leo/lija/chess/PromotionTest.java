@@ -11,10 +11,7 @@ import static leo.lija.chess.Role.KNIGHT;
 import static leo.lija.chess.Role.QUEEN;
 
 @DisplayName("pawn promotion should")
-class PromotionTest {
-
-    VisualFormat visual = new VisualFormat();
-    BaseTest baseTest = new BaseTest();
+class PromotionTest extends Base {
 
     Board board = visual.str2Obj("""
   p
@@ -24,7 +21,7 @@ K      """);
     @Test
     @DisplayName("promote to a queen")
     void promoteToQueen() {
-        baseTest.beGame(game.playMove(C2, C1, QUEEN), """
+        beGame(game.playMove(C2, C1, QUEEN), """
 
 K q    """);
     }
@@ -32,7 +29,7 @@ K q    """);
     @Test
     @DisplayName("promote to a queen by default")
     void promoteToQueenByDefault() {
-        baseTest.beGame(game.playMove(C2, C1), """
+        beGame(game.playMove(C2, C1), """
 
 K q    """);
     }
@@ -40,7 +37,7 @@ K q    """);
     @Test
     @DisplayName("promote to a knight")
     void promoteToKnight() {
-        baseTest.beGame(game.playMove(C2, C1, KNIGHT), """
+        beGame(game.playMove(C2, C1, KNIGHT), """
 
 K n    """);
     }

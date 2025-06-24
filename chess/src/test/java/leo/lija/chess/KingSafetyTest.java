@@ -20,7 +20,7 @@ import static leo.lija.chess.Pos.G2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("In order to save the king should")
-class KingSafetyTest extends BaseTest {
+class KingSafetyTest extends Base {
 
 	@Nested
 	@DisplayName("the king")
