@@ -26,4 +26,8 @@ public record Move(
     public Move withHistory(History h) {
         return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castle, enpassant);
     }
+
+    public boolean isCapture() {
+        return capture.isPresent();
+    }
 }

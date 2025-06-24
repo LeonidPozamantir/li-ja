@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,12 +30,10 @@ import static leo.lija.chess.Pos.H3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("a king should castle")
-public class CastleTest {
+public class CastleTest extends BaseTest {
 
 
-
-	VisualFormat visual = new VisualFormat();
-	Utils utils = new Utils();
+	
 	@Nested
 	@DisplayName("king side")
 	class Kingside {
@@ -56,17 +53,17 @@ R  QK  R""");
 				@Test
 				@DisplayName("bishop in the way")
 				void bishopInTheWay() {
-					assertThat(goodHist.placeAt(WHITE.bishop(), F1).destsFrom(E1)).isEmpty();
+					assertThat(goodHist.placeAt(WHITE.bishop(), F1).destsFrom(E1).get()).isEmpty();
 				}
 				@Test
 				@DisplayName("knight in the way")
 				void knightInTheWay() {
-					assertThat(goodHist.placeAt(WHITE.knight(), G1).destsFrom(E1)).containsExactly(F1);
+					assertThat(goodHist.placeAt(WHITE.knight(), G1).destsFrom(E1).get()).containsExactly(F1);
 				}
 				@Test
 				@DisplayName("not allowed by history")
 				void badHistory() {
-					assertThat(badHist.destsFrom(E1)).containsExactly(F1);
+					assertThat(badHist.destsFrom(E1).get()).containsExactly(F1);
 				}
 			}
 
@@ -80,12 +77,12 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 				@Test
 				@DisplayName("bishop in the way")
 				void bishopInTheWay() {
-					assertThat(board960.placeAt(WHITE.bishop(), D1).destsFrom(C1)).isEmpty();
+					assertThat(board960.placeAt(WHITE.bishop(), D1).destsFrom(C1).get()).isEmpty();
 				}
 				@Test
 				@DisplayName("knight in the way")
 				void knightInTheWay() {
-					assertThat(board960.placeAt(WHITE.knight(), F1).destsFrom(C1)).containsExactly(D1);
+					assertThat(board960.placeAt(WHITE.knight(), F1).destsFrom(C1).get()).containsExactly(D1);
 				}
 			}
 
@@ -98,13 +95,13 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
-				assertThat(game.board().destsFrom(E1)).containsExactlyInAnyOrder(F1, G1);
+				assertThat(game.board().destsFrom(E1).get()).containsExactlyInAnyOrder(F1, G1);
 			}
 
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				utils.beGame(game.playMove(E1, G1), """
+				beGame(game.playMove(E1, G1), """
 PPPPPPPP
 R  Q RK """);
 			}
@@ -128,22 +125,22 @@ R   KB R""");
 			@Test
 			@DisplayName("queen in the way")
 			void queenInTheWay() {
-				assertThat(goodHist.placeAt(WHITE.queen(), D1).destsFrom(E1)).isEmpty();
+				assertThat(goodHist.placeAt(WHITE.queen(), D1).destsFrom(E1).get()).isEmpty();
 			}
 			@Test
 			@DisplayName("bishop in the way")
 			void bishopInTheWay() {
-				assertThat(goodHist.placeAt(WHITE.bishop(), C1).destsFrom(E1)).containsExactly(D1);
+				assertThat(goodHist.placeAt(WHITE.bishop(), C1).destsFrom(E1).get()).containsExactly(D1);
 			}
 			@Test
 			@DisplayName("knight in the way")
 			void knightInTheWay() {
-				assertThat(goodHist.placeAt(WHITE.knight(), B1).destsFrom(E1)).containsExactly(D1);
+				assertThat(goodHist.placeAt(WHITE.knight(), B1).destsFrom(E1).get()).containsExactly(D1);
 			}
 			@Test
 			@DisplayName("not allowed by history")
 			void badHistory() {
-				assertThat(badHist.destsFrom(E1)).containsExactly(D1);
+				assertThat(badHist.destsFrom(E1).get()).containsExactly(D1);
 			}
 		}
 
@@ -154,13 +151,13 @@ R   KB R""");
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
-				assertThat(game.board().destsFrom(E1)).containsExactlyInAnyOrder(D1, C1);
+				assertThat(game.board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, C1);
 			}
 
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				utils.beGame(game.playMove(E1, C1), """
+				beGame(game.playMove(E1, C1), """
 PPPPPPPP
   KR B R""");
 			}
@@ -183,7 +180,7 @@ R   K  R""").withHistory(History.castle(WHITE, true, true));
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				utils.beGame(g2, """
+				beGame(g2, """
 PPPPPPPP
 R    RK """);
 			}
@@ -191,13 +188,13 @@ R    RK """);
 			@Test
 			@DisplayName("cannot castle queenside anymore")
 			void cantCastleQueenside() {
-				assertThat(g2.board().destsFrom(G1)).containsExactly(H1);
+				assertThat(g2.board().destsFrom(G1).get()).containsExactly(H1);
 			}
 
 			@Test
 			@DisplayName("cannot castle kingside anymore even if the position looks good")
 			void cantCastleKingside() {
-				assertThat(g2.board().moveTo(F1, H1).moveTo(G1, E1).destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.board().moveTo(F1, H1).moveTo(G1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -209,7 +206,7 @@ R    RK """);
 			@Test
 			@DisplayName("correct new board")
 			void correctNewBoard() {
-				utils.beGame(g2, """
+				beGame(g2, """
 PPPPPPPP
   KR   R""");
 			}
@@ -217,13 +214,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("cannot castle kingside anymore")
 			void cantCastleKingside() {
-				assertThat(g2.board().destsFrom(C1)).containsExactly(B1);
+				assertThat(g2.board().destsFrom(C1).get()).containsExactly(B1);
 			}
 
 			@Test
 			@DisplayName("cannot castle queenside anymore even if the position looks good")
 			void cantCastleQueenside() {
-				assertThat(g2.board().moveTo(D1, A1).moveTo(C1, E1).destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.board().moveTo(D1, A1).moveTo(C1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -237,13 +234,13 @@ PPPPPPPP
 				@Test
 				@DisplayName("cannot castle anymore")
 				void cantCastle() {
-					assertThat(g2.board().destsFrom(F1)).containsExactlyInAnyOrder(E1, G1);
+					assertThat(g2.board().destsFrom(F1).get()).containsExactlyInAnyOrder(E1, G1);
 				}
 				@Test
 				@DisplayName("neither if the king comes back")
 				void comesBack() {
 					Game g3 = g2.playMove(F1, E1).as(WHITE);
-					assertThat(g3.board().destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+					assertThat(g3.board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 				}
 			}
 			@Nested
@@ -253,13 +250,13 @@ PPPPPPPP
 				@Test
 				@DisplayName("cannot castle anymore")
 				void cantCastle() {
-					assertThat(g2.board().destsFrom(D1)).containsExactlyInAnyOrder(C1, E1);
+					assertThat(g2.board().destsFrom(D1).get()).containsExactlyInAnyOrder(C1, E1);
 				}
 				@Test
 				@DisplayName("neither if the king comes back")
 				void comesBack() {
 					Game g3 = g2.playMove(D1, E1).as(WHITE);
-					assertThat(g3.board().destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+					assertThat(g3.board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 				}
 			}
 		}
@@ -272,13 +269,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("can only castle queenside")
 			void castleQueenside() {
-				assertThat(g2.board().destsFrom(E1)).containsExactlyInAnyOrder(C1, D1, F1);
+				assertThat(g2.board().destsFrom(E1).get()).containsExactlyInAnyOrder(C1, D1, F1);
 			}
 
 			@Test
 			@DisplayName("can't castle at all if queenside rook moves")
 			void cantCastle() {
-				assertThat(g2.playMove(A1, B1).board().destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.playMove(A1, B1).board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -290,13 +287,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("can only castle kingside")
 			void castleKingside() {
-				assertThat(g2.board().destsFrom(E1)).containsExactlyInAnyOrder(D1, F1, G1);
+				assertThat(g2.board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1, G1);
 			}
 
 			@Test
 			@DisplayName("can't castle at all if kingside rook moves")
 			void cantCastle() {
-				assertThat(g2.playMove(H1, G1).board().destsFrom(E1)).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.playMove(H1, G1).board().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 	}
@@ -310,13 +307,13 @@ R   K  R""");
 		@Test
 		@DisplayName("by rook")
 		void byRook() {
-			assertThat(board.placeAt(BLACK.rook(), E3).destsFrom(E1)).containsExactlyInAnyOrder(D1, D2, F1, F2);
+			assertThat(board.placeAt(BLACK.rook(), E3).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, D2, F1, F2);
 		}
 
 		@Test
 		@DisplayName("by knight")
 		void byKnight() {
-			assertThat(board.placeAt(BLACK.knight(), D3).destsFrom(E1)).containsExactlyInAnyOrder(D1, D2, E2, F1);
+			assertThat(board.placeAt(BLACK.knight(), D3).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, D2, E2, F1);
 		}
 	}
 
@@ -331,11 +328,11 @@ R   K  R""");
 R  QK  R""");
 			@Test
 			void close() {
-				assertThat(board.placeAt(BLACK.rook(), F3).destsFrom(E1)).containsExactlyInAnyOrder(D2, E2);
+				assertThat(board.placeAt(BLACK.rook(), F3).destsFrom(E1).get()).containsExactlyInAnyOrder(D2, E2);
 			}
 			@Test
 			void far() {
-				assertThat(board.placeAt(BLACK.rook(), G3).destsFrom(E1)).containsExactlyInAnyOrder(D2, E2, F2, F1);
+				assertThat(board.placeAt(BLACK.rook(), G3).destsFrom(E1).get()).containsExactlyInAnyOrder(D2, E2, F2, F1);
 			}
 		}
 		@Nested
@@ -345,11 +342,11 @@ R  QK  R""");
 R   KB R""");
 			@Test
 			void close() {
-				assertThat(board.placeAt(BLACK.rook(), D3).destsFrom(E1)).containsExactlyInAnyOrder(E2, F2);
+				assertThat(board.placeAt(BLACK.rook(), D3).destsFrom(E1).get()).containsExactlyInAnyOrder(E2, F2);
 			}
 			@Test
 			void far() {
-				assertThat(board.placeAt(BLACK.rook(), C3).destsFrom(E1)).containsExactlyInAnyOrder(D1, D2, E2, F2);
+				assertThat(board.placeAt(BLACK.rook(), C3).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, D2, E2, F2);
 			}
 		}
 		@Nested
@@ -363,12 +360,12 @@ BK     R""");
 				@Test
 				@DisplayName("rook threat")
 				void rookThreat() {
-					assertThat(board.placeAt(BLACK.rook(), F3).destsFrom(B1)).containsExactlyInAnyOrder(A2, B2, C2, C1);
+					assertThat(board.placeAt(BLACK.rook(), F3).destsFrom(B1).get()).containsExactlyInAnyOrder(A2, B2, C2, C1);
 				}
 				@Test
 				@DisplayName("enemy king threat")
 				void enemyKingThreat() {
-					assertThat(board.placeAt(BLACK.king(), E2).destsFrom(B1)).containsExactlyInAnyOrder(A2, B2, C2, C1);
+					assertThat(board.placeAt(BLACK.king(), E2).destsFrom(B1).get()).containsExactlyInAnyOrder(A2, B2, C2, C1);
 				}
 			}
 		}
@@ -382,14 +379,14 @@ BK     R""");
 		void kingSide() {
 			Board board = visual.str2Obj("""
 R  QK  R""");
-			assertThat(board.placeAt(BLACK.rook(), H3).destsFrom(E1)).containsExactlyInAnyOrder(D2, E2, F1, F2, G1);
+			assertThat(board.placeAt(BLACK.rook(), H3).destsFrom(E1).get()).containsExactlyInAnyOrder(D2, E2, F1, F2, G1);
 		}
 		@Test
 		@DisplayName("queen side")
 		void queenSide() {
 			Board board = visual.str2Obj("""
 R   KB R""");
-			assertThat(board.placeAt(BLACK.rook(), A3).destsFrom(E1)).containsExactlyInAnyOrder(C1, D1, D2, E2, F2);
+			assertThat(board.placeAt(BLACK.rook(), A3).destsFrom(E1).get()).containsExactlyInAnyOrder(C1, D1, D2, E2, F2);
 		}
 	}
 }

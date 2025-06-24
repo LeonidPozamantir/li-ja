@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,25 +53,20 @@ import static leo.lija.chess.Role.QUEEN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Queen should")
-class QueenTest {
-
-	VisualFormat visual = new VisualFormat();
+class QueenTest extends BaseTest {
 
 	private final Piece queen = new Piece(Color.WHITE, QUEEN);
-	private List<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(queen, pos).destsFrom(pos);
-	}
 
 	@Test
 	@DisplayName("move in any direction until the edge of the board")
 	void testBasicMoves() {
-		assertThat(moves(D4)).containsExactlyInAnyOrder(D5, D6, D7, D8, D3, D2, D1, E4, F4, G4, H4, C4, B4, A4, C3, B2, A1, E5, F6, G7, H8, C5, B6, A7, E3, F2, G1);
+		assertThat(pieceMoves(queen, D4).get()).containsExactlyInAnyOrder(D5, D6, D7, D8, D3, D2, D1, E4, F4, G4, H4, C4, B4, A4, C3, B2, A1, E5, F6, G7, H8, C5, B6, A7, E3, F2, G1);
 	}
 
 	@Test
 	@DisplayName("move in any direction when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(moves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G7, F6, E5, D4, C3, B2, A1, G8, F8, E8, D8, C8, B8, A8);
+		assertThat(pieceMoves(queen, H8).get()).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G7, F6, E5, D4, C3, B2, A1, G8, F8, E8, D8, C8, B8, A8);
 	}
 
 	@Test
@@ -88,7 +82,7 @@ N Q    P
 PPPPPPPP
  NBQKBNR
 """);
-		List<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4).get();
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B   x
   x  x
@@ -114,7 +108,7 @@ N QP   P
 PPPPPPPP
  NBQKBNR
 """);
-		List<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4).get();
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 k B
   x  x
@@ -144,31 +138,31 @@ PPPPPPPP
 		@Test
 		@DisplayName("reachable enemy - horizontal")
 		void testReachableEnemyHorizontal() {
-			assertThat(board.actorAt(C4).threatens(A4)).isTrue();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(A4))).contains(true);
 		}
 
 		@Test
 		@DisplayName("reachable enemy - diagonal")
 		void testReachableEnemyVertical() {
-			assertThat(board.actorAt(C4).threatens(A6)).isTrue();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(A6))).contains(true);
 		}
 
 		@Test
 		@DisplayName("unreachable enemy")
 		void testUnreachableEnemy() {
-			assertThat(board.actorAt(C4).threatens(H4)).isFalse();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(H4))).contains(false);
 		}
 
 		@Test
 		@DisplayName("reachable friend")
 		void testReachableFriend() {
-			assertThat(board.actorAt(C4).threatens(C2)).isFalse();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(C2))).contains(false);
 		}
 
 		@Test
 		@DisplayName("Other fields")
 		void testOtherFields() {
-			assertThat(board.actorAt(C4).threatens(B6)).isFalse();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(B6))).contains(false);
 		}
 	}
 }

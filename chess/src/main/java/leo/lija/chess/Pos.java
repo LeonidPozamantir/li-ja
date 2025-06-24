@@ -10,10 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,46 +26,50 @@ public class Pos {
     @Getter
     private final int y;
 
-    private Optional<Optional<Pos>> optUp = Optional.empty();
-    private Optional<Optional<Pos>> optDown = Optional.empty();
-    private Optional<Optional<Pos>> optLeft = Optional.empty();
-    private Optional<Optional<Pos>> optRight = Optional.empty();
-    private Optional<Optional<Pos>> optUpLeft = Optional.empty();
-    private Optional<Optional<Pos>> optUpRight = Optional.empty();
-    private Optional<Optional<Pos>> optDownLeft = Optional.empty();
-    private Optional<Optional<Pos>> optDownRight = Optional.empty();
+    private Optional<Optional<Pos>> cachedUp = Optional.empty();
+    private Optional<Optional<Pos>> cachedDown = Optional.empty();
+    private Optional<Optional<Pos>> cachedLeft = Optional.empty();
+    private Optional<Optional<Pos>> cachedRight = Optional.empty();
+    private Optional<Optional<Pos>> cachedUpLeft = Optional.empty();
+    private Optional<Optional<Pos>> cachedUpRight = Optional.empty();
+    private Optional<Optional<Pos>> cachedDownLeft = Optional.empty();
+    private Optional<Optional<Pos>> cachedDownRight = Optional.empty();
+
+    private Optional<String> cachedFile = Optional.empty();
+    private Optional<String> cachedRank = Optional.empty();
+    private Optional<String> cachedKey = Optional.empty();
 
     public Optional<Pos> up() {
-        if (optUp.isEmpty()) optUp = Optional.of(shiftUp(1));
-        return optUp.get();
+        if (cachedUp.isEmpty()) cachedUp = Optional.of(shiftUp(1));
+        return cachedUp.get();
     }
     public Optional<Pos> down() {
-        if (optDown.isEmpty()) optDown = Optional.of(shiftDown(1));
-        return optDown.get();
+        if (cachedDown.isEmpty()) cachedDown = Optional.of(shiftDown(1));
+        return cachedDown.get();
     }
     public Optional<Pos> left() {
-        if (optLeft.isEmpty()) optLeft = Optional.of(shiftLeft(1));
-        return optLeft.get();
+        if (cachedLeft.isEmpty()) cachedLeft = Optional.of(shiftLeft(1));
+        return cachedLeft.get();
     }
     public Optional<Pos> right() {
-        if (optRight.isEmpty()) optRight = Optional.of(shiftRight(1));
-        return optRight.get();
+        if (cachedRight.isEmpty()) cachedRight = Optional.of(shiftRight(1));
+        return cachedRight.get();
     }
     public Optional<Pos> upLeft() {
-        if (optUpLeft.isEmpty()) optUpLeft = Optional.of(shiftUp(1).flatMap(p -> p.shiftLeft(1)));
-        return optUpLeft.get();
+        if (cachedUpLeft.isEmpty()) cachedUpLeft = Optional.of(shiftUp(1).flatMap(p -> p.shiftLeft(1)));
+        return cachedUpLeft.get();
     }
     public Optional<Pos> upRight() {
-        if (optUpRight.isEmpty()) optUpRight = Optional.of(shiftUp(1).flatMap(p -> p.shiftRight(1)));
-        return optUpRight.get();
+        if (cachedUpRight.isEmpty()) cachedUpRight = Optional.of(shiftUp(1).flatMap(p -> p.shiftRight(1)));
+        return cachedUpRight.get();
     }
     public Optional<Pos> downLeft() {
-        if (optDownLeft.isEmpty()) optDownLeft = Optional.of(shiftDown(1).flatMap(p -> p.shiftLeft(1)));
-        return optDownLeft.get();
+        if (cachedDownLeft.isEmpty()) cachedDownLeft = Optional.of(shiftDown(1).flatMap(p -> p.shiftLeft(1)));
+        return cachedDownLeft.get();
     }
     public Optional<Pos> downRight() {
-        if (optDownRight.isEmpty()) optDownRight = Optional.of(shiftDown(1).flatMap(p -> p.shiftRight(1)));
-        return optDownRight.get();
+        if (cachedDownRight.isEmpty()) cachedDownRight = Optional.of(shiftDown(1).flatMap(p -> p.shiftRight(1)));
+        return cachedDownRight.get();
     }
 
     public Optional<Pos> shiftUp(int n) {
@@ -118,6 +120,21 @@ public class Pos {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .toList();
+    }
+
+    public String file() {
+        if (cachedFile.isEmpty()) cachedFile = Optional.of(String.valueOf((char) (x + 96)));
+        return cachedFile.get();
+    }
+
+    public String rank() {
+        if (cachedRank.isEmpty()) cachedRank = Optional.of(String.valueOf(y));
+        return cachedRank.get();
+    }
+
+    public String key() {
+        if (cachedKey.isEmpty()) cachedKey = Optional.of(file() + rank());
+        return cachedKey.get();
     }
 
     @Override

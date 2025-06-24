@@ -45,20 +45,24 @@ public class Situation {
 
 	public Move move(Pos from, Pos to, Role promotion) {
 		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
-		String illegalMoveException = "Illegal move %s->%s".formatted(from, to);
-		Actor actor = board.actorAt(from);
-		if (!actor.is(color)) throw new ChessRulesException(illegalMoveException);
-		Move someMove = actor.moves().stream()
-			.filter(m -> m.dest().equals(to))
-			.findFirst().orElseThrow(() -> new ChessRulesException(illegalMoveException));
 
-		if (promotion == QUEEN) return someMove;
-		return Optional.of(someMove.after())
-			.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
-			.flatMap(b1 -> b1.take(to))
-			.flatMap(b2 -> b2.place(color.of(promotion), to))
-			.map(b3 -> someMove.withAfter(b3).withPromotion(Optional.of(promotion)))
-			.orElseThrow(() -> new ChessRulesException(illegalMoveException));
+		Optional<Actor> actor = board.actorAt(from);
+		Optional<Move> someMove = actor
+			.filter(a -> a.is(color))
+			.flatMap(a -> a.moves().stream()
+				.filter(m -> m.dest().equals(to))
+				.findFirst()
+			);
+
+		Optional<Move> resMove = promotion == QUEEN
+			? someMove
+			: someMove.map(Move::after)
+				.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
+				.flatMap(b1 -> b1.take(to))
+				.flatMap(b2 -> b2.place(color.of(promotion), to))
+				.map(b3 -> someMove.get().withAfter(b3).withPromotion(Optional.of(promotion)));
+
+			return resMove.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 	}
 
 	public Situation as(Color newColor) {

@@ -1,7 +1,9 @@
 package leo.lija.chess;
 
+import leo.lija.chess.format.PgnDump;
 import leo.lija.chess.utils.Pair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public record Game(
 ) {
 
     public Game(Board board, Color player) {
-        this(board, player, List.of());
+        this(board, player, new ArrayList<>());
     }
     public Game() {
         this(Board.empty(), WHITE);
@@ -33,7 +35,8 @@ public record Game(
 
     public Game playMove(Pos from, Pos to, Role promotion) {
         Move move =  situation().move(from, to, promotion);
-        return new Game(move.after(), player.getOpposite());
+        pgnMoves.add(PgnDump.move(move));
+        return new Game(move.after(), player.getOpposite(), pgnMoves);
 
     }
 

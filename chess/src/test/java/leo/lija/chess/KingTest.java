@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,25 +33,20 @@ import static leo.lija.chess.Role.KING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("King should")
-class KingTest {
-
-	VisualFormat visual = new VisualFormat();
+class KingTest extends BaseTest {
 
 	private final Piece king = new Piece(Color.WHITE, KING);
-	private List<Pos> moves(Pos pos) {
-		return Board.empty().placeAt(king, pos).actorAt(pos).destinations();
-	}
 
 	@Test
 	@DisplayName("move 1 position in any direction")
 	void testBasicMoves() {
-		assertThat(moves(D4)).containsExactlyInAnyOrder(D3, C3, C4, C5, D5, E5, E4, E3);
+		assertThat(pieceMoves(king, D4).get()).containsExactlyInAnyOrder(D3, C3, C4, C5, D5, E5, E4, E3);
 	}
 
 	@Test
 	@DisplayName("move 1 position in any direction when on edge")
 	void testBasicMovesOnEdge() {
-		assertThat(moves(H8)).containsExactlyInAnyOrder(H7, G7, G8);
+		assertThat(pieceMoves(king, H8).get()).containsExactlyInAnyOrder(H7, G7, G8);
 	}
 
 	@Test
@@ -61,7 +55,7 @@ class KingTest {
 		Board board = visual.str2Obj("""
 PPPPPPPP
 R  QK NR""");
-		assertThat(board.destsFrom(E1)).containsExactly(F1);
+		assertThat(board.destsFrom(E1).get()).containsExactly(F1);
 	}
 
 	@Test
@@ -75,7 +69,7 @@ NPKP   P
 PPPPPPPP
  NBQKBNR
 """);
-		List<Pos> possibleMoves = board.destsFrom(C4);
+		List<Pos> possibleMoves = board.destsFrom(C4).get();
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 
@@ -97,7 +91,7 @@ PPPPPPPP
  p
 N
 """);
-		List<Pos> possibleMoves = board.destsFrom(C3);
+		List<Pos> possibleMoves = board.destsFrom(C3).get();
 		assertThat(visual.newLine(visual.obj2StrWithMarks(board, Map.of(possibleMoves, 'x')))).isEqualTo("""
 
 
@@ -127,19 +121,19 @@ PP   PPP
 		@Test
 		@DisplayName("reachable enemy")
 		void testReachableEnemy() {
-			assertThat(board.actorAt(C4).threatens(B5)).isTrue();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(B5))).contains(true);
 		}
 
 		@Test
 		@DisplayName("Unreachable enemy")
 		void testUnreachableEnemy() {
-			assertThat(board.actorAt(C4).threatens(A5)).isFalse();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(A5))).contains(false);
 		}
 
 		@Test
 		@DisplayName("reachable friend")
 		void testReachableFriend() {
-			assertThat(board.actorAt(C4).threatens(C3)).isFalse();
+			assertThat(board.actorAt(C4).map(a -> a.threatens(C3))).contains(false);
 		}
 
 	}
@@ -150,6 +144,6 @@ PP   PPP
 		assertThat(visual.str2Obj("""
    k
  K
-""").destsFrom(B1)).containsExactlyInAnyOrder(A1, A2, B2);
+""").destsFrom(B1).get()).containsExactlyInAnyOrder(A1, A2, B2);
 	}
 }

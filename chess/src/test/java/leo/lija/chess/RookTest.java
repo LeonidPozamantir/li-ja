@@ -1,11 +1,8 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static leo.lija.chess.Pos.A4;
 import static leo.lija.chess.Pos.A6;
@@ -44,25 +41,20 @@ import static leo.lija.chess.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Rook should")
-class RookTest {
-
-    VisualFormat visual = new VisualFormat();
+class RookTest extends BaseTest {
 
     private final Piece rook = new Piece(Color.WHITE, ROOK);
-    private List<Pos> moves(Pos pos) {
-        return Board.empty().placeAt(rook, pos).destsFrom(pos);
-    }
 
     @Test
     @DisplayName("move to any position along the same rank or file")
     void testBasicMoves() {
-        assertThat(moves(E4)).containsExactlyInAnyOrder(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4);
+        assertThat(pieceMoves(rook, E4).get()).containsExactlyInAnyOrder(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4);
     }
 
     @Test
     @DisplayName("move to any position along the same rank or file when in edge")
     void testBasicMovesEdge() {
-        assertThat(moves(H8)).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G8, F8, E8, D8, C8, B8, A8);
+        assertThat(pieceMoves(rook, H8).get()).containsExactlyInAnyOrder(H7, H6, H5, H4, H3, H2, H1, G8, F8, E8, D8, C8, B8, A8);
     }
 
     @Test
@@ -78,7 +70,7 @@ N R    P
 PPPPPPPP
  NBQKBNR
 """);
-        assertThat(board.destsFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
+        assertThat(board.destsFrom(C4).get()).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, D4, E4, F4, G4);
     }
 
     @Test
@@ -94,7 +86,7 @@ n R   p
 PPPPPPPP
  NBQKBNR
 """);
-        assertThat(board.destsFrom(C4)).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, A4, D4, E4, F4, G4);
+        assertThat(board.destsFrom(C4).get()).containsExactlyInAnyOrder(C3, C5, C6, C7, B4, A4, D4, E4, F4, G4);
     }
 
     @Nested
@@ -114,37 +106,37 @@ PPPPPPPP
         @Test
         @DisplayName("reachable enemy to the left")
         void testReachableEnemyLeft() {
-            assertThat(board.actorAt(C4).threatens(A4)).isTrue();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(A4))).contains(true);
         }
 
         @Test
         @DisplayName("reachable enemy to the top")
         void testReachableEnemyTop() {
-            assertThat(board.actorAt(C4).threatens(C7)).isTrue();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(C7))).contains(true);
         }
 
         @Test
         @DisplayName("Unreachable enemy")
         void testUnreachableEnemy() {
-            assertThat(board.actorAt(C4).threatens(A6)).isFalse();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(A6))).contains(false);
         }
 
         @Test
         @DisplayName("reachable friend")
         void testReachableFriend() {
-            assertThat(board.actorAt(C4).threatens(H4)).isFalse();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(H4))).contains(false);
         }
 
         @Test
         @DisplayName("nothing left")
         void testNothingUpLeft() {
-            assertThat(board.actorAt(C4).threatens(B4)).isFalse();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(B4))).contains(false);
         }
 
         @Test
         @DisplayName("nothing up")
         void testNothingDownRight() {
-            assertThat(board.actorAt(C4).threatens(C5)).isFalse();
+            assertThat(board.actorAt(C4).map(a -> a.threatens(C5))).contains(false);
         }
     }
 

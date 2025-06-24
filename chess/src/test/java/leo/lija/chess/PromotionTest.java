@@ -14,7 +14,7 @@ import static leo.lija.chess.Role.QUEEN;
 class PromotionTest {
 
     VisualFormat visual = new VisualFormat();
-    Utils utils = new Utils();
+    BaseTest baseTest = new BaseTest();
 
     Board board = visual.str2Obj("""
   p
@@ -24,7 +24,7 @@ K      """);
     @Test
     @DisplayName("promote to a queen")
     void promoteToQueen() {
-        utils.beGame(game.playMove(C2, C1, QUEEN), """
+        baseTest.beGame(game.playMove(C2, C1, QUEEN), """
 
 K q    """);
     }
@@ -32,7 +32,7 @@ K q    """);
     @Test
     @DisplayName("promote to a queen by default")
     void promoteToQueenByDefault() {
-        utils.beGame(game.playMove(C2, C1), """
+        baseTest.beGame(game.playMove(C2, C1), """
 
 K q    """);
     }
@@ -40,7 +40,7 @@ K q    """);
     @Test
     @DisplayName("promote to a knight")
     void promoteToKnight() {
-        utils.beGame(game.playMove(C2, C1, KNIGHT), """
+        baseTest.beGame(game.playMove(C2, C1, KNIGHT), """
 
 K n    """);
     }

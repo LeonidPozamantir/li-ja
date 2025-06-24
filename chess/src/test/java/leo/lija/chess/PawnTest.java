@@ -49,7 +49,7 @@ public class PawnTest {
 		void testBasicMoves() {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn()
-			)).destsFrom(A4)).containsExactly(A5);
+			)).destsFrom(A4).get()).containsExactly(A5);
 		}
 
 		@Test
@@ -58,7 +58,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn(),
 					A5, WHITE.pawn()
-			)).destsFrom(A4)).isEmpty();
+			)).destsFrom(A4).get()).isEmpty();
 		}
 
 		@Test
@@ -68,7 +68,7 @@ public class PawnTest {
 					D4, WHITE.pawn(),
 					C5, BLACK.pawn(),
 					E5, BLACK.bishop()
-			)).destsFrom(D4)).containsExactlyInAnyOrder(C5, D5, E5);
+			)).destsFrom(D4).get()).containsExactlyInAnyOrder(C5, D5, E5);
 		}
 
 		@Test
@@ -77,7 +77,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, WHITE.pawn(),
 					C5, WHITE.pawn()
-			)).destsFrom(A4)).containsExactly(A5);
+			)).destsFrom(A4).get()).containsExactly(A5);
 		}
 
 		@Nested
@@ -89,7 +89,7 @@ public class PawnTest {
 			void pathFree() {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn()
-				)).destsFrom(A2)).containsExactly(A3, A4);
+				)).destsFrom(A2).get()).containsExactly(A3, A4);
 			}
 
 			@Test
@@ -98,7 +98,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A3, WHITE.rook()
-				)).destsFrom(A2)).isEmpty();
+				)).destsFrom(A2).get()).isEmpty();
 			}
 
 			@Test
@@ -107,7 +107,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A4, WHITE.rook()
-				)).destsFrom(A2)).containsExactly(A3);
+				)).destsFrom(A2).get()).containsExactly(A3);
 			}
 
 			@Test
@@ -116,7 +116,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A3, BLACK.rook()
-				)).destsFrom(A2)).isEmpty();
+				)).destsFrom(A2).get()).isEmpty();
 			}
 
 			@Test
@@ -125,7 +125,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A2, WHITE.pawn(),
 					A4, BLACK.rook()
-				)).destsFrom(A2)).containsExactly(A3);
+				)).destsFrom(A2).get()).containsExactly(A3);
 			}
 		}
 
@@ -145,25 +145,25 @@ public class PawnTest {
 				@Test
 				@DisplayName("without history")
 				void withoutHistory() {
-					assertThat(board.destsFrom(D5)).containsExactly(D6);
+					assertThat(board.destsFrom(D5).get()).containsExactly(D6);
 				}
 
 				@Test
 				@DisplayName("with irrelevant history")
 				void withIrrelevantHistory() {
-					assertThat(board.withHistory(new History(Optional.of(Pair.of(A2, A4)))).destsFrom(D5)).containsExactly(D6);
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(A2, A4)))).destsFrom(D5).get()).containsExactly(D6);
 				}
 
 				@Test
 				@DisplayName("with relevant history on the left")
 				void withRelevantHistoryLeft() {
-					assertThat(board.withHistory(new History(Optional.of(Pair.of(C7, C5)))).destsFrom(D5)).containsExactlyInAnyOrder(D6, C6);
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(C7, C5)))).destsFrom(D5).get()).containsExactlyInAnyOrder(D6, C6);
 				}
 
 				@Test
 				@DisplayName("with relevant history on the right")
 				void withRelevantHistoryRight() {
-					assertThat(board.withHistory(new History(Optional.of(Pair.of(E7, E5)))).destsFrom(D5)).containsExactlyInAnyOrder(D6, E6);
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(E7, E5)))).destsFrom(D5).get()).containsExactlyInAnyOrder(D6, E6);
 				}
 			}
 
@@ -174,7 +174,7 @@ public class PawnTest {
 					D5, WHITE.pawn(),
 					E5, BLACK.rook()
 				), new History(Optional.of(Pair.of(E7, E5))));
-				assertThat(board.destsFrom(D5)).containsExactly(D6);
+				assertThat(board.destsFrom(D5).get()).containsExactly(D6);
 			}
 
 			@Test
@@ -184,7 +184,7 @@ public class PawnTest {
 					D5, WHITE.pawn(),
 					E5, WHITE.pawn()
 				), new History(Optional.of(Pair.of(E7, E5))));
-				assertThat(board.destsFrom(D5)).containsExactly(D6);
+				assertThat(board.destsFrom(D5).get()).containsExactly(D6);
 			}
 		}
 	}
@@ -198,7 +198,7 @@ public class PawnTest {
 		void testBasicMoves() {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn()
-			)).destsFrom(A4)).containsExactly(A3);
+			)).destsFrom(A4).get()).containsExactly(A3);
 		}
 
 		@Test
@@ -207,7 +207,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn(),
 					A3, BLACK.pawn()
-			)).destsFrom(A4)).isEmpty();
+			)).destsFrom(A4).get()).isEmpty();
 		}
 
 		@Test
@@ -217,7 +217,7 @@ public class PawnTest {
 					D4, BLACK.pawn(),
 					C3, WHITE.pawn(),
 					E3, WHITE.bishop()
-			)).destsFrom(D4)).containsExactlyInAnyOrder(C3, D3, E3);
+			)).destsFrom(D4).get()).containsExactlyInAnyOrder(C3, D3, E3);
 		}
 
 		@Test
@@ -226,7 +226,7 @@ public class PawnTest {
 			assertThat(new Board(Map.of(
 					A4, BLACK.pawn(),
 					C3, BLACK.pawn()
-			)).destsFrom(A4)).containsExactlyInAnyOrder(A3);
+			)).destsFrom(A4).get()).containsExactlyInAnyOrder(A3);
 		}
 
 		@Nested
@@ -238,7 +238,7 @@ public class PawnTest {
 			void pathFree() {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn()
-				)).destsFrom(A7)).containsExactlyInAnyOrder(A6, A5);
+				)).destsFrom(A7).get()).containsExactlyInAnyOrder(A6, A5);
 			}
 
 			@Test
@@ -247,7 +247,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A6, BLACK.rook()
-				)).destsFrom(A7)).isEmpty();
+				)).destsFrom(A7).get()).isEmpty();
 			}
 
 			@Test
@@ -256,7 +256,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A5, BLACK.rook()
-				)).destsFrom(A7)).containsExactly(A6);
+				)).destsFrom(A7).get()).containsExactly(A6);
 			}
 
 			@Test
@@ -265,7 +265,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A6, WHITE.rook()
-				)).destsFrom(A7)).isEmpty();
+				)).destsFrom(A7).get()).isEmpty();
 			}
 
 			@Test
@@ -274,7 +274,7 @@ public class PawnTest {
 				assertThat(new Board(Map.of(
 					A7, BLACK.pawn(),
 					A5, WHITE.rook()
-				)).destsFrom(A7)).containsExactly(A6);
+				)).destsFrom(A7).get()).containsExactly(A6);
 			}
 		}
 
@@ -294,13 +294,13 @@ public class PawnTest {
 				@Test
 				@DisplayName("without history")
 				void withoutHistory() {
-					assertThat(board.destsFrom(D4)).containsExactly(D3);
+					assertThat(board.destsFrom(D4).get()).containsExactly(D3);
 				}
 
 				@Test
 				@DisplayName("with relevant history on the left")
 				void withRelevantHistoryLeft() {
-					assertThat(board.withHistory(new History(Optional.of(Pair.of(C2, C4)))).destsFrom(D4)).containsExactlyInAnyOrder(D3, C3);
+					assertThat(board.withHistory(new History(Optional.of(Pair.of(C2, C4)))).destsFrom(D4).get()).containsExactlyInAnyOrder(D3, C3);
 				}
 
 			}
@@ -312,7 +312,7 @@ public class PawnTest {
 					D4, BLACK.pawn(),
 					E4, WHITE.rook()
 				), new History(Optional.of(Pair.of(E2, E4))));
-				assertThat(board.destsFrom(D4)).containsExactly(D3);
+				assertThat(board.destsFrom(D4).get()).containsExactly(D3);
 			}
 
 		}

@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,7 @@ import static leo.lija.chess.Pos.G2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("In order to save the king should")
-class KingSafetyTest {
-
-	VisualFormat visual = new VisualFormat();
+class KingSafetyTest extends BaseTest {
 
 	@Nested
 	@DisplayName("the king")
@@ -35,7 +32,7 @@ class KingSafetyTest {
     P n
 PPPP   P
 RNBQK  R""");
-			assertThat(board.destsFrom(E1)).containsExactly(F2);
+			assertThat(board.destsFrom(E1).get()).containsExactly(F2);
 		}
 
 		@Test
@@ -45,7 +42,7 @@ RNBQK  R""");
     b n
 PPPP   P
 RNBQK  R""");
-			assertThat(board.destsFrom(E1)).isEmpty();
+			assertThat(board.destsFrom(E1).get()).isEmpty();
 		}
 
 		@Test
@@ -56,7 +53,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK  R""");
-			assertThat(board.destsFrom(E1)).containsExactlyInAnyOrder(F1, F2);
+			assertThat(board.destsFrom(E1).get()).containsExactlyInAnyOrder(F1, F2);
 		}
 
 	}
@@ -75,7 +72,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK  R""");
-				assertThat(board.destsFrom(D1)).containsExactly(E2);
+				assertThat(board.destsFrom(D1).get()).containsExactly(E2);
 			}
 
 			@Test
@@ -85,7 +82,7 @@ RNBQK  R""");
 
 PPPP   P
 RNBQK NR""");
-				assertThat(board.destsFrom(G1)).containsExactly(E2);
+				assertThat(board.destsFrom(G1).get()).containsExactly(E2);
 			}
 
 			@Test
@@ -94,7 +91,7 @@ RNBQK NR""");
   K    r
 PPPP   P
 RNBQ  NR""");
-				assertThat(board.destsFrom(D2)).containsExactly(D3);
+				assertThat(board.destsFrom(D2).get()).containsExactly(D3);
 			}
 
 			@Test
@@ -105,7 +102,7 @@ RNBQ  NR""");
 
 PPPP   P
 RNBQ  NR""");
-				assertThat(board.destsFrom(D2)).containsExactly(D4);
+				assertThat(board.destsFrom(D2).get()).containsExactly(D4);
 			}
 		}
 
@@ -119,7 +116,7 @@ RNBQ  NR""");
 
 PPPPK Q
 RNB    R""");
-				assertThat(board.destsFrom(G2)).containsExactly(E4);
+				assertThat(board.destsFrom(G2).get()).containsExactly(E4);
 			}
 
 			@Test
@@ -130,7 +127,7 @@ RNB    R""");
 
 PPPPQ
 RNB K  R""");
-				assertThat(board.destsFrom(E2)).containsExactlyInAnyOrder(E3, E4);
+				assertThat(board.destsFrom(E2).get()).containsExactlyInAnyOrder(E3, E4);
 			}
 
 			@Test
@@ -140,7 +137,7 @@ RNB K  R""");
      P
 PPPP
 RNB K  R""");
-				assertThat(board.destsFrom(F3)).containsExactly(E4);
+				assertThat(board.destsFrom(F3).get()).containsExactly(E4);
 			}
 		}
 
@@ -154,7 +151,7 @@ RNB K  R""");
 
 PPPPB
 RNB K  R""");
-				assertThat(board.destsFrom(E2)).isEmpty();
+				assertThat(board.destsFrom(E2).get()).isEmpty();
 			}
 
 			@Test
@@ -164,7 +161,7 @@ RNB K  R""");
  K P  r
 PPP
 RNB    R""");
-				assertThat(board.destsFrom(D3)).isEmpty();
+				assertThat(board.destsFrom(D3).get()).isEmpty();
 			}
 		}
 	}

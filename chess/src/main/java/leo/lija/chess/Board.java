@@ -40,9 +40,9 @@ public class Board {
     @EqualsAndHashCode.Include
     private final History history;
 
-    private Optional<Map<Color, Set<Pos>>> optOccupation = Optional.empty();
-    private Optional<Map<Color, List<Actor>>> optColorActors = Optional.empty();
-    private Optional<Map<Color, Pos>> optKingPos = Optional.empty();
+    private Optional<Map<Color, Set<Pos>>> cachedOccupation = Optional.empty();
+    private Optional<Map<Color, List<Actor>>> cachedColorActors = Optional.empty();
+    private Optional<Map<Color, Pos>> cachedKingPos = Optional.empty();
 
     public Optional<Piece> at (Pos at) {
         return Optional.ofNullable(pieces.get(at));
@@ -64,35 +64,33 @@ public class Board {
     }
 
     public Map<Color, List<Actor>> colorActors() {
-        if (optColorActors.isEmpty()) {
+        if (cachedColorActors.isEmpty()) {
             Map<Color, List<Actor>> colorActors = actors().values().stream().collect(Collectors.groupingBy(Actor::color));
-            optColorActors = Optional.of(colorActors);
+            cachedColorActors = Optional.of(colorActors);
         }
-        return optColorActors.get();
+        return cachedColorActors.get();
     }
 
     public List<Actor> actorsOf(Color color) {
         return colorActors().getOrDefault(color, List.of());
     }
 
-    public Actor actorAt(Pos at) {
-        Actor res = actors().get(at);
-        if (res == null) throw new ChessRulesException(NO_PIECE_AT + " " + at);
-        return res;
+    public Optional<Actor> actorAt(Pos at) {
+        return Optional.ofNullable(actors().get(at));
     }
 
     public Optional<Pos> kingPosOf(Color color) {
-        if (optKingPos.isEmpty()) {
+        if (cachedKingPos.isEmpty()) {
             Map<Color, Pos> kingPos = pieces.entrySet().stream()
                 .filter(e -> e.getValue().role() == KING)
                 .collect(Collectors.toMap(e -> e.getValue().color(), Map.Entry::getKey));
-            optKingPos = Optional.of(kingPos);
+            cachedKingPos = Optional.of(kingPos);
         }
-        return Optional.ofNullable(optKingPos.get().get(color));
+        return Optional.ofNullable(cachedKingPos.get().get(color));
     }
 
-    public List<Pos> destsFrom(Pos from) {
-        return actorAt(from).destinations();
+    public Optional<List<Pos>> destsFrom(Pos from) {
+        return actorAt(from).map(Actor::destinations);
     }
 
     public Board placeAt(Piece piece, Pos at) {
@@ -178,7 +176,7 @@ public class Board {
     }
 
     public Map<Color, Set<Pos>> occupation() {
-        if (optOccupation.isEmpty()) {
+        if (cachedOccupation.isEmpty()) {
             Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(
                     Function.identity(),
                     c -> pieces.entrySet().stream()
@@ -186,9 +184,9 @@ public class Board {
                             .map(Map.Entry::getKey)
                             .collect(Collectors.toSet())
             ));
-            optOccupation = Optional.of(occupation);
+            cachedOccupation = Optional.of(occupation);
         }
-        return optOccupation.get();
+        return cachedOccupation.get();
     }
 
     public Set<Pos> occupations() {
