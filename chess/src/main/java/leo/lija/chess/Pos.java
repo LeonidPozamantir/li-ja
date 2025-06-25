@@ -114,6 +114,10 @@ public class Pos {
         return x > other.x;
     }
 
+    public boolean isVertical(Pos other) {
+        return x == other.x;
+    }
+
     public List<Pos> horizontalPath(Pos other) {
         return IntStream.range(Math.min(x, other.x), Math.max(x, other.x) + 1)
             .mapToObj(i -> makePos(i, y))

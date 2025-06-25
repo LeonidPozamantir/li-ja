@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.VisualFormat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

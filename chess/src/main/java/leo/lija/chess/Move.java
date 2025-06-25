@@ -27,7 +27,26 @@ public record Move(
         return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castle, enpassant);
     }
 
-    public boolean isCapture() {
+    public Situation situation() {
+        return before.as(piece.color());
+    }
+
+    // does this move check the opponent?
+    public boolean checks() {
+        return after.as(color().getOpposite()).check();
+    }
+
+    // does this move checkmate the opponent?
+    public boolean checkmates() {
+        return after.as(color().getOpposite()).checkmate();
+    }
+
+    // does this move capture an opponent piece?
+    public boolean captures() {
         return capture.isPresent();
+    }
+
+    public Color color() {
+        return piece.color();
     }
 }

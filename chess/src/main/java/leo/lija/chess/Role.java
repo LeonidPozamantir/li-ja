@@ -30,4 +30,9 @@ public enum Role {
     public final boolean promotable;
     final List<Function<Pos, Optional<Pos>>> dirs;
 
+    public Optional<Character> cachedPgn = Optional.empty();
+    public char pgn() {
+        if (cachedPgn.isEmpty()) cachedPgn = Optional.of((char) (fen - 32));
+        return cachedPgn.get();
+    }
 }

@@ -23,6 +23,7 @@ import static leo.lija.chess.Side.QUEEN_SIDE;
 
 public class Actor {
 
+	@Getter
 	private final Piece piece;
 	@Getter
 	private final Pos pos;

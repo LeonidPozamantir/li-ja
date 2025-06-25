@@ -20,7 +20,7 @@ public class Situation {
 		this(new Board(), Color.WHITE);
 	}
 
-	List<Actor> actors() {
+	public List<Actor> actors() {
 		return board.actorsOf(color);
 	}
 
