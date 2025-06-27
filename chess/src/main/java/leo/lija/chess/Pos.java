@@ -1,5 +1,6 @@
 package leo.lija.chess;
 
+import leo.lija.chess.utils.Pair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -127,7 +128,7 @@ public class Pos {
     }
 
     public String file() {
-        if (cachedFile.isEmpty()) cachedFile = Optional.of(String.valueOf((char) (x + 96)));
+        if (cachedFile.isEmpty()) cachedFile = Optional.of(xToString(x));
         return cachedFile.get();
     }
 
@@ -146,16 +147,16 @@ public class Pos {
         return (char) (x + 96) + String.valueOf(y);
     }
 
-    private static final Set<Integer> bounds = IntStream.rangeClosed(1, 8)
-            .boxed()
-            .collect(Collectors.toSet());
-
     public static Optional<Pos> makePos(int x, int y) {
-        if (bounds.contains(x) && bounds.contains(y)) return Optional.of(new Pos(x, y)); else return Optional.empty();
+        return Optional.ofNullable(allCoords.get(Pair.of(x, y)));
     }
 
     public static Pos atUnsafe(int x, int y) {
-        return new Pos(x, y);
+        return allCoords.get(Pair.of(x, y));
+    }
+
+    private static String xToString(int x) {
+        return String.valueOf((char) (x + 96));
     }
 
     public static final Pos A1 = new Pos(1, 1);
@@ -233,6 +234,15 @@ public class Pos {
             Map.entry("g1", G1), Map.entry("g2", G2), Map.entry("g3", G3), Map.entry("g4", G4), Map.entry("g5", G5), Map.entry("g6", G6), Map.entry("g7", G7), Map.entry("g8", G8),
             Map.entry("h1", H1), Map.entry("h2", H2), Map.entry("h3", H3), Map.entry("h4", H4), Map.entry("h5", H5), Map.entry("h6", H6), Map.entry("h7", H7), Map.entry("h8", H8)
     );
+
+    private static final Map<Pair<Integer, Integer>, Pos> allCoords = IntStream.rangeClosed(1, 8)
+        .boxed()
+        .flatMap(x -> IntStream.rangeClosed(1, 8)
+            .mapToObj(y -> {
+                String key = xToString(x) + y;
+                return Pair.of(Pair.of(x, y), allKeys.get(key));
+            }))
+        .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
     public static Collection<Pos> all() {
         return allKeys.values();

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static leo.lija.chess.Color.BLACK;
@@ -41,8 +42,8 @@ class BoardTest {
     @Test
     @DisplayName("Should allow piece to be taken")
     void pieceCanBeTaken() {
-        Board newBoard = newGameBoard.takeValid(A1);
-        assertThat(newBoard.at(A1)).isEmpty();
+        Optional<Board> newBoard = newGameBoard.take(A1);
+        assertThat(newBoard.get().at(A1)).isEmpty();
     }
 
     @Test

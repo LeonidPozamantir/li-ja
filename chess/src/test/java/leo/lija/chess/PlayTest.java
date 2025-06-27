@@ -64,7 +64,7 @@ class PlayTest {
 	@DisplayName("opening one")
 	class Opening1 {
 
-		Game game = Game.newGame().playMoves(
+		RichGame game = RichGame.newGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(E7, E5),
 			Pair.of(F1, C4),
@@ -78,7 +78,7 @@ class PlayTest {
 		@Test
 		@DisplayName("current game")
 		void currentGame() {
-			assertThat(visual.newLine(game.board().visual())).isEqualTo("""
+			assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
 rnbqkb r
 pp p pp
   p  n p
@@ -93,11 +93,11 @@ RN QK NR
 		@Test
 		@DisplayName("after recapture")
 		void afterRecapture() {
-			Game newGame = game.playMoves(
+			RichGame newGame = game.playMoves(
 				Pair.of(G5, F6),
 				Pair.of(D8, F6)
 			);
-			assertThat(visual.newLine(newGame.board().visual())).isEqualTo("""
+			assertThat(visual.newLine(newGame.getBoard().visual())).isEqualTo("""
 rnb kb r
 pp p pp
   p  q p
@@ -114,7 +114,7 @@ RN QK NR
 	@DisplayName("Deep Blue vs Kasparov 1")
 	void deepBlueKasparov1() {
 
-		Game game = Game.newGame().playMoves(
+		RichGame game = RichGame.newGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(C7, C5),
 			Pair.of(C2, C3),
@@ -136,7 +136,7 @@ RN QK NR
 			Pair.of(C3, D4),
 			Pair.of(F8, B4)
 		);
-		assertThat(visual.newLine(game.board().visual())).isEqualTo("""
+		assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
 r   k  r
 pp   ppp
   n pn
@@ -151,7 +151,7 @@ RN Q RK
 	@Test
 	@DisplayName("Peruvian Immortal")
 	void peruvianImmortal() {
-		Game game = Game.newGame().playMoves(
+		RichGame game = RichGame.newGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(D7, D5),
 			Pair.of(E4, D5),
@@ -180,7 +180,7 @@ RN Q RK
 			Pair.of(B7, C6),
 			Pair.of(E2, A6)
 		);
-		assertThat(visual.newLine(game.board().visual())).isEqualTo("""
+		assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
   kr  nr
 p  n ppp
 B p p

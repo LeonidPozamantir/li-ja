@@ -16,6 +16,8 @@ public class Situation {
 	final Board board;
 	final Color color;
 
+	private Optional<Map<Pos, List<Pos>>> cachedDestinations = Optional.empty();
+
 	public Situation() {
 		this(new Board(), Color.WHITE);
 	}
@@ -28,6 +30,15 @@ public class Situation {
 		return actors().stream()
 			.filter(a -> !a.destinations().isEmpty())
 			.collect(Collectors.toMap(Actor::getPos, Actor::moves));
+	}
+
+	public Map<Pos, List<Pos>> destinations() {
+		if (cachedDestinations.isEmpty()) {
+			Map<Pos, List<Pos>> dests = moves().entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().map(m -> m.dest()).toList()));
+			cachedDestinations = Optional.of(dests);
+		}
+		return cachedDestinations.get();
 	}
 
 	public boolean check() {
@@ -65,7 +76,4 @@ public class Situation {
 			return resMove.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 	}
 
-	public Situation as(Color newColor) {
-		return new Situation(board, newColor);
-	}
 }

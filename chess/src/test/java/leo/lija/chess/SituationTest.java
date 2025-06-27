@@ -24,27 +24,27 @@ public class SituationTest {
 			@Test
 			@DisplayName("by rook")
 			void byRook() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
 K  r
-""").as(WHITE).check()).isTrue();
+""", WHITE).check()).isTrue();
 			}
 
 			@Test
 			@DisplayName("by knight")
 			void byKnight() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
   n
 K
-""").as(WHITE).check()).isTrue();
+""", WHITE).check()).isTrue();
 			}
 
 			@Test
 			@DisplayName("not")
 			void not() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
    n
 K
-""").as(WHITE).check()).isFalse();
+""", WHITE).check()).isFalse();
 			}
 		}
 
@@ -55,28 +55,28 @@ K
 			@Test
 			@DisplayName("by rook")
 			void byRook() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
 PP
 K  r
-""").as(WHITE).checkmate()).isTrue();
+""", WHITE).checkmate()).isTrue();
 			}
 
 			@Test
 			@DisplayName("by knight")
 			void byKnight() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
 PPn
 KR
-""").as(WHITE).checkmate()).isTrue();
+""", WHITE).checkmate()).isTrue();
 			}
 
 			@Test
 			@DisplayName("not")
 			void not() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
    n
 K
-""").as(WHITE).checkmate()).isFalse();
+""", WHITE).checkmate()).isFalse();
 			}
 		}
 
@@ -87,19 +87,19 @@ K
 			@Test
 			@DisplayName("stuck in a corner")
 			void stuckInACorner() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
 prr
 K
-""").as(WHITE).stalemate()).isTrue();
+""", WHITE).stalemate()).isTrue();
 			}
 
 			@Test
 			@DisplayName("not")
 			void not() {
-				assertThat(visual.str2Obj("""
+				assertThat(visual.str2Sit("""
   b
 K
-""").as(WHITE).stalemate()).isFalse();
+""", WHITE).stalemate()).isFalse();
 			}
 		}
 	}

@@ -98,10 +98,6 @@ public class Board {
         return Optional.of(new Board(piecesNew, history));
     }
 
-    public Board takeValid(Pos at) {
-        return take(at).orElseThrow(() -> new ChessRulesException(NO_PIECE_AT + " " + at + " to move"));
-    }
-
     public Optional<Board> take(Pos at) {
         return Optional.ofNullable(pieces.get(at)).map(p -> {
             Map<Pos, Piece> piecesNew = new HashMap<>(pieces);
@@ -157,10 +153,6 @@ public class Board {
 
     public Board updateHistory(UnaryOperator<History> f) {
         return new Board(pieces, f.apply(history));
-    }
-
-    public Situation as(Color c) {
-        return new Situation(this, c);
     }
 
     public long count(Piece p) {

@@ -1,8 +1,11 @@
 package leo.lija.benchmark;
 
 import leo.lija.chess.Game;
+import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import org.openjdk.jmh.annotations.Benchmark;
+
+import java.util.Arrays;
 
 import static leo.lija.chess.Pos.A1;
 import static leo.lija.chess.Pos.A2;
@@ -50,7 +53,7 @@ public class GameBenchmark {
 
     @Benchmark
     public void timeImmortal() {
-        Game.newGame().playMoves(
+        playMoves(
             Pair.of(E2, E4),
             Pair.of(D7, D5),
             Pair.of(E4, D5),
@@ -81,30 +84,39 @@ public class GameBenchmark {
         );
     }
 
-    @Benchmark
-    public void timeDeepBlue() {
-        Game.newGame().playMoves(
-            Pair.of(E2, E4),
-            Pair.of(C7, C5),
-            Pair.of(C2, C3),
-            Pair.of(D7, D5),
-            Pair.of(E4, D5),
-            Pair.of(D8, D5),
-            Pair.of(D2, D4),
-            Pair.of(G8, F6),
-            Pair.of(G1, F3),
-            Pair.of(C8, G4),
-            Pair.of(F1, E2),
-            Pair.of(E7, E6),
-            Pair.of(H2, H3),
-            Pair.of(G4, H5),
-            Pair.of(E1, G1),
-            Pair.of(B8, C6),
-            Pair.of(C1, E3),
-            Pair.of(C5, D4),
-            Pair.of(C3, D4),
-            Pair.of(F8, B4)
-        );
+//    @Benchmark
+//    public void timeDeepBlue() {
+//        playMoves(
+//            Pair.of(E2, E4),
+//            Pair.of(C7, C5),
+//            Pair.of(C2, C3),
+//            Pair.of(D7, D5),
+//            Pair.of(E4, D5),
+//            Pair.of(D8, D5),
+//            Pair.of(D2, D4),
+//            Pair.of(G8, F6),
+//            Pair.of(G1, F3),
+//            Pair.of(C8, G4),
+//            Pair.of(F1, E2),
+//            Pair.of(E7, E6),
+//            Pair.of(H2, H3),
+//            Pair.of(G4, H5),
+//            Pair.of(E1, G1),
+//            Pair.of(B8, C6),
+//            Pair.of(C1, E3),
+//            Pair.of(C5, D4),
+//            Pair.of(C3, D4),
+//            Pair.of(F8, B4)
+//        );
+//    }
+
+    @SafeVarargs
+    public final Game playMoves(Pair<Pos, Pos>... moves) {
+        return Arrays.stream(moves)
+            .reduce(Game.newGame(), (g, move) -> {
+                g.situation().destinations();
+                return g.playMove(move.getFirst(), move.getSecond());
+            }, (s1, s2) -> s1);
     }
 
 }

@@ -6,6 +6,7 @@ import leo.lija.chess.History;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
+import leo.lija.chess.Situation;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,6 +59,10 @@ public class VisualFormat implements Format<Board> {
             }
         }
         return new Board(boardPieces).withHistory(History.noCastle());
+    }
+
+    public Situation str2Sit(String str, Color color) {
+        return new Situation(str2Obj(str), color);
     }
 
     @Override
