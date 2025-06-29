@@ -127,8 +127,8 @@ public class Actor {
 				if (tripToRook.isEmpty()) return Optional.empty();
 				Pos rookPos = tripToRook.getLast();
 				if (board.at(rookPos).isEmpty() || !board.at(rookPos).get().equals(color.rook())) return Optional.empty();
-				Optional<Pos> newKingPos = Pos.makePos(side.castledKingX, kingPos.getY());
-				Optional<Pos> newRookPos = Pos.makePos(side.castledRookX, rookPos.getY());
+				Optional<Pos> newKingPos = Pos.posAt(side.castledKingX, kingPos.getY());
+				Optional<Pos> newRookPos = Pos.posAt(side.castledRookX, rookPos.getY());
 				if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
 
 				List<Pos> securedPoss = kingPos.horizontalPath(newKingPos.get());

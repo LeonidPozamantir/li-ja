@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
-import static leo.lija.chess.Pos.makePos;
+import static leo.lija.chess.Pos.posAt;
 import static leo.lija.chess.Role.BISHOP;
 import static leo.lija.chess.Role.KING;
 import static leo.lija.chess.Role.KNIGHT;
@@ -49,7 +49,7 @@ public class Board {
     }
 
     public Optional<Piece> at(int x, int y) {
-        return makePos(x, y).flatMap(this::at);
+        return posAt(x, y).flatMap(this::at);
     }
 
     public Map<Pos, Actor> actors() {

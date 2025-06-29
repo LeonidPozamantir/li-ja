@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -74,19 +73,19 @@ public class Pos {
     }
 
     public Optional<Pos> shiftUp(int n) {
-        return makePos(x, y + n);
+        return posAt(x, y + n);
     }
 
     public Optional<Pos> shiftDown(int n) {
-        return makePos(x, y - n);
+        return posAt(x, y - n);
     }
 
     public Optional<Pos> shiftLeft(int n) {
-        return makePos(x - n, y);
+        return posAt(x - n, y);
     }
 
     public Optional<Pos> shiftRight(int n) {
-        return makePos(x + n, y);
+        return posAt(x + n, y);
     }
 
     public List<Pos> multShiftLeft(Predicate<Pos> stop) {
@@ -121,7 +120,7 @@ public class Pos {
 
     public List<Pos> horizontalPath(Pos other) {
         return IntStream.range(Math.min(x, other.x), Math.max(x, other.x) + 1)
-            .mapToObj(i -> makePos(i, y))
+            .mapToObj(i -> posAt(i, y))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .toList();
@@ -147,12 +146,12 @@ public class Pos {
         return (char) (x + 96) + String.valueOf(y);
     }
 
-    public static Optional<Pos> makePos(int x, int y) {
+    public static Optional<Pos> posAt(int x, int y) {
         return Optional.ofNullable(allCoords.get(Pair.of(x, y)));
     }
 
-    public static Pos atUnsafe(int x, int y) {
-        return allCoords.get(Pair.of(x, y));
+    public static Optional<Pos> posAt(String key) {
+        return Optional.ofNullable(allKeys.get(key));
     }
 
     private static String xToString(int x) {
@@ -237,10 +236,10 @@ public class Pos {
 
     private static final Map<Pair<Integer, Integer>, Pos> allCoords = IntStream.rangeClosed(1, 8)
         .boxed()
-        .flatMap(x -> IntStream.rangeClosed(1, 8)
-            .mapToObj(y -> {
-                String key = xToString(x) + y;
-                return Pair.of(Pair.of(x, y), allKeys.get(key));
+        .flatMap(i -> IntStream.rangeClosed(1, 8)
+            .mapToObj(j -> {
+                String key = xToString(i) + j;
+                return Pair.of(Pair.of(i, j), allKeys.get(key));
             }))
         .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 

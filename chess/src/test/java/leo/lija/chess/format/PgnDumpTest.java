@@ -3,7 +3,6 @@ package leo.lija.chess.format;
 import leo.lija.chess.Game;
 import leo.lija.chess.RichGame;
 import leo.lija.chess.utils.Pair;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
