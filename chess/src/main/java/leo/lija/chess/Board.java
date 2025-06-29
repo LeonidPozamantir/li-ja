@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -193,13 +195,23 @@ public class Board {
     }
 
     public boolean autodraw() {
-        return Color.all().stream().allMatch(c -> {
+        return history.positionHashes().size() > 100 || Color.all().stream().allMatch(c -> {
             List<Role> roles = rolesOf(c).stream().filter(r -> !r.equals(KING)).toList();
             if (roles.size() > 1) return false;
-            if (roles.isEmpty()) return true;
-            if (roles.get(0).equals(KNIGHT) || roles.get(0).equals(BISHOP)) return true;
-            return false;
+            return roles.isEmpty() || roles.get(0).equals(KNIGHT) || roles.get(0).equals(BISHOP);
         });
+    }
+
+    public String positionHash() {
+        String positionHash = actors().values().stream().map(Actor::hash).collect(Collectors.joining());
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(positionHash.getBytes());
+            return (String.format("%02x", hashBytes[0]) + String.format("%02x", hashBytes[1]) + String.format("%02x", hashBytes[2])).substring(0,5);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+
     }
 
     String visual() {
@@ -211,42 +223,42 @@ public class Board {
     }
 
     public Board() {
-        if (cachedStandard.isEmpty()) {
-            Map<Pos, Piece> piecesNew = new HashMap<>();
-            List<Role> lineUp = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
-            for (int y: List.of(1, 2, 7, 8)) {
-                for (int x = 1; x <= 8; x++) {
-                    Piece piece = null;
-                    switch (y) {
-                        case 1:
-                            piece = WHITE.of(lineUp.get(x - 1));
-                            break;
-                        case 2:
-                            piece = WHITE.pawn();
-                            break;
-                        case 7:
-                            piece = BLACK.pawn();
-                            break;
-                        case 8:
-                            piece = BLACK.of(lineUp.get(x - 1));
-                            break;
-                        default:
-                    }
-                    piecesNew.put(Pos.posAt(x, y).get(), piece);
-                }
-            }
-            cachedStandard = Optional.of(new Board(piecesNew, new History()));
-        }
-
-        this.pieces = cachedStandard.get().getPieces();
-        this.history = cachedStandard.get().getHistory();
+        this.pieces = cachedStandard.pieces;
+        this.history = cachedStandard.history;
     }
 
     public Board(Map<Pos, Piece> pieces) {
         this(pieces, new History());
     }
 
-    private static Optional<Board> cachedStandard = Optional.empty();
+    private static Board cachedStandard;
+
+    static {
+        Map<Pos, Piece> piecesNew = new HashMap<>();
+        List<Role> lineUp = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
+        for (int y: List.of(1, 2, 7, 8)) {
+            for (int x = 1; x <= 8; x++) {
+                Piece piece = null;
+                switch (y) {
+                    case 1:
+                        piece = WHITE.of(lineUp.get(x - 1));
+                        break;
+                    case 2:
+                        piece = WHITE.pawn();
+                        break;
+                    case 7:
+                        piece = BLACK.pawn();
+                        break;
+                    case 8:
+                        piece = BLACK.of(lineUp.get(x - 1));
+                        break;
+                    default:
+                }
+                piecesNew.put(Pos.posAt(x, y).get(), piece);
+            }
+        }
+        cachedStandard = new Board(piecesNew, new History());
+    }
 
     public static Board empty() {
         return new Board(Map.of());

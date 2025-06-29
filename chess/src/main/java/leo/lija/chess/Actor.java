@@ -105,6 +105,10 @@ public class Actor {
 		};
 	}
 
+	public String hash() {
+		return piece.fen() + pos.key();
+	}
+
 	private List<Move> kingSafety(List<Move> ms) {
 		return ms.stream()
 			.filter(m -> m.after().actorsOf(color().getOpposite()).stream()

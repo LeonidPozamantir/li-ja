@@ -1,6 +1,7 @@
 package leo.lija.chess;
 
 
+import io.vavr.collection.List;
 import leo.lija.chess.utils.Pair;
 
 import java.util.EnumMap;
@@ -14,7 +15,8 @@ import static leo.lija.chess.Side.QUEEN_SIDE;
 
 public record History (
 	Optional<Pair<Pos, Pos>> lastMove,
-	EnumMap<Color, Pair<Boolean, Boolean>> castles
+	EnumMap<Color, Pair<Boolean, Boolean>> castles,
+	List<String> positionHashes
 ) {
 	public History() {
 		this(Optional.empty());
@@ -24,7 +26,7 @@ public record History (
 		this(lastMove, new EnumMap<>(Map.of(
 			WHITE, Pair.of(true, true),
 			BLACK, Pair.of(true, true)
-		)));
+		)), List.of());
 	}
 
 	public boolean canCastle(Color color, Side side) {
@@ -43,13 +45,21 @@ public record History (
 			!side.equals(KING_SIDE) && castlesColor.getFirst(),
 			!side.equals(QUEEN_SIDE) && castlesColor.getSecond()
 		));
-		return new History(lastMove, newCastles);
+		return new History(lastMove, newCastles, positionHashes);
 	}
 
 	public History withoutCastles(Color color) {
 		EnumMap<Color, Pair<Boolean, Boolean>> newCastles = new EnumMap<>(castles);
 		newCastles.put(color, Pair.of(false, false));
-		return new History(lastMove, newCastles);
+		return new History(lastMove, newCastles, positionHashes);
+	}
+
+	public History withoutPositionHashes() {
+		return new History(lastMove, castles, List.of());
+	}
+
+	public History withNewPositionHash(String hash) {
+		return new History(lastMove, castles, positionHashes.prepend(hash));
 	}
 
 	private Pair<Boolean, Boolean> colorCastles(Color color) {
@@ -57,10 +67,10 @@ public record History (
 	}
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {
-		return new History(Optional.empty(), new EnumMap<>(Map.of(color, Pair.of(kingSide, queenSide))));
+		return new History(Optional.empty(), new EnumMap<>(Map.of(color, Pair.of(kingSide, queenSide))), List.of());
 	}
 
 	public static History noCastle() {
-		return new History(Optional.empty(), new EnumMap<>(Color.class));
+		return new History(Optional.empty(), new EnumMap<>(Color.class), List.of());
 	}
 }

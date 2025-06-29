@@ -33,7 +33,7 @@ public class Game {
 
     public Game playMove(Pos from, Pos to, Role promotion) {
         Move move =  situation().move(from, to, promotion);
-        Game newGame = new Game(move.after(), player.getOpposite());
+        Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
         pgnMoves.add(pgnMove);
         return new Game(newGame.board, newGame.player, pgnMoves);

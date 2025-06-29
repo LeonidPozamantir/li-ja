@@ -5,6 +5,8 @@ import lombok.With;
 
 import java.util.Optional;
 
+import static leo.lija.chess.Role.PAWN;
+
 public record Move(
     Piece piece,
     Pos orig,
@@ -13,7 +15,7 @@ public record Move(
     @With Board after,
     Optional<Pos> capture,
     @With Optional<Role> promotion,
-    boolean castle,
+    boolean castles,
     boolean enpassant
 ) {
 
@@ -24,12 +26,23 @@ public record Move(
     }
 
     public Move withHistory(History h) {
-        return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castle, enpassant);
+        return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castles, enpassant);
+    }
+
+    public Board afterWithPositionHashesUpdated() {
+        return after.updateHistory(h -> {
+           if (piece.is(PAWN) || captures() || promotes() || castles) return h.withoutPositionHashes();
+           return h.withNewPositionHash(after.positionHash());
+        });
     }
 
     // does this move capture an opponent piece?
     public boolean captures() {
         return capture.isPresent();
+    }
+
+    public boolean promotes() {
+        return promotion.isPresent();
     }
 
     public Color color() {

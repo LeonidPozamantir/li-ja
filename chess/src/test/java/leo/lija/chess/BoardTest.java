@@ -274,13 +274,12 @@ R  BK  R""");
                 @Test
                 @DisplayName("tons of pointless moves")
                 void manyPointless() {
-                    RichGame game = RichGame.newGame();
                     List<Pair<Pos, Pos>> movesCycle = List.of(Pair.of(B1, C3), Pair.of(B8, C6), Pair.of(C3, B1), Pair.of(C6, B8));
                     List<Pair<Pos, Pos>> moves = Collections.nCopies(30, movesCycle)
                         .stream()
                         .flatMap(List::stream)
                         .toList();
-                    game.playMoves(moves.toArray(new Pair[0]));
+                    RichGame game = RichGame.newGame().playMoves(moves.toArray(new Pair[0]));
                     assertThat(game.board.autodraw()).isTrue();
                 }
             }
