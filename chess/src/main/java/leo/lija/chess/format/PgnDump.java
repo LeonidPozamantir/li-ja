@@ -32,8 +32,10 @@ public class PgnDump {
             .filter(a -> !a.getPos().equals(m.orig()) && a.getPiece().role().equals(m.piece().role()) && a.destinations().contains(m.dest()))
             .toList();
 
-        if (candidates.isEmpty()) return "";
-         return candidates.stream().anyMatch(a -> a.getPos().isVertical(m.orig()))
+        if (candidates.isEmpty()) {
+            return "";
+        }
+        return candidates.stream().anyMatch(a -> a.getPos().isVertical(m.orig()))
             ? m.orig().file() + m.orig().rank()
             : m.orig().file();
     }

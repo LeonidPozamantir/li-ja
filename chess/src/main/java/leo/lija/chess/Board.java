@@ -65,6 +65,13 @@ public class Board {
         return cachedColorActors.get();
     }
 
+    public List<Role> rolesOf(Color c) {
+        return pieces.values().stream()
+            .filter(p -> p.color().equals(c))
+            .map(Piece::role)
+            .toList();
+    }
+
     public List<Actor> actorsOf(Color color) {
         return colorActors().getOrDefault(color, List.of());
     }
@@ -147,6 +154,24 @@ public class Board {
             });
     }
 
+    public Map<Color, Set<Pos>> occupation() {
+        if (cachedOccupation.isEmpty()) {
+            Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(
+                Function.identity(),
+                c -> pieces.entrySet().stream()
+                    .filter(e -> e.getValue().color() == c)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet())
+            ));
+            cachedOccupation = Optional.of(occupation);
+        }
+        return cachedOccupation.get();
+    }
+
+    public Set<Pos> occupations() {
+        return pieces.keySet();
+    }
+
     public Board withHistory(History h) {
         return new Board(pieces, h);
     }
@@ -156,27 +181,25 @@ public class Board {
     }
 
     public long count(Piece p) {
-        return pieces.entrySet().stream()
-            .filter(e -> e.getValue().equals(p))
+        return pieces.values().stream()
+            .filter(e -> e.equals(p))
             .count();
     }
 
-    public Map<Color, Set<Pos>> occupation() {
-        if (cachedOccupation.isEmpty()) {
-            Map<Color, Set<Pos>> occupation = Arrays.stream(Color.values()).collect(Collectors.toMap(
-                    Function.identity(),
-                    c -> pieces.entrySet().stream()
-                            .filter(e -> e.getValue().color() == c)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toSet())
-            ));
-            cachedOccupation = Optional.of(occupation);
-        }
-        return cachedOccupation.get();
+    public long count(Color c) {
+        return pieces.values().stream()
+            .filter(e -> e.color().equals(c))
+            .count();
     }
 
-    public Set<Pos> occupations() {
-        return pieces.keySet();
+    public boolean autodraw() {
+        return Color.all().stream().allMatch(c -> {
+            List<Role> roles = rolesOf(c).stream().filter(r -> !r.equals(KING)).toList();
+            if (roles.size() > 1) return false;
+            if (roles.isEmpty()) return true;
+            if (roles.get(0).equals(KNIGHT) || roles.get(0).equals(BISHOP)) return true;
+            return false;
+        });
     }
 
     String visual() {
@@ -188,38 +211,45 @@ public class Board {
     }
 
     public Board() {
-        Map<Pos, Piece> piecesNew = new HashMap<>();
-        List<Role> lineUp = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
-        for (int y: List.of(1, 2, 7, 8)) {
-            for (int x = 1; x <= 8; x++) {
-                Piece piece = null;
-                switch (y) {
-                    case 1:
-                        piece = WHITE.of(lineUp.get(x - 1));
-                        break;
-                    case 2:
-                        piece = WHITE.pawn();
-                        break;
-                    case 7:
-                        piece = BLACK.pawn();
-                        break;
-                    case 8:
-                        piece = BLACK.of(lineUp.get(x - 1));
-                        break;
-                    default:
+        if (cachedStandard.isEmpty()) {
+            Map<Pos, Piece> piecesNew = new HashMap<>();
+            List<Role> lineUp = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
+            for (int y: List.of(1, 2, 7, 8)) {
+                for (int x = 1; x <= 8; x++) {
+                    Piece piece = null;
+                    switch (y) {
+                        case 1:
+                            piece = WHITE.of(lineUp.get(x - 1));
+                            break;
+                        case 2:
+                            piece = WHITE.pawn();
+                            break;
+                        case 7:
+                            piece = BLACK.pawn();
+                            break;
+                        case 8:
+                            piece = BLACK.of(lineUp.get(x - 1));
+                            break;
+                        default:
+                    }
+                    piecesNew.put(Pos.posAt(x, y).get(), piece);
                 }
-                piecesNew.put(Pos.atUnsafe(x, y), piece);
             }
+            cachedStandard = Optional.of(new Board(piecesNew, new History()));
         }
-        this.pieces = piecesNew;
-        this.history = new History();
+
+        this.pieces = cachedStandard.get().getPieces();
+        this.history = cachedStandard.get().getHistory();
     }
 
     public Board(Map<Pos, Piece> pieces) {
         this(pieces, new History());
     }
 
+    private static Optional<Board> cachedStandard = Optional.empty();
+
     public static Board empty() {
         return new Board(Map.of());
     }
+
 }

@@ -16,7 +16,6 @@ import static leo.lija.chess.Role.QUEEN;
 @RequiredArgsConstructor
 public class Game {
 
-    @Getter
     protected final Board board;
     protected final Color player;
     @Getter

@@ -1,10 +1,13 @@
 package leo.lija.chess;
 
 import leo.lija.chess.format.VisualFormat;
+import leo.lija.chess.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -21,33 +24,34 @@ import static leo.lija.chess.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@DisplayName("should")
 class BoardTest {
 
     private final Board newGameBoard = new Board();
     VisualFormat visual = new VisualFormat();
 
     @Test
-    @DisplayName("Should have pieces by default")
+    @DisplayName("have pieces by default")
     void hasPieces() {
         assertThat(newGameBoard.getPieces()).isNotEmpty();
     }
 
     @Test
-    @DisplayName("Should allow piece to be placed")
+    @DisplayName("allow piece to be placed")
     void pieceCanBePlaced() {
         Board newBoard = newGameBoard.placeAt(new Piece(WHITE, ROOK), E3);
         assertThat(newBoard.at(E3)).contains(new Piece(WHITE, ROOK));
     }
 
     @Test
-    @DisplayName("Should allow piece to be taken")
+    @DisplayName("allow piece to be taken")
     void pieceCanBeTaken() {
         Optional<Board> newBoard = newGameBoard.take(A1);
         assertThat(newBoard.get().at(A1)).isEmpty();
     }
 
     @Test
-    @DisplayName("Should position white pieces correctly")
+    @DisplayName("position white pieces correctly")
     void whitePiecesPositionedCorrectly() {
         assertThat(newGameBoard.at(A1)).contains(new Piece(WHITE, ROOK));
         assertThat(newGameBoard.at(B1)).contains(new Piece(WHITE, KNIGHT));
@@ -68,7 +72,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Should position black pieces correctly")
+    @DisplayName("position black pieces correctly")
     void blackPiecesPositionedCorrectly() {
         assertThat(newGameBoard.at(A7)).contains(new Piece(BLACK, PAWN));
         assertThat(newGameBoard.at(B7)).contains(new Piece(BLACK, PAWN));
@@ -89,7 +93,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Should allow piece to be move")
+    @DisplayName("allow piece to be move")
     void pieceCanBeMoved() {
         Board newBoard = newGameBoard.moveTo(E2, E4);
         assertThat(newBoard.at(E2)).isEmpty();
@@ -97,26 +101,26 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Should not allow empty place to move")
+    @DisplayName("not allow empty place to move")
     void emptyPlaceCannotBeMoved() {
         assertThrows(Exception.class, () -> newGameBoard.moveTo(E5, E6));
     }
 
     @Test
-    @DisplayName("Should not allow to move to occupied position")
+    @DisplayName("not allow to move to occupied position")
     void canNotBeMoveToOccupiedPosition() {
         assertThrows(Exception.class, () -> newGameBoard.moveTo(A1, A2));
     }
 
     @Test
-    @DisplayName("should allow a pawn to be promoted to a queen")
+    @DisplayName("allow a pawn to be promoted to a queen")
     void promoteToQueen() {
         Board b = Board.empty().placeAt(new Piece(WHITE, PAWN), A7).promote(A7, A8).get();
         assertThat(b.at(A8)).contains(WHITE.queen());
     }
 
     @Test
-    @DisplayName("should provide occupation map")
+    @DisplayName("provide occupation map")
     void occupationMap() {
         Board board = new Board(Map.of(
                 A2, new Piece(WHITE, PAWN),
@@ -165,6 +169,121 @@ R   K  R""");
             Board board = visual.str2Obj("""
 R  BK  R""");
             assertThat(E1.multShiftLeft(p -> board.occupations().contains(p))).containsExactly(D1);
+        }
+    }
+
+    @Nested
+    @DisplayName("detect")
+    class Detect {
+
+        @Nested
+        @DisplayName("automatic draw")
+        class AutomaticDraw {
+
+            @Nested
+            @DisplayName("by lack of pieces")
+            class LackOfPieces {
+                @Test
+                void empty() {
+                    assertThat(Board.empty().autodraw()).isTrue();
+                }
+
+                @Test
+                @DisplayName("new")
+                void newBoard() {
+                    assertThat(new Board().autodraw()).isFalse();
+                }
+
+                @Test
+                void opened() {
+                    RichGame game = RichGame.newGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
+                    assertThat(game.board.autodraw()).isFalse();
+                }
+
+                @Test
+                @DisplayName("two kings")
+                void twoKings() {
+                    Board board = visual.str2Obj("""
+        k
+  K      """);
+                    assertThat(board.autodraw()).isTrue();
+                }
+
+                @Test
+                @DisplayName("two kings and one pawn")
+                void twoKingsPawn() {
+                    Board board = visual.str2Obj("""
+    P   k
+  K      """);
+                    assertThat(board.autodraw()).isFalse();
+                }
+
+                @Test
+                @DisplayName("two kings and one bishop")
+                void twoKingsBishop() {
+                    Board board = visual.str2Obj("""
+        k
+  K     B""");
+                    assertThat(board.autodraw()).isTrue();
+                }
+
+                @Test
+                @DisplayName("two kings, one bishop and one knight of different colors")
+                void twoKingsBishopOpKnight() {
+                    Board board = visual.str2Obj("""
+        k
+  K n   B""");
+                    assertThat(board.autodraw()).isTrue();
+                }
+
+                @Test
+                @DisplayName("two kings, one bishop and one knight of same color")
+                void twoKingsBishopKnight() {
+                    Board board = visual.str2Obj("""
+    B   k
+  K N    """);
+                    assertThat(board.autodraw()).isFalse();
+                }
+
+                @Test
+                @DisplayName("two kings, one bishop and one rook of different colors")
+                void twoKingsBishopOpRook() {
+                    Board board = visual.str2Obj("""
+        k
+  K r   B""");
+                    assertThat(board.autodraw()).isFalse();
+                }
+            }
+
+            @Nested
+            @DisplayName("by fifty moves")
+            class FiftyMoves {
+
+                @Test
+                @DisplayName("new")
+                void newBoard() {
+                    assertThat(new Board().autodraw()).isFalse();
+                }
+
+                @Test
+                void opened() {
+                    RichGame game = RichGame.newGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
+                    assertThat(game.board.autodraw()).isFalse();
+                }
+
+                @Test
+                @DisplayName("tons of pointless moves")
+                void manyPointless() {
+                    RichGame game = RichGame.newGame();
+                    List<Pair<Pos, Pos>> movesCycle = List.of(Pair.of(B1, C3), Pair.of(B8, C6), Pair.of(C3, B1), Pair.of(C6, B8));
+                    List<Pair<Pos, Pos>> moves = Collections.nCopies(30, movesCycle)
+                        .stream()
+                        .flatMap(List::stream)
+                        .toList();
+                    game.playMoves(moves.toArray(new Pair[0]));
+                    assertThat(game.board.autodraw()).isTrue();
+                }
+            }
         }
     }
 }

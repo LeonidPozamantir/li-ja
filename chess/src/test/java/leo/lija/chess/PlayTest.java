@@ -78,7 +78,7 @@ class PlayTest {
 		@Test
 		@DisplayName("current game")
 		void currentGame() {
-			assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
+			assertThat(visual.newLine(game.board.visual())).isEqualTo("""
 rnbqkb r
 pp p pp
   p  n p
@@ -97,7 +97,7 @@ RN QK NR
 				Pair.of(G5, F6),
 				Pair.of(D8, F6)
 			);
-			assertThat(visual.newLine(newGame.getBoard().visual())).isEqualTo("""
+			assertThat(visual.newLine(newGame.board.visual())).isEqualTo("""
 rnb kb r
 pp p pp
   p  q p
@@ -136,7 +136,7 @@ RN QK NR
 			Pair.of(C3, D4),
 			Pair.of(F8, B4)
 		);
-		assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
+		assertThat(visual.newLine(game.board.visual())).isEqualTo("""
 r   k  r
 pp   ppp
   n pn
@@ -180,7 +180,7 @@ RN Q RK
 			Pair.of(B7, C6),
 			Pair.of(E2, A6)
 		);
-		assertThat(visual.newLine(game.getBoard().visual())).isEqualTo("""
+		assertThat(visual.newLine(game.board.visual())).isEqualTo("""
   kr  nr
 p  n ppp
 B p p

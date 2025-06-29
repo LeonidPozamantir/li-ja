@@ -95,7 +95,7 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
-				assertThat(game.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(F1, G1);
+				assertThat(game.board.destsFrom(E1).get()).containsExactlyInAnyOrder(F1, G1);
 			}
 
 			@Test
@@ -151,7 +151,7 @@ R   KB R""");
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
-				assertThat(game.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, C1);
+				assertThat(game.board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, C1);
 			}
 
 			@Test
@@ -188,13 +188,13 @@ R    RK """);
 			@Test
 			@DisplayName("cannot castle queenside anymore")
 			void cantCastleQueenside() {
-				assertThat(g2.getBoard().destsFrom(G1).get()).containsExactly(H1);
+				assertThat(g2.board.destsFrom(G1).get()).containsExactly(H1);
 			}
 
 			@Test
 			@DisplayName("cannot castle kingside anymore even if the position looks good")
 			void cantCastleKingside() {
-				assertThat(g2.getBoard().moveTo(F1, H1).moveTo(G1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.board.moveTo(F1, H1).moveTo(G1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -214,13 +214,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("cannot castle kingside anymore")
 			void cantCastleKingside() {
-				assertThat(g2.getBoard().destsFrom(C1).get()).containsExactly(B1);
+				assertThat(g2.board.destsFrom(C1).get()).containsExactly(B1);
 			}
 
 			@Test
 			@DisplayName("cannot castle queenside anymore even if the position looks good")
 			void cantCastleQueenside() {
-				assertThat(g2.getBoard().moveTo(D1, A1).moveTo(C1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.board.moveTo(D1, A1).moveTo(C1, E1).destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -234,13 +234,13 @@ PPPPPPPP
 				@Test
 				@DisplayName("cannot castle anymore")
 				void cantCastle() {
-					assertThat(g2.getBoard().destsFrom(F1).get()).containsExactlyInAnyOrder(E1, G1);
+					assertThat(g2.board.destsFrom(F1).get()).containsExactlyInAnyOrder(E1, G1);
 				}
 				@Test
 				@DisplayName("neither if the king comes back")
 				void comesBack() {
 					RichGame g3 = g2.playMove(F1, E1).as(WHITE);
-					assertThat(g3.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+					assertThat(g3.board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 				}
 			}
 			@Nested
@@ -250,13 +250,13 @@ PPPPPPPP
 				@Test
 				@DisplayName("cannot castle anymore")
 				void cantCastle() {
-					assertThat(g2.getBoard().destsFrom(D1).get()).containsExactlyInAnyOrder(C1, E1);
+					assertThat(g2.board.destsFrom(D1).get()).containsExactlyInAnyOrder(C1, E1);
 				}
 				@Test
 				@DisplayName("neither if the king comes back")
 				void comesBack() {
 					RichGame g3 = g2.playMove(D1, E1).as(WHITE);
-					assertThat(g3.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+					assertThat(g3.board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 				}
 			}
 		}
@@ -269,13 +269,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("can only castle queenside")
 			void castleQueenside() {
-				assertThat(g2.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(C1, D1, F1);
+				assertThat(g2.board.destsFrom(E1).get()).containsExactlyInAnyOrder(C1, D1, F1);
 			}
 
 			@Test
 			@DisplayName("can't castle at all if queenside rook moves")
 			void cantCastle() {
-				assertThat(g2.playMove(A1, B1).getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.playMove(A1, B1).board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 
@@ -287,13 +287,13 @@ PPPPPPPP
 			@Test
 			@DisplayName("can only castle kingside")
 			void castleKingside() {
-				assertThat(g2.getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1, G1);
+				assertThat(g2.board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1, G1);
 			}
 
 			@Test
 			@DisplayName("can't castle at all if kingside rook moves")
 			void cantCastle() {
-				assertThat(g2.playMove(H1, G1).getBoard().destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
+				assertThat(g2.playMove(H1, G1).board.destsFrom(E1).get()).containsExactlyInAnyOrder(D1, F1);
 			}
 		}
 	}
