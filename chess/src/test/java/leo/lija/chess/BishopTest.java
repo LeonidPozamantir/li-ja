@@ -31,7 +31,7 @@ import static leo.lija.chess.Role.BISHOP;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Bishop should")
-class BishopTest extends Base {
+class BishopTest extends BaseChess {
 
 	private final Piece bishop = new Piece(Color.WHITE, BISHOP);
 

@@ -53,7 +53,7 @@ import static leo.lija.chess.Role.QUEEN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Queen should")
-class QueenTest extends Base {
+class QueenTest extends BaseChess {
 
 	private final Piece queen = new Piece(Color.WHITE, QUEEN);
 

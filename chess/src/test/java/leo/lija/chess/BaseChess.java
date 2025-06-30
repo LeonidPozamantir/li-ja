@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Base {
+public class BaseChess {
 
     VisualFormat visual = new VisualFormat();
 

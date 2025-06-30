@@ -28,7 +28,7 @@ import static leo.lija.chess.Role.KNIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Knight should")
-class KnightTest extends Base {
+class KnightTest extends BaseChess {
 
 	private final Piece knight = new Piece(Color.WHITE, KNIGHT);
 

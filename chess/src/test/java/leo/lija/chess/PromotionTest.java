@@ -10,7 +10,7 @@ import static leo.lija.chess.Role.KNIGHT;
 import static leo.lija.chess.Role.QUEEN;
 
 @DisplayName("pawn promotion should")
-class PromotionTest extends Base {
+class PromotionTest extends BaseChess {
 
     Board board = visual.str2Obj("""
   p
