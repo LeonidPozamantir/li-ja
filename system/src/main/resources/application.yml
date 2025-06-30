@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: lija
+
+  datasource:
+    generate-unique-name: false
+    name: lija
+

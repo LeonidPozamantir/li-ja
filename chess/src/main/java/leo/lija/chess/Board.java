@@ -1,5 +1,6 @@
 package leo.lija.chess;
 
+import leo.lija.chess.exceptions.ChessException;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.format.VisualFormat;
 import lombok.EqualsAndHashCode;
@@ -209,7 +210,7 @@ public class Board {
             byte[] hashBytes = md.digest(positionHash.getBytes());
             return (String.format("%02x", hashBytes[0]) + String.format("%02x", hashBytes[1]) + String.format("%02x", hashBytes[2])).substring(0,5);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
+            throw new ChessException("MD5 algorithm not found", e);
         }
 
     }

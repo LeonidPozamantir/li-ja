@@ -21,6 +21,7 @@
 		<module>chess</module>
 		<module>http</module>
 		<module>benchmark</module>
+		<module>system</module>
 	</modules>
 
 </project>
