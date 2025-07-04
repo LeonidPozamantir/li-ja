@@ -24,4 +24,8 @@
 		<module>system</module>
 	</modules>
 
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+
 </project>

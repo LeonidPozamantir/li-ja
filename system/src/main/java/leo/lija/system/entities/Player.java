@@ -3,23 +3,31 @@ package leo.lija.system.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Embeddable
-public record Player(
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@AllArgsConstructor
+public class Player {
+
     @NotNull
     @Column(nullable = false)
-    String id,
+    private String id;
+
     @NotNull
     @Column(nullable = false)
-    String color,
+    private String color;
+
     @NotNull
     @Column(nullable = false)
-    String ps,
-    Integer aiLevel,
-    Boolean isWinner,
-    String evts,
-    Integer elo
-) {
+    private String ps;
+
+    private Integer aiLevel;
+    private Boolean isWinner;
+    private String evts;
+    private Integer elo;
 
     public boolean isAi() {
         return aiLevel != null;
