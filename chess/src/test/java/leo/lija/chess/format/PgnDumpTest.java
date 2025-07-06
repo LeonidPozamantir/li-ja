@@ -66,13 +66,13 @@ class PgnDumpTest {
         @Test
         @DisplayName("Gioachino Greco")
         void greco() {
-            assertThat(gioachinoGreco.getPgnMoves()).containsExactlyInAnyOrder("d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(" "));
+            assertThat(gioachinoGreco.getPgnMoves()).isEqualTo("d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3");
         }
 
         @Test
         @DisplayName("Peruvian Immortal")
         void peruvian() {
-            assertThat(peruvianImmortal.getPgnMoves()).containsExactlyInAnyOrder("e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#".split(" "));
+            assertThat(peruvianImmortal.getPgnMoves()).isEqualTo("e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#");
         }
     }
 }

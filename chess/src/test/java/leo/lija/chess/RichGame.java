@@ -3,13 +3,12 @@ package leo.lija.chess;
 import leo.lija.chess.utils.Pair;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static leo.lija.chess.Color.WHITE;
 
 public class RichGame extends Game {
 
-    public RichGame(Board board, Color player, List<String> pgnMoves) {
+    public RichGame(Board board, Color player, String pgnMoves) {
         super(board, player, pgnMoves);
     }
 
