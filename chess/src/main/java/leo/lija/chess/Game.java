@@ -2,6 +2,7 @@ package leo.lija.chess;
 
 import leo.lija.chess.format.PgnDump;
 import leo.lija.chess.utils.Pair;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,7 @@ import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Role.QUEEN;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class Game {
 
     protected final Board board;

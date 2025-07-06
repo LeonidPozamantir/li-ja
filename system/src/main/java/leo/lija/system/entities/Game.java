@@ -32,4 +32,8 @@ public class Game {
     private int turns;
     private int variant;
 
+    public leo.lija.chess.Game toChess() {
+        return new leo.lija.chess.Game(null, null);
+    }
+
 }

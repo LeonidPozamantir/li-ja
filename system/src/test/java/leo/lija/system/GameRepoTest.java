@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("the game repo should")
-class GameRepoTest {
+class GameRepoTest extends Fixtures {
 
     @Autowired
     private GameRepo repo;
