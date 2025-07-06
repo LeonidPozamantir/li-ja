@@ -12,6 +12,6 @@ class ModelToChessTest extends Fixtures {
     @Test
     @DisplayName("new game")
     void testNewGame() {
-        assertThat(newGame.toChess()).isEqualTo(Game.newGame());
+        assertThat(newDbGame.toChess()).isEqualTo(Game.newGame());
     }
 }

@@ -1,6 +1,6 @@
 package leo.lija.system;
 
-import leo.lija.system.entities.Game;
+import leo.lija.system.entities.DbGame;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +21,7 @@ class GameRepoTest extends Fixtures {
     @Autowired
     private GameRepo repo;
 
-    Game anyGame;
+    DbGame anyGame;
 
     @BeforeAll
     void init() {
@@ -40,7 +40,7 @@ class GameRepoTest extends Fixtures {
 
         @Test
         void existing() {
-            Optional<Game> g = repo.findById(anyGame.getId());
+            Optional<DbGame> g = repo.findById(anyGame.getId());
             assertThat(g).isPresent();
             assertThat(g.get().getId()).isEqualTo(anyGame.getId());
         }

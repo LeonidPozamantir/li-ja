@@ -6,18 +6,26 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
+import leo.lija.chess.Board;
+import leo.lija.chess.Game;
+import leo.lija.chess.History;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
+
+import static leo.lija.chess.Color.BLACK;
+import static leo.lija.chess.Color.WHITE;
+import static leo.lija.chess.Pos.A1;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor
 @Getter
-public class Game {
+public class DbGame {
 
     @Id
     private String id;
@@ -32,8 +40,12 @@ public class Game {
     private int turns;
     private int variant;
 
-    public leo.lija.chess.Game toChess() {
-        return new leo.lija.chess.Game(null, null);
+    public Game toChess() {
+        return new Game(
+            new Board(Map.of(A1, WHITE.rook()), new History()),
+            0 == turns % 2 ? WHITE : BLACK,
+            pgn
+            );
     }
 
 }
