@@ -14,11 +14,11 @@ import static leo.lija.chess.Role.QUEEN;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode
+@Getter
 public class Game {
 
     protected final Board board;
     protected final Color player;
-    @Getter
     protected final String pgnMoves;
 
     private Optional<Situation> cachedSituation = Optional.empty();
