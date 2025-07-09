@@ -59,7 +59,7 @@ public enum Color {
         return new Piece(this, KING);
     }
 
-    public final static List<Color> all = List.of(WHITE, BLACK);
+    public static final List<Color> all = List.of(WHITE, BLACK);
 
-    public final static Map<String, Color> allByName = Map.of("white", WHITE, "black", BLACK);
+    public static final Map<String, Color> allByName = Map.of("white", WHITE, "black", BLACK);
 }

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Piotr {
 
-    public final static Map<Character, Pos> decodePos = Map.ofEntries(
+    public static final Map<Character, Pos> decodePos = Map.ofEntries(
         Map.entry('a', A1), Map.entry('b', B1), Map.entry('c', C1), Map.entry('d', D1),
         Map.entry('e', E1), Map.entry('f', F1), Map.entry('g', G1), Map.entry('h', H1),
         Map.entry('i', A2), Map.entry('j', B2), Map.entry('k', C2), Map.entry('l', D2),
@@ -33,9 +33,9 @@ public class Piotr {
         Map.entry('8', E8), Map.entry('9', F8), Map.entry('!', G8), Map.entry('?', H8)
     );
 
-    public final static Map<Pos, Character> encodePos = decodePos.entrySet().stream()
+    public static final Map<Pos, Character> encodePos = decodePos.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-    public final static Map<Character, Role> decodeRole = Role.all.stream()
+    public static final Map<Character, Role> decodeRole = Role.all.stream()
         .collect(Collectors.toMap(r -> r.fen, Function.identity()));
 }
