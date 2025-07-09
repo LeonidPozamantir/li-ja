@@ -57,7 +57,7 @@ ppp pppp
    P   N
   P B P
 P P  P P
-R  QR  q
+R  QK  q
 """);
         }
     }

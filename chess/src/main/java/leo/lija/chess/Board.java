@@ -196,7 +196,7 @@ public class Board {
     }
 
     public boolean autodraw() {
-        return history.positionHashes().size() > 100 || Color.all().stream().allMatch(c -> {
+        return history.positionHashes().size() > 100 || Color.all.stream().allMatch(c -> {
             List<Role> roles = rolesOf(c).stream().filter(r -> !r.equals(KING)).toList();
             if (roles.size() > 1) return false;
             return roles.isEmpty() || roles.get(0).equals(KNIGHT) || roles.get(0).equals(BISHOP);

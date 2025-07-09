@@ -3,6 +3,7 @@ package leo.lija.chess;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 import static leo.lija.chess.Role.BISHOP;
 import static leo.lija.chess.Role.KING;
@@ -58,7 +59,7 @@ public enum Color {
         return new Piece(this, KING);
     }
 
-    public static List<Color> all() {
-        return List.of(WHITE, BLACK);
-    }
+    public final static List<Color> all = List.of(WHITE, BLACK);
+
+    public final static Map<String, Color> allByName = Map.of("white", WHITE, "black", BLACK);
 }

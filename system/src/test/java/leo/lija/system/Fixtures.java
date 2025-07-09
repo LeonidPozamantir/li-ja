@@ -23,7 +23,7 @@ public class Fixtures {
         return new Player(
             color.substring(0, 4),
             color,
-            "ip ar jp bn kp cb lp dq mp ek np fb op gn pp hr",
+            ps,
             null,
             null,
             "0s|1Msystem White creates the game|2Msystem Black joins the game|3r/ipkkf590ldrr",
