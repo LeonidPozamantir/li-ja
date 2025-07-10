@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import static leo.lija.chess.Pos.*;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,9 +34,13 @@ public class Piotr {
         Map.entry('8', E8), Map.entry('9', F8), Map.entry('!', G8), Map.entry('?', H8)
     );
 
-    public static final Map<Pos, Character> encodePos = decodePos.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+    public static final Map<Pos, Character> encodePos = Collections.unmodifiableMap(
+        decodePos.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey))
+    );
 
-    public static final Map<Character, Role> decodeRole = Role.all.stream()
-        .collect(Collectors.toMap(r -> r.fen, Function.identity()));
+    public static final Map<Character, Role> decodeRole = Collections.unmodifiableMap(
+        Role.all.stream()
+            .collect(Collectors.toMap(r -> r.fen, Function.identity()))
+    );
 }

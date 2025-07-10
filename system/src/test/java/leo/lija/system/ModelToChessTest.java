@@ -1,6 +1,8 @@
 package leo.lija.system;
 
 import leo.lija.chess.Game;
+import leo.lija.chess.format.VisualFormat;
+import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Player;
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +11,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
+import static leo.lija.chess.Pos.A7;
+import static leo.lija.chess.Pos.C7;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("model to chess conversion")
 class ModelToChessTest extends Fixtures {
+
+    private VisualFormat visual = new VisualFormat();
 
 //    @Test
 //    @DisplayName("new game")
@@ -24,17 +31,7 @@ class ModelToChessTest extends Fixtures {
     @Nested
     @DisplayName("played game")
     class PlayedGame {
-        Game game = new DbGame(
-            "huhuhaha",
-            List.of(
-                newPlayer("white", "ip ar sp16 sN14 kp ub8 Bp6 dq Kp0 ek np LB12 wp22 Fn2 pp hR"),
-                newPlayer("black", "Wp 4r Xp Qn1 Yp LB13 Rp9 hq17 0p 8k 1p 9b 2p sN3 3p ?r")
-            ),
-            "e4 Nc6 Nf3 Nf6 e5 Ne4 d3 Nc5 Be3 d6 d4 Ne4 Bd3 Bf5 Nc3 Nxc3 bxc3 Qd7 Bxf5 Qxf5 Nh4 Qe4 g3 Qxh1+",
-            31,
-            24,
-            1
-        ).toChess();
+        Game game = dbGame1.toChess();
 
         @Test
         void player() {
@@ -49,7 +46,7 @@ class ModelToChessTest extends Fixtures {
 
         @Test
         void pieces() {
-            assertThat(game.getBoard().toString()).isEqualTo("""
+            assertThat(visual.newLine(game.getBoard().toString())).isEqualTo("""
 r   kb r
 ppp pppp
   np
@@ -59,6 +56,49 @@ ppp pppp
 P P  P P
 R  QK  q
 """);
+        }
+
+        @Test
+        @DisplayName("last move")
+        void lastMove() {
+            assertThat(game.getBoard().getHistory().lastMove()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("and another played game")
+    class AnotherPlayedGame {
+        Game game = dbGame2.toChess();
+
+        @Test
+        void player() {
+            assertThat(game.getPlayer()).isEqualTo(BLACK);
+        }
+
+        @Test
+        @DisplayName("pgn moves")
+        void pgnMoves() {
+            assertThat(game.getPgnMoves()).isEqualTo("e4 e5 Qh5 Qf6 Nf3 g6 Qxe5+ Qxe5 Nxe5 Nf6 Nc3 Nc6 Nxc6 bxc6 e5 Nd5 Nxd5 cxd5 d4 Rb8 c3 d6 Be2 dxe5 dxe5 Rg8 Bf3 d4 cxd4 Bb4+ Ke2 g5 a3 g4 Bc6+ Bd7 Bxd7+ Kxd7 axb4 Rxb4 Kd3 Rb3+ Kc4 Rb6 Rxa7 Rc6+ Kb5 Rb8+ Ka5 Rc4 Rd1 Kc6 d5+ Kc5 Rxc7#");
+        }
+
+        @Test
+        void pieces() {
+            assertThat(visual.newLine(game.getBoard().toString())).isEqualTo("""
+ r
+  R  p p
+
+K kPP
+  r   p
+
+ P   PPP
+  BR
+""");
+        }
+
+        @Test
+        @DisplayName("last move")
+        void lastMove() {
+            assertThat(game.getBoard().getHistory().lastMove()).contains(Pair.of(A7, C7));
         }
     }
 }
