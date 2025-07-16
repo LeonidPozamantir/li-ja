@@ -3,10 +3,12 @@ package leo.lija.system.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Board;
+import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.History;
@@ -41,14 +43,15 @@ public class DbGame {
     private String id;
 
     @ElementCollection
-    private List<Player> players;
+    private List<DbPlayer> players;
 
     @NotNull
     @Column(nullable = false)
     private String pgn;
     private int status;
     private int turns;
-    private int variant;
+    @Embedded
+    private DbClock clock;
     private String lastMove;
 
     public Game toChess() {
@@ -61,10 +64,17 @@ public class DbGame {
                    .map(Optional::get);
             })
             .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+        Optional<Clock> oc = Optional.ofNullable(clock).map(c -> {
+            Color color = Color.of(c.getColor()).get();
+            Float whiteTime = c.getTimes().get("white");
+            Float blackTime = c.getTimes().get("black");
+            return new Clock(color, c.getIncrement(), c.getLimit(), Map.of(WHITE, whiteTime, BLACK, blackTime));
+        });
         return new Game(
             new Board(pieces, new History(getLastMoveChess())),
             0 == turns % 2 ? WHITE : BLACK,
-            pgn
+            pgn,
+            oc
             );
     }
 

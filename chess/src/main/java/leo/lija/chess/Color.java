@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static leo.lija.chess.Role.BISHOP;
 import static leo.lija.chess.Role.KING;
@@ -20,8 +21,12 @@ public enum Color {
     public Piece of(Role role) {
         return new Piece(this, role);
     }
-    public static Color isW(boolean b) {
+    public static Color of(boolean b) {
         return b ? WHITE : BLACK;
+    }
+
+    public static Optional<Color> of(String n) {
+        return Optional.ofNullable(allByName.get(n));
     }
 
     private Color opposite;

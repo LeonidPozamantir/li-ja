@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor
 @Getter
-public class Player {
+public class DbPlayer {
 
     @NotNull
     @Column(nullable = false)

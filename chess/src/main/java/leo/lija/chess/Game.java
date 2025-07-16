@@ -20,11 +20,12 @@ public class Game {
     protected final Board board;
     protected final Color player;
     protected final String pgnMoves;
+    protected final Optional<Clock> clock;
 
     private Optional<Situation> cachedSituation = Optional.empty();
 
     public Game(Board board, Color player) {
-        this(board, player, "");
+        this(board, player, "", Optional.empty());
     }
 
     public Game playMove(Pos from, Pos to) {
@@ -36,7 +37,7 @@ public class Game {
         Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
         String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
-        return new Game(newGame.board, newGame.player, newPgnMoves);
+        return new Game(newGame.board, newGame.player, newPgnMoves, clock);
 
     }
 
