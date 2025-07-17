@@ -1,6 +1,7 @@
 package leo.lija.system.entities;
 
 
+import io.vavr.collection.HashMap;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
@@ -74,8 +75,9 @@ public class DbGame {
             new Board(pieces, new History(getLastMoveChess())),
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
-            oc
-            );
+            oc,
+            HashMap.empty()
+        );
     }
 
     private Optional<Pair<Pos, Piece>> decodePosPiece(String pieceCode, Color color) {

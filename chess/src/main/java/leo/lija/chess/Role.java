@@ -27,25 +27,25 @@ public enum Role {
     )),
     PAWN('p', false,null);
 
-    public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
-    public static final List<Role> allPromotable = List.of(QUEEN, ROOK, BISHOP, KNIGHT);
-    public static final Map<String, Role> allPromotableByName = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(Role::toString, Function.identity())));
-
-    public Optional<Role> promotable(String name) {
-        return Optional.ofNullable(allPromotableByName.get(name));
-    }
-
-    public Optional<Role> promotable(Optional<String> name) {
-        return name.flatMap(n -> promotable(n));//.orElse(Optional.of(QUEEN)); - incorrect, fill be fixed 11/05
-    }
-
     public final char fen;
-    public final boolean promotable;
+    public final boolean isPromotable;
     final List<Function<Pos, Optional<Pos>>> dirs;
 
     private Optional<Character> cachedPgn = Optional.empty();
     public char pgn() {
         if (cachedPgn.isEmpty()) cachedPgn = Optional.of((char) (fen - 32));
         return cachedPgn.get();
+    }
+
+    public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
+    public static final List<Role> allPromotable = List.of(QUEEN, ROOK, BISHOP, KNIGHT);
+    public static final Map<String, Role> allPromotableByName = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(Role::toString, Function.identity())));
+
+    public static Optional<Role> promotable(String name) {
+        return Optional.ofNullable(allPromotableByName.get(name));
+    }
+
+    public static Optional<Role> promotable(Optional<String> name) {
+        return name.flatMap(n -> promotable(n));//.orElse(Optional.of(QUEEN)); - incorrect, fill be fixed 11/05
     }
 }

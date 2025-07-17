@@ -196,7 +196,7 @@ R  BK  R""");
 
                 @Test
                 void opened() {
-                    RichGame game = RichGame.newGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
+                    RichGame game = new RichGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
                     assertThat(game.board.autodraw()).isFalse();
                 }
 
@@ -267,7 +267,7 @@ R  BK  R""");
 
                 @Test
                 void opened() {
-                    RichGame game = RichGame.newGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
+                    RichGame game = new RichGame().playMoves(Pair.of(E2, E4), Pair.of(C7, C5), Pair.of(C2, C3), Pair.of(D7, D5), Pair.of(E4, D5));
                     assertThat(game.board.autodraw()).isFalse();
                 }
 
@@ -279,7 +279,7 @@ R  BK  R""");
                         .stream()
                         .flatMap(List::stream)
                         .toList();
-                    RichGame game = RichGame.newGame().playMoves(moves.toArray(new Pair[0]));
+                    RichGame game = new RichGame().playMoves(moves.toArray(new Pair[0]));
                     assertThat(game.board.autodraw()).isTrue();
                 }
             }

@@ -1,5 +1,7 @@
 package leo.lija.chess;
 
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import leo.lija.chess.format.PgnDump;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,11 +23,16 @@ public class Game {
     protected final Color player;
     protected final String pgnMoves;
     protected final Optional<Clock> clock;
+    protected final Map<Pos, Piece> deads;
 
     private Optional<Situation> cachedSituation = Optional.empty();
 
+    public Game() {
+        this(new Board(), WHITE);
+    }
+
     public Game(Board board, Color player) {
-        this(board, player, "", Optional.empty());
+        this(board, player, "", Optional.empty(), HashMap.empty());
     }
 
     public Game playMove(Pos from, Pos to) {
@@ -37,8 +44,10 @@ public class Game {
         Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
         String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
-        return new Game(newGame.board, newGame.player, newPgnMoves, clock);
-
+        Optional<Pos> cpos = move.capture();
+        Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
+        Map<Pos, Piece> newDeads = cpiece.isPresent() ? deads.put(cpos.get(), cpiece.get()) : deads;
+        return new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads);
     }
 
     public Situation situation() {
@@ -50,7 +59,4 @@ public class Game {
         return Arrays.asList(pgnMoves.split(" "));
     }
 
-    public static Game newGame() {
-        return new Game(new Board(), WHITE);
-    }
 }

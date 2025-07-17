@@ -56,9 +56,9 @@ class PgnDumpTest {
     @DisplayName("move list")
     class onlyMoves {
 
-        Game gioachinoGreco = RichGame.newGame().playMoves(Pair.of(D2, D4), Pair.of(D7, D5), Pair.of(C2, C4), Pair.of(D5, C4), Pair.of(E2, E3), Pair.of(B7, B5),
+        Game gioachinoGreco = new RichGame().playMoves(Pair.of(D2, D4), Pair.of(D7, D5), Pair.of(C2, C4), Pair.of(D5, C4), Pair.of(E2, E3), Pair.of(B7, B5),
             Pair.of(A2, A4), Pair.of(C7, C6), Pair.of(A4, B5), Pair.of(C6, B5), Pair.of(D1, F3));
-        Game peruvianImmortal = RichGame.newGame().playMoves(Pair.of(E2, E4), Pair.of(D7, D5), Pair.of(E4, D5), Pair.of(D8, D5), Pair.of(B1, C3), Pair.of(D5, A5), Pair.of(D2, D4),
+        Game peruvianImmortal = new RichGame().playMoves(Pair.of(E2, E4), Pair.of(D7, D5), Pair.of(E4, D5), Pair.of(D8, D5), Pair.of(B1, C3), Pair.of(D5, A5), Pair.of(D2, D4),
             Pair.of(C7, C6), Pair.of(G1, F3), Pair.of(C8, G4), Pair.of(C1, F4), Pair.of(E7, E6), Pair.of(H2, H3), Pair.of(G4, F3), Pair.of(D1, F3), Pair.of(F8, B4),
             Pair.of(F1, E2), Pair.of(B8, D7), Pair.of(A2, A3), Pair.of(E8, C8), Pair.of(A3, B4), Pair.of(A5, A1), Pair.of(E1, D2), Pair.of(A1, H1), Pair.of(F3, C6),
             Pair.of(B7, C6), Pair.of(E2, A6));

@@ -113,7 +113,7 @@ public class GameBenchmark {
     @SafeVarargs
     public final Game playMoves(Pair<Pos, Pos>... moves) {
         return Arrays.stream(moves)
-            .reduce(Game.newGame(), (g, move) -> {
+            .reduce(new Game(), (g, move) -> {
                 g.situation().destinations();
                 return g.playMove(move.getFirst(), move.getSecond());
             }, (s1, s2) -> s1);

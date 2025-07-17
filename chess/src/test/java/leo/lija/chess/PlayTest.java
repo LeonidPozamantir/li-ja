@@ -64,7 +64,7 @@ class PlayTest {
 	@DisplayName("opening one")
 	class Opening1 {
 
-		RichGame game = RichGame.newGame().playMoves(
+		RichGame game = new RichGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(E7, E5),
 			Pair.of(F1, C4),
@@ -114,7 +114,7 @@ RN QK NR
 	@DisplayName("Deep Blue vs Kasparov 1")
 	void deepBlueKasparov1() {
 
-		RichGame game = RichGame.newGame().playMoves(
+		RichGame game = new RichGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(C7, C5),
 			Pair.of(C2, C3),
@@ -151,7 +151,7 @@ RN Q RK
 	@Test
 	@DisplayName("Peruvian Immortal")
 	void peruvianImmortal() {
-		RichGame game = RichGame.newGame().playMoves(
+		RichGame game = new RichGame().playMoves(
 			Pair.of(E2, E4),
 			Pair.of(D7, D5),
 			Pair.of(E4, D5),

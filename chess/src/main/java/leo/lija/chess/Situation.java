@@ -55,7 +55,7 @@ public class Situation {
 	}
 
 	public Move move(Pos from, Pos to, Role promotion) {
-		if (!promotion.promotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
+		if (!promotion.isPromotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 
 		Optional<Actor> actor = board.actorAt(from);
 		Optional<Move> someMove = actor

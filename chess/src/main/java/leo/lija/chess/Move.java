@@ -20,7 +20,7 @@ public record Move(
 ) {
 
     public Move {
-        if (promotion.isPresent() && !promotion.get().promotable) {
+        if (promotion.isPresent() && !promotion.get().isPromotable) {
             throw new ChessRulesException("Can't promote to %s".formatted(promotion));
         }
     }

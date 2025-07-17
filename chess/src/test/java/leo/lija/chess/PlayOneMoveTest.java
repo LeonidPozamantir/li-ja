@@ -14,6 +14,6 @@ class PlayOneMoveTest {
     @Test
     @DisplayName("only process things once")
     void processOnce() {
-        assertDoesNotThrow(() -> RichGame.newGame().playMoves(Pair.of(E2, E4)));
+        assertDoesNotThrow(() -> new RichGame().playMoves(Pair.of(E2, E4)));
     }
 }
