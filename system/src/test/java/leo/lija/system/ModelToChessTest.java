@@ -23,11 +23,11 @@ class ModelToChessTest extends Fixtures {
 
     private VisualFormat visual = new VisualFormat();
 
-//    @Test
-//    @DisplayName("new game")
-//    void testNewGame() {
-//        assertThat(newDbGame.toChess()).isEqualTo(Game.newGame());
-//    }
+    @Test
+    @DisplayName("new game")
+    void testNewGame() {
+        assertThat(newDbGame.toChess()).isEqualTo(new Game());
+    }
 
     @Nested
     @DisplayName("played game")

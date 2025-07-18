@@ -6,8 +6,22 @@ import leo.lija.system.entities.DbPlayer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
+import static leo.lija.system.entities.DbGame.PLAYER_ID_SIZE;
 
 public class Fixtures {
+
+    Random random = new Random();
+    private String randomString(int len) {
+        return Stream.generate(() -> String.valueOf(randomChar())).limit(len).collect(Collectors.joining());
+    }
+    private char randomChar() {
+        return (char) (random.nextInt(25) + 97);
+    }
 
     DbPlayer white = newDbPlayer("white", "ip ar jp bn kp cb lp dq mp ek np fb op gn pp hr");
     DbPlayer black = newDbPlayer("black", "Wp 4r Xp 5n Yp 6b Zp 7q 0p 8k 1p 9b 2p !n 3p ?r");
@@ -20,7 +34,13 @@ public class Fixtures {
         0,
         null,
         null
-        );
+    );
+
+    public DbGame newDbGameWithRandomIds() {
+        List<DbPlayer> players = newDbGame.getPlayers().stream().map(p -> new DbPlayer(randomString(PLAYER_ID_SIZE), p.getColor(), p.getPs(), p.getAiLevel(), p.getIsWinner(),
+            p.getEvts(), p.getElo())).toList();
+        return new DbGame(randomString(GAME_ID_SIZE), players, newDbGame.getPgn(), newDbGame.getStatus(), newDbGame.getTurns(), newDbGame.getClock(), newDbGame.getLastMove());
+    }
 
     DbPlayer newDbPlayer(String color, String ps) {
         return new DbPlayer(
@@ -78,5 +98,16 @@ public class Fixtures {
         "a3 a8"
     );
 
-
+    DbGame dbGame4 = new DbGame(
+        "-huhuhiha",
+        List.of(
+            newDbPlayer("white", "ip ar sp sN kp ub Bp dq Kp ek np LB wp Fn pp hR"),
+            newDbPlayer("black", "Wp 4r Xp Qn Yp LB Rp hq 0p 8k 1p 9b 2p sN 3p ?r")
+        ),
+        "e4 Nc6 Nf3 Nf6 e5 Ne4 d3 Nc5 Be3 d6 d4 Ne4 Bd3 Bf5 Nc3 Nxc3 bxc3 Qd7 Bxf5 Qxf5 Nh4 Qe4 g3 Qxh1+",
+        31,
+        24,
+        null,
+        null
+    );
 }

@@ -33,7 +33,7 @@ public class RichGame extends Game {
     @Override
     public RichGame playMove(Pos from, Pos to) {
         Game game = super.playMove(from, to);
-        return new RichGame(game.board, game.player, game.pgnMoves, game.clock, deads);
+        return new RichGame(game.board, game.player, game.pgnMoves, game.clock, game.deads);
     }
 
 }

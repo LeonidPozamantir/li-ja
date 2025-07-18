@@ -35,6 +35,10 @@ public class Game {
         this(board, player, "", Optional.empty(), HashMap.empty());
     }
 
+    public Game(Board board, Color player, String pgnMoves) {
+        this(board, player, pgnMoves, Optional.empty(), HashMap.empty());
+    }
+
     public Game playMove(Pos from, Pos to) {
         return playMove(from, to, QUEEN);
     }

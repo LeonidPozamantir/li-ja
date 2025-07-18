@@ -3,21 +3,21 @@ package leo.lija.system.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Getter
 public class DbClock {
 
-    private final String color;
-    private final int increment;
+    private String color;
+    private Integer increment;
     @Column(name = "time_limit")
-    private final int limit;
+    private Integer limit;
     @ElementCollection
-    private final Map<String, Float> times;
+    private Map<String, Float> times;
 }
