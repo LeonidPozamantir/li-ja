@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import io.vavr.Tuple2;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Game;
 import leo.lija.chess.format.VisualFormat;
@@ -15,7 +16,10 @@ import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.A3;
 import static leo.lija.chess.Pos.A7;
 import static leo.lija.chess.Pos.A8;
+import static leo.lija.chess.Pos.C3;
 import static leo.lija.chess.Pos.C7;
+import static leo.lija.chess.Pos.F5;
+import static leo.lija.chess.Pos.H1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("model to chess conversion")
@@ -57,6 +61,11 @@ ppp pppp
 P P  P P
 R  QK  q
 """);
+        }
+
+        @Test
+        void deads() {
+            assertThat(game.getDeads()).containsExactlyInAnyOrder(new Tuple2<>(C3, BLACK.knight()), new Tuple2<>(F5, BLACK.bishop()), new Tuple2<>(H1, WHITE.rook()));
         }
 
         @Test

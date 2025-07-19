@@ -8,6 +8,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Board;
 import leo.lija.chess.Clock;
@@ -96,19 +97,34 @@ public class DbGame {
         if (cachedPlayersById.isEmpty()) cachedPlayersById = Optional.of(players.stream().collect(Collectors.toMap(DbPlayer::getId, Function.identity())));
         return cachedPlayersById.get();
     }
-    private transient Optional<Map<String, DbPlayer>> cachedPlayersByColor = Optional.empty();
-    private transient Optional<Map<String, DbPlayer>> cachedPlayersById = Optional.empty();
+    @Transient
+    private Optional<Map<String, DbPlayer>> cachedPlayersByColor = Optional.empty();
+    @Transient
+    private Optional<Map<String, DbPlayer>> cachedPlayersById = Optional.empty();
 
     public Game toChess() {
-        Map<Pos, Piece> pieces = players.stream()
-            .flatMap(player -> {
-                Color color = Color.allByName.get(player.getColor());
-               return Arrays.stream(player.getPs().split(" "))
-                   .map(pieceCode -> decodePosPiece(pieceCode, color))
-                   .filter(Optional::isPresent)
-                   .map(Optional::get);
-            })
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+        Map<Pos, Piece> pieces = new java.util.HashMap<>();
+        Map<Pos, Piece> deads = new java.util.HashMap<>();
+        players.forEach(player -> {
+            Color color = Color.allByName.get(player.getColor());
+            Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> {
+                char[] codes = pieceCode.toCharArray();
+                if (codes.length < 2) return;
+
+                char pos = codes[0];
+                char role = codes[1];
+                if (Character.isUpperCase(role)) {
+                    Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, Character.toLowerCase(role), color);
+                    if (optPosPiece.isEmpty()) return;
+                    deads.put(optPosPiece.get().getFirst(), optPosPiece.get().getSecond());
+                } else {
+                    Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, role, color);
+                    if (optPosPiece.isEmpty()) return;
+                    pieces.put(optPosPiece.get().getFirst(), optPosPiece.get().getSecond());
+                }
+            });
+        });
+
         Optional<Clock> oc = Optional.ofNullable(clock).map(c -> {
             Color color = Color.of(c.getColor()).get();
             Float whiteTime = c.getTimes().get("white");
@@ -120,17 +136,8 @@ public class DbGame {
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
             oc,
-            HashMap.empty()
+            HashMap.ofAll(deads)
         );
-    }
-
-    private Optional<Pair<Pos, Piece>> decodePosPiece(String pieceCode, Color color) {
-        char[] codes = pieceCode.toCharArray();
-        if (codes.length < 2) return Optional.empty();
-
-        char pos = codes[0];
-        char role = codes[1];
-        return posPiece(pos, role, color);
     }
 
     private Optional<Pair<Pos, Piece>> posPiece(char posCode, char roleCode, Color color) {
