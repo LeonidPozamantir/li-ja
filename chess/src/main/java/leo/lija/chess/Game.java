@@ -3,6 +3,7 @@ package leo.lija.chess;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import leo.lija.chess.format.PgnDump;
+import leo.lija.chess.utils.Pair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class Game {
     protected final Color player;
     protected final String pgnMoves;
     protected final Optional<Clock> clock;
-    protected final Map<Pos, Piece> deads;
+    protected final io.vavr.collection.List<Pair<Pos, Piece>> deads;
 
     private Optional<Situation> cachedSituation = Optional.empty();
 
@@ -32,11 +33,11 @@ public class Game {
     }
 
     public Game(Board board, Color player) {
-        this(board, player, "", Optional.empty(), HashMap.empty());
+        this(board, player, "", Optional.empty(), io.vavr.collection.List.empty());
     }
 
     public Game(Board board, Color player, String pgnMoves) {
-        this(board, player, pgnMoves, Optional.empty(), HashMap.empty());
+        this(board, player, pgnMoves, Optional.empty(), io.vavr.collection.List.empty());
     }
 
     public Game playMove(Pos from, Pos to) {
@@ -50,7 +51,7 @@ public class Game {
         String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
-        Map<Pos, Piece> newDeads = cpiece.isPresent() ? deads.put(cpos.get(), cpiece.get()) : deads;
+        io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
         return new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads);
     }
 

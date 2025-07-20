@@ -19,7 +19,7 @@ class GameTest extends BaseChess {
     @DisplayName("add it to the dead pieces")
     void addToDead() {
         RichGame game = new RichGame().playMoves(Pair.of(E2, E4), Pair.of(D7, D5), Pair.of(E4, D5));
-        assertThat(game.deads).containsExactlyInAnyOrder(new Tuple2<>(D5, BLACK.pawn()));
+        assertThat(game.deads).containsExactlyInAnyOrder(Pair.of(D5, BLACK.pawn()));
     }
 
 }

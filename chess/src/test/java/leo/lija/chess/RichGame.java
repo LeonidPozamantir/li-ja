@@ -1,6 +1,6 @@
 package leo.lija.chess;
 
-import io.vavr.collection.Map;
+import io.vavr.collection.List;
 import leo.lija.chess.utils.Pair;
 
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class RichGame extends Game {
 
-    public RichGame(Board board, Color player, String pgnMoves, Optional<Clock> clock, Map<Pos, Piece> deads) {
+    public RichGame(Board board, Color player, String pgnMoves, Optional<Clock> clock, List<Pair<Pos, Piece>> deads) {
         super(board, player, pgnMoves, clock, deads);
     }
 

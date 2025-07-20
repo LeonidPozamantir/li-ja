@@ -1,7 +1,6 @@
 package leo.lija.system.entities;
 
 
-import io.vavr.collection.HashMap;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
@@ -26,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
@@ -104,7 +105,7 @@ public class DbGame {
 
     public Game toChess() {
         Map<Pos, Piece> pieces = new java.util.HashMap<>();
-        Map<Pos, Piece> deads = new java.util.HashMap<>();
+        List<Pair<Pos, Piece>> deads = new ArrayList<>();
         players.forEach(player -> {
             Color color = Color.allByName.get(player.getColor());
             Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> {
@@ -116,7 +117,7 @@ public class DbGame {
                 if (Character.isUpperCase(role)) {
                     Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, Character.toLowerCase(role), color);
                     if (optPosPiece.isEmpty()) return;
-                    deads.put(optPosPiece.get().getFirst(), optPosPiece.get().getSecond());
+                    deads.add(Pair.of(optPosPiece.get().getFirst(), optPosPiece.get().getSecond()));
                 } else {
                     Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, role, color);
                     if (optPosPiece.isEmpty()) return;
@@ -136,7 +137,7 @@ public class DbGame {
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
             oc,
-            HashMap.ofAll(deads)
+            io.vavr.collection.List.ofAll(deads)
         );
     }
 
@@ -162,12 +163,17 @@ public class DbGame {
 
     public void update(Game game) {
         players = players.stream()
-            .map(p -> {
-                Color color = Color.allByName.get(p.getColor());
-                String newPs = game.getBoard().actorsOf(color).stream()
-                    .map(actor -> Piotr.encodePos.get(actor.getPos()).toString() + actor.getPiece().role().fen)
-                    .collect(Collectors.joining(" "));
-                return new DbPlayer(p.getId(), p.getColor(), newPs, p.getAiLevel(), p.getIsWinner(), p.getEvts(), p.getElo());
+            .map(player -> {
+                Color color = Color.allByName.get(player.getColor());
+                String newPs = Stream.concat(
+                    game.getBoard().getPieces().entrySet().stream()
+                        .filter(e -> e.getValue().is(color))
+                        .map(e -> Piotr.encodePos.get(e.getKey()).toString() + e.getValue().role().fen),
+                    game.getDeads().toJavaStream()
+                        .filter(p -> p.getSecond().is(color))
+                        .map(p -> Piotr.encodePos.get(p.getFirst()).toString() + Character.toUpperCase(p.getSecond().role().fen))
+                ).collect(Collectors.joining(" "));
+                return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getEvts(), player.getElo());
             }).toList();
         pgn = game.getPgnMoves();
     }

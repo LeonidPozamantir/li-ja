@@ -65,7 +65,12 @@ R  QK  q
 
         @Test
         void deads() {
-            assertThat(game.getDeads()).containsExactlyInAnyOrder(new Tuple2<>(C3, BLACK.knight()), new Tuple2<>(F5, BLACK.bishop()), new Tuple2<>(H1, WHITE.rook()));
+            assertThat(game.getDeads()).containsExactlyInAnyOrder(
+                Pair.of(C3, BLACK.knight()),
+                Pair.of(F5, BLACK.bishop()),
+                Pair.of(F5, WHITE.bishop()),
+                Pair.of(C3, WHITE.knight()),
+                Pair.of(H1, WHITE.rook()));
         }
 
         @Test
@@ -137,6 +142,7 @@ K kPP
             assertThat(game.getPlayer()).isEqualTo(BLACK);
         }
 
+        @Test
         void pieces() {
             assertThat(visual.newLine(game.getBoard().toString())).isEqualTo("""
 R  k
