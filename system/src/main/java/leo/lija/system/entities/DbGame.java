@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.posAt;
+import static leo.lija.system.Utils.MOVE_STRING;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
@@ -60,6 +61,7 @@ public class DbGame {
     @Setter
     private int turns;
     @Embedded
+    @Setter
     private DbClock clock;
     private String lastMove;
 
@@ -108,22 +110,7 @@ public class DbGame {
         List<Pair<Pos, Piece>> deads = new ArrayList<>();
         players.forEach(player -> {
             Color color = Color.allByName.get(player.getColor());
-            Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> {
-                char[] codes = pieceCode.toCharArray();
-                if (codes.length < 2) return;
-
-                char pos = codes[0];
-                char role = codes[1];
-                if (Character.isUpperCase(role)) {
-                    Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, Character.toLowerCase(role), color);
-                    if (optPosPiece.isEmpty()) return;
-                    deads.add(Pair.of(optPosPiece.get().getFirst(), optPosPiece.get().getSecond()));
-                } else {
-                    Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, role, color);
-                    if (optPosPiece.isEmpty()) return;
-                    pieces.put(optPosPiece.get().getFirst(), optPosPiece.get().getSecond());
-                }
-            });
+            Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> addToPiecesAndDeads(pieceCode, color, pieces, deads));
         });
 
         Optional<Clock> oc = Optional.ofNullable(clock).map(c -> {
@@ -137,8 +124,26 @@ public class DbGame {
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
             oc,
-            io.vavr.collection.List.ofAll(deads)
+            io.vavr.collection.List.ofAll(deads),
+            turns
         );
+    }
+
+    private void addToPiecesAndDeads(String pieceCode, Color color, Map<Pos, Piece> pieces, List<Pair<Pos, Piece>> deads) {
+        char[] codes = pieceCode.toCharArray();
+        if (codes.length < 2) return;
+
+        char pos = codes[0];
+        char role = codes[1];
+        if (Character.isUpperCase(role)) {
+            Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, Character.toLowerCase(role), color);
+            if (optPosPiece.isEmpty()) return;
+            deads.add(Pair.of(optPosPiece.get().getFirst(), optPosPiece.get().getSecond()));
+        } else {
+            Optional<Pair<Pos, Piece>> optPosPiece = posPiece(pos, role, color);
+            if (optPosPiece.isEmpty()) return;
+            pieces.put(optPosPiece.get().getFirst(), optPosPiece.get().getSecond());
+        }
     }
 
     private Optional<Pair<Pos, Piece>> posPiece(char posCode, char roleCode, Color color) {
@@ -149,8 +154,7 @@ public class DbGame {
 
     private Optional<Pair<Pos, Pos>> getLastMoveChess() {
         return Optional.ofNullable(lastMove).flatMap(lm -> {
-            Pattern lastMovePattern = Pattern.compile("^([a-h][1-8]) ([a-h][1-8])$");
-            Matcher matcher = lastMovePattern.matcher(lm);
+            Matcher matcher = MOVE_STRING.matcher(lm);
             if (matcher.find()) {
                 Optional<Pos> from = posAt(matcher.group(1));
                 Optional<Pos> to = posAt(matcher.group(2));
@@ -176,6 +180,7 @@ public class DbGame {
                 return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getEvts(), player.getElo());
             }).toList();
         pgn = game.getPgnMoves();
+        turns = game.getTurns();
     }
 
     public static final int GAME_ID_SIZE = 8;

@@ -22,7 +22,12 @@ public class GameRepo {
     }
 
     public Optional<DbGame> game(String gameId) {
-        if (gameId.length() == GAME_ID_SIZE) return findById(gameId);
+        if (gameId.length() == GAME_ID_SIZE) {
+            return findById(gameId).map( g -> {
+                if (g.getClock() != null && g.getClock().getColor() == null) g.setClock(null);
+                return g;
+            });
+        }
         return Optional.empty();
     }
 

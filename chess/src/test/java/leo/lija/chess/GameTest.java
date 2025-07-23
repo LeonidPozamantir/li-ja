@@ -1,6 +1,5 @@
 package leo.lija.chess;
 
-import io.vavr.Tuple2;
 import leo.lija.chess.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

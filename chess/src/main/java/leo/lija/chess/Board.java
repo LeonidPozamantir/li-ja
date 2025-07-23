@@ -215,7 +215,7 @@ public class Board {
 
     }
 
-    String visual() {
+    public String visual() {
         return visualFormat.obj2Str(this);
     }
     @Override

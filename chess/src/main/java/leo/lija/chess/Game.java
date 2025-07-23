@@ -1,7 +1,5 @@
 package leo.lija.chess;
 
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
 import leo.lija.chess.format.PgnDump;
 import leo.lija.chess.utils.Pair;
 import lombok.EqualsAndHashCode;
@@ -25,6 +23,7 @@ public class Game {
     protected final String pgnMoves;
     protected final Optional<Clock> clock;
     protected final io.vavr.collection.List<Pair<Pos, Piece>> deads;
+    protected final int turns;
 
     private Optional<Situation> cachedSituation = Optional.empty();
 
@@ -33,11 +32,15 @@ public class Game {
     }
 
     public Game(Board board, Color player) {
-        this(board, player, "", Optional.empty(), io.vavr.collection.List.empty());
+        this(board, player, "", Optional.empty(), io.vavr.collection.List.empty(), 0);
     }
 
     public Game(Board board, Color player, String pgnMoves) {
-        this(board, player, pgnMoves, Optional.empty(), io.vavr.collection.List.empty());
+        this(board, player, pgnMoves, Optional.empty(), io.vavr.collection.List.empty(), 0);
+    }
+
+    public Game(Board board, Color player, String pgnMoves, Optional<Clock> clock, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
+        this(board, player, pgnMoves, clock, deads, 0);
     }
 
     public Game playMove(Pos from, Pos to) {
@@ -45,6 +48,7 @@ public class Game {
     }
 
     public Game playMove(Pos from, Pos to, Role promotion) {
+        if (promotion == null) promotion = QUEEN;
         Move move =  situation().move(from, to, promotion);
         Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
@@ -52,7 +56,7 @@ public class Game {
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
         io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
-        return new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads);
+        return new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads, turns + 1);
     }
 
     public Situation situation() {
