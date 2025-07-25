@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Embeddable
@@ -20,6 +21,7 @@ public class DbPlayer {
 
     @NotNull
     @Column(nullable = false)
+    @Setter
     private String id;
 
     @NotNull

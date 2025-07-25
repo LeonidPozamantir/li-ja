@@ -19,9 +19,8 @@
 
 	<modules>
 		<module>chess</module>
-		<module>http</module>
-		<module>benchmark</module>
 		<module>system</module>
+		<module>benchmark</module>
 	</modules>
 
 	<properties>

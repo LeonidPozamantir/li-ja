@@ -26,9 +26,15 @@
             <version>${jmh.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>leo</groupId>
             <artifactId>chess</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>leo</groupId>
+            <artifactId>system</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -34,7 +34,6 @@ public class Server {
                 Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
                 Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId).orElseThrow(() -> new AppException("Wrong ID " + fullId));
                 DbGame game = gameAndPlayer.getFirst();
-                DbPlayer player = gameAndPlayer.getSecond();
                 Game chessGame = game.toChess();
                 Game newChessGame = chessGame.playMove(orig, dest, promotion);
                 game.update(newChessGame);
