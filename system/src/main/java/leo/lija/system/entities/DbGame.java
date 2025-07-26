@@ -19,11 +19,9 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.Piotr;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,9 +40,7 @@ import static leo.lija.system.Utils.MOVE_STRING;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Getter
-@EqualsAndHashCode
-@ToString
+@Data
 public class DbGame {
 
     @Id
@@ -181,6 +176,16 @@ public class DbGame {
             }).toList();
         pgn = game.getPgnMoves();
         turns = game.getTurns();
+    }
+
+    public Map<DbPlayer, EventStack> eventStacks() {
+        return players.stream().collect(Collectors.toMap(Function.identity(), player -> EventStack.decode(player.getEvts())));
+    }
+
+    public void withEventStacks(Map<DbPlayer, EventStack> stacks) {
+        players.stream().forEach(player -> {
+            if (stacks.containsKey(player)) player.setEvts(stacks.get(player).encode());
+        });
     }
 
     public static final int GAME_ID_SIZE = 8;

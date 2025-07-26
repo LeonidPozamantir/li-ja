@@ -75,14 +75,14 @@ public class GameBenchmark {
     private static ConfigurableApplicationContext context;
 
     @Setup(Level.Trial)
-    public void setContext() {
+    public static void setContext() {
         context = SpringApplication.run(LijaApplication.class);
         repo = context.getBean(GameRepoJpa.class);
         server = context.getBean(Server.class);
     }
 
     @TearDown(Level.Trial)
-    public void close() {
+    public static void close() {
         context.close();
     }
 

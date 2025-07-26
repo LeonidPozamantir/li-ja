@@ -43,11 +43,7 @@ public class Game {
         this(board, player, pgnMoves, clock, deads, 0);
     }
 
-    public Game playMove(Pos from, Pos to) {
-        return playMove(from, to, QUEEN);
-    }
-
-    public Game playMove(Pos from, Pos to, Role promotion) {
+    public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
         if (promotion == null) promotion = QUEEN;
         Move move =  situation().move(from, to, promotion);
         Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
@@ -56,7 +52,15 @@ public class Game {
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
         io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
-        return new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads, turns + 1);
+        return Pair.of(new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads, turns + 1), move);
+    }
+
+    public Game playMove(Pos from, Pos to) {
+        return playMove(from, to, QUEEN);
+    }
+
+    public Game playMove(Pos from, Pos to, Role promotion) {
+        return apply(from, to, promotion).getFirst();
     }
 
     public Situation situation() {

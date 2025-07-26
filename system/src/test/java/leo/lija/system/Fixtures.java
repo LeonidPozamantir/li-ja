@@ -49,7 +49,7 @@ public class Fixtures {
             ps,
             null,
             null,
-            "0s|1Msystem White creates the game|2Msystem Black joins the game|3r/ipkkf590ldrr",
+            "0s|1Msystem White creates the game|2Msystem Black joins the game",
             1280
         );
     }

@@ -1,11 +1,13 @@
 package leo.lija.system;
 
 import leo.lija.chess.Game;
+import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.EventStack;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,11 @@ public class Server {
                 Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId).orElseThrow(() -> new AppException("Wrong ID " + fullId));
                 DbGame game = gameAndPlayer.getFirst();
                 Game chessGame = game.toChess();
-                Game newChessGame = chessGame.playMove(orig, dest, promotion);
+                Pair<Game, Move> newChessGameAndMove = chessGame.apply(orig, dest, promotion);
+                Game newChessGame = newChessGameAndMove.getFirst();
+                Move move = newChessGameAndMove.getSecond();
                 game.update(newChessGame);
+                game.eventStacks().replaceAll((player, eventStack) -> eventStack.withMove(move));
                 repo.save(game);
                 return newChessGame.situation().destinations();
             })
@@ -45,6 +50,10 @@ public class Server {
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString) {
         return playMove(fullId, moveString, Optional.empty());
+    }
+
+    private Map<DbPlayer, EventStack> moveToEvents(Move move) {
+        return Map.of();
     }
 
     private Optional<Pair<String, String>> decodeMoveString(String moveString) {

@@ -5,23 +5,17 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-@ToString
+@Data
 public class DbPlayer {
 
     @NotNull
     @Column(nullable = false)
-    @Setter
     private String id;
 
     @NotNull
@@ -40,4 +34,5 @@ public class DbPlayer {
     public boolean isAi() {
         return aiLevel != null;
     }
+
 }
