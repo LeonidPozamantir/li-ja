@@ -53,7 +53,7 @@ public class VisualFormat implements Format<Board> {
                 if (c != ' ') {
                     Role role = pieces.get(Character.toLowerCase(c));
                     if (role != null) {
-                        boardPieces.put(Pos.posAt(x + 1, 8 - y).get(), new Piece(Color.of(Character.isUpperCase(c)), role));
+                        boardPieces.put(Pos.posAt(x + 1, 8 - y).get(), new Piece(Color.apply(Character.isUpperCase(c)), role));
                     }
                 }
             }

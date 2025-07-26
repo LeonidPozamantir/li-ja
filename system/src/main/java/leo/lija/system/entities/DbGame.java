@@ -104,12 +104,12 @@ public class DbGame {
         Map<Pos, Piece> pieces = new java.util.HashMap<>();
         List<Pair<Pos, Piece>> deads = new ArrayList<>();
         players.forEach(player -> {
-            Color color = Color.allByName.get(player.getColor());
+            Color color = Color.apply(player.getColor()).get();
             Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> addToPiecesAndDeads(pieceCode, color, pieces, deads));
         });
 
         Optional<Clock> oc = Optional.ofNullable(clock).map(c -> {
-            Color color = Color.of(c.getColor()).get();
+            Color color = Color.apply(c.getColor()).get();
             Float whiteTime = c.getTimes().get("white");
             Float blackTime = c.getTimes().get("black");
             return new Clock(color, c.getIncrement(), c.getLimit(), Map.of(WHITE, whiteTime, BLACK, blackTime));
@@ -163,7 +163,7 @@ public class DbGame {
     public void update(Game game) {
         players = players.stream()
             .map(player -> {
-                Color color = Color.allByName.get(player.getColor());
+                Color color = Color.apply(player.getColor()).get();
                 String newPs = Stream.concat(
                     game.getBoard().getPieces().entrySet().stream()
                         .filter(e -> e.getValue().is(color))
