@@ -2,7 +2,7 @@ package leo.lija.system.entities;
 
 import leo.lija.chess.Move;
 import leo.lija.system.entities.event.Event;
-import leo.lija.system.entities.event.EventDecoder;
+import leo.lija.system.entities.event.EventDecoderMap;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
@@ -47,7 +47,7 @@ public class EventStack {
                     String version = matcher.group(1);
                     String code = matcher.group(2);
                     String data = matcher.group(3);
-                    return Optional.ofNullable(EventDecoder.all.get(code.charAt(0)))
+                    return Optional.ofNullable(EventDecoderMap.all.get(code.charAt(0)))
                         .flatMap(decoder -> decoder.decode(data)
                             .map(event -> Map.entry(Integer.valueOf(version), event)));
                 }).filter(Optional::isPresent).map(Optional::get)

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class PossibleMovesEventDecoder extends EventDecoder {
+public class PossibleMovesEventDecoder implements EventDecoder {
     @Override
     public Optional<Event> decode(String str) {
         return Optional.of(new PossibleMovesEvent(

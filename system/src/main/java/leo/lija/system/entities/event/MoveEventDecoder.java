@@ -5,7 +5,7 @@ import leo.lija.system.Piotr;
 
 import java.util.Optional;
 
-public class MoveEventDecoder extends EventDecoder {
+public class MoveEventDecoder implements EventDecoder {
     @Override
     public Optional<Event> decode(String str) {
         char[] chars = str.toCharArray();

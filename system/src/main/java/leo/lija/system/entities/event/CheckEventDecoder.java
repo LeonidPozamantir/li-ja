@@ -4,11 +4,11 @@ import leo.lija.system.Piotr;
 
 import java.util.Optional;
 
-public class EnpassantEventDecoder implements EventDecoder {
+public class CheckEventDecoder implements EventDecoder {
     @Override
     public Optional<Event> decode(String str) {
         if (str.isEmpty()) return Optional.empty();
-        char k = str.charAt(0);
-        return Optional.ofNullable(Piotr.decodePos.get(k)).map(killed -> new EnpassantEvent(killed));
+        char p = str.charAt(0);
+        return Optional.ofNullable(Piotr.decodePos.get(p)).map(pos -> new CheckEvent(pos));
     }
 }
