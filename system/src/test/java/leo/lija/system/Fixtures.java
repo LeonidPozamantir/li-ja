@@ -43,13 +43,17 @@ public class Fixtures {
     }
 
     DbPlayer newDbPlayer(String color, String ps) {
+        return newDbPlayer(color, ps, "0s|1Msystem White creates the game|2Msystem Black joins the game");
+    }
+
+    DbPlayer newDbPlayer(String color, String ps, String evts) {
         return new DbPlayer(
             color.substring(0, 4),
             color,
             ps,
             null,
             null,
-            "0s|1Msystem White creates the game|2Msystem Black joins the game",
+            evts,
             1280
         );
     }
@@ -109,5 +113,23 @@ public class Fixtures {
         24,
         null,
         null
+    );
+
+    DbGame dbGame5 = new DbGame(
+        "luik7l0a",
+        List.of(
+            newDbPlayer("white", "qp4 aR rp0 bn sp46 TB2 uP26 dQ uP14 kk40 MP22 QB8 EP6 gn 3P10 lr44", "109p|110m1vb|111p|112mplw|113p|114mvub|115p|116ml7w|117C?|118p|119m?3b|120p|121m7lw|122Msystem Time out|123e|124p"),
+            newDbPlayer("black", "Op5 7R47 Xp QN21 Ip19 Qb17 uP1 dQ39 KP3 3k15 EP9 ab13 Up33 TN11 Mp7 ur15", "109p|110m1vb|111p|112mplw|113p|114mvub|115p|116ml7w|117C?|118p|119m?3b|120p|121m7lw|122Msystem Time out|123e|124p")
+        ),
+        "b3 d5 Bb2 e6 a3 a6 g3 h6 Bg2 f5 h3 Nf6 Bf1 Be7 e3 O-O Bg2 Bd7 h4 c5 h5 Nc6 f3 d4 g4 dxe3 dxe3 fxg4 fxg4 e5 g5 hxg5 h6 g6 h7+ Kh8 Bxc6 Bxc6 Bxe5 Qxd1+ Kxd1 Rf7 Bxf6+ Bxf6 Rh2 Bxa1 c3 Rd8+ Kc2 Rf3 Rd2 Rxe3 Rxd8+ Kxh7 Rd2",
+        35,
+        55,
+        new DbClock(
+            "black",
+            0,
+            60,
+            Map.of("white", 27.61f, "black", 60.24f)
+        ),
+        "d8 d2"
     );
 }

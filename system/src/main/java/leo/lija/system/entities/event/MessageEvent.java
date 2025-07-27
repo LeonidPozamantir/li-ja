@@ -13,6 +13,6 @@ public class MessageEvent implements Event {
 
     @Override
     public Optional<String> encode() {
-        return Optional.of("M" + author + " " + message.replaceAll("\\|", "(pipe)"));
+        return Optional.of("M" + author + " " + message.replace("|", "(pipe)"));
     }
 }

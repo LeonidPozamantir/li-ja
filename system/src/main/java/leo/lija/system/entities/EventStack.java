@@ -1,15 +1,16 @@
 package leo.lija.system.entities;
 
 import leo.lija.chess.Move;
+import leo.lija.chess.utils.Pair;
+import leo.lija.system.Utils;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.EventDecoderMap;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,13 +19,13 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class EventStack {
-    private final Map<Integer, Event> events;
+    private final List<Pair<Integer, Event>> events;
 
     public String encode() {
-        return events.entrySet().stream()
+        return events.stream()
             .map(e -> {
-                Integer version = e.getKey();
-                Event event = e.getValue();
+                Integer version = e.getFirst();
+                Event event = e.getSecond();
                 return event.encode().map(code -> version.toString() + code);
             }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.joining("|"));
     }
@@ -41,17 +42,18 @@ public class EventStack {
                 .map(evt -> {
                     Matcher matcher = EVENT_ENCODING.matcher(evt);
                     if (!matcher.find()) {
-                        Optional<Map.Entry<Integer, Event>> res = Optional.empty();
+                        Optional<Pair<Integer, Event>> res = Optional.empty();
                         return res;
                     }
-                    String version = matcher.group(1);
+                    String v = matcher.group(1);
                     String code = matcher.group(2);
                     String data = matcher.group(3);
-                    return Optional.ofNullable(EventDecoderMap.all.get(code.charAt(0)))
-                        .flatMap(decoder -> decoder.decode(data)
-                            .map(event -> Map.entry(Integer.valueOf(version), event)));
+                    return Utils.parseIntOption(v)
+                        .flatMap(version -> Optional.ofNullable(EventDecoderMap.all.get(code.charAt(0)))
+                            .flatMap(decoder -> decoder.decode(data)
+                                .map(event -> Pair.of(version, event))));
                 }).filter(Optional::isPresent).map(Optional::get)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .toList()
         );
     }
 
@@ -59,7 +61,8 @@ public class EventStack {
         return new EventStack(
             IntStream.range(0, events.length)
                 .boxed()
-                .collect(Collectors.toMap(Function.identity(), i -> events[i]))
+                .map(i -> Pair.of(i, events[i]))
+                .toList()
         );
     }
 }

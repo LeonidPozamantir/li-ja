@@ -13,7 +13,7 @@ public class MessageEventDecoder implements EventDecoder {
         String author = words.get(0);
         words.removeFirst();
         return Optional.of(new MessageEvent(
-            author, words.stream().collect(Collectors.joining(" ")).replaceAll("\\(pipe\\)", "|")
+            author, words.stream().collect(Collectors.joining(" ")).replace("(pipe)", "|")
         ));
     }
 }

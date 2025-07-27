@@ -49,10 +49,10 @@ import static leo.lija.chess.Role.QUEEN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("an event stack should")
-class EventStackTest {
+class EventStackTest extends Fixtures {
 
     @Test
-    @DisplayName("encode and decode")
+    @DisplayName("encode and decode all events without loss")
     void encodeDecode() {
         EventStack stack = EventStack.apply(
             new StartEvent(),
@@ -77,5 +77,13 @@ class EventStackTest {
             new EndEvent()
         );
         assertThat(EventStack.decode(stack.encode())).isEqualTo(stack);
+    }
+
+    @Test
+    @DisplayName("decode and re-encode production data events")
+    void decodeEncodeProduction() {
+        assertThat(dbGame5.getPlayers()).allMatch(player ->
+            (EventStack.decode(player.getEvts())).encode().equals(player.getEvts())
+        );
     }
 }
