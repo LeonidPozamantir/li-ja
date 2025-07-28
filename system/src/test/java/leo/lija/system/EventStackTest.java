@@ -6,6 +6,7 @@ import leo.lija.system.entities.event.CastlingEvent;
 import leo.lija.system.entities.event.CheckEvent;
 import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.EnpassantEvent;
+import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.MoretimeEvent;
 import leo.lija.system.entities.event.MoveEvent;
@@ -16,10 +17,12 @@ import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.entities.event.StartEvent;
 import leo.lija.system.entities.event.ThreefoldEvent;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
@@ -27,6 +30,7 @@ import static leo.lija.chess.Pos.A1;
 import static leo.lija.chess.Pos.A2;
 import static leo.lija.chess.Pos.A3;
 import static leo.lija.chess.Pos.A4;
+import static leo.lija.chess.Pos.A5;
 import static leo.lija.chess.Pos.A7;
 import static leo.lija.chess.Pos.A8;
 import static leo.lija.chess.Pos.B7;
@@ -85,5 +89,54 @@ class EventStackTest extends Fixtures {
         assertThat(dbGame5.getPlayers()).allMatch(player ->
             (EventStack.decode(player.getEvts())).encode().equals(player.getEvts())
         );
+    }
+
+    @Nested
+    @DisplayName("optimize events")
+    class OptimizeEvents {
+
+        @Test
+        @DisplayName("empty duplicated possible move events")
+        void emptyDuplicated() {
+            assertThat(EventStack.apply(
+                new StartEvent(),
+                new MoveEvent(G4, C3, BLACK),
+                new PossibleMovesEvent(Map.of(A7, List.of(A8, B8))),
+                new MoveEvent(E5, F6, WHITE),
+                new PossibleMovesEvent(Map.of(A2, List.of(A3, A4), F3, List.of(F5, G3, D4, E8))),
+                new MoveEvent(G4, C3, BLACK),
+                new PossibleMovesEvent(Map.of(A5, List.of(A8, B8))),
+                new MoretimeEvent(WHITE, 15),
+                new EndEvent()
+            ).optimize()).isEqualTo(EventStack.apply(
+                new StartEvent(),
+                new MoveEvent( G4,  C3,  BLACK),
+                new PossibleMovesEvent(Map.of()),
+                new MoveEvent( E5,  F6,  WHITE),
+                new PossibleMovesEvent(Map.of()),
+                new MoveEvent( G4,  C3,  BLACK),
+                new PossibleMovesEvent(Map.of(A5, List.of(A8, B8))),
+                new MoretimeEvent(WHITE, 15),
+                new EndEvent()
+            ));
+        }
+
+        @Test
+        @DisplayName("keep only the " + EventStack.MAX_EVENTS + " more recent events")
+        void keepRecent() {
+            int nb = EventStack.MAX_EVENTS;
+            Event someEvent = new CheckEvent(D6);
+            Event endEvent = new EndEvent();
+            Event[] events = Stream.concat(
+                Stream.generate(() -> someEvent).limit(nb + 40),
+                Stream.of(endEvent)
+            ).toArray(Event[]::new);
+            EventStack stack = EventStack.apply(events);
+            List<Event> expected = Stream.concat(
+                Stream.generate(() -> someEvent).limit(nb - 1),
+                Stream.of(endEvent)
+            ).toList();
+            assertThat(stack.optimize().getEvents().stream().map(Pair::getSecond).toList()).isEqualTo(expected);
+        }
     }
 }

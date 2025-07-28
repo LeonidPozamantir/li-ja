@@ -5,17 +5,21 @@ import leo.lija.chess.utils.Pair;
 import leo.lija.system.Utils;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.EventDecoderMap;
+import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class EventStack {
@@ -30,9 +34,28 @@ public class EventStack {
             }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.joining("|"));
     }
 
+    public EventStack optimize() {
+        final boolean[] previous = {false};
+        return new EventStack(
+          events.reversed().stream().limit(MAX_EVENTS)
+              .map(e -> {
+                  Pair<Integer, Event> res;
+                 if (e.getSecond() instanceof PossibleMovesEvent && previous[0]) res = Pair.of(e.getFirst(), new PossibleMovesEvent(Map.of()));
+                 else if (e.getSecond() instanceof PossibleMovesEvent) {
+                     previous[0] = true;
+                     res = Pair.of(e.getFirst(), e.getSecond());
+                 }
+                 else res = e;
+                 return res;
+              }).toList().reversed()
+        );
+    }
+
     public EventStack withMove(Move move) {
         return this;
     }
+
+    public static final int MAX_EVENTS = 16;
 
     private static final Pattern EVENT_ENCODING = Pattern.compile("^(\\d+)(\\w)(.*)$");
 
