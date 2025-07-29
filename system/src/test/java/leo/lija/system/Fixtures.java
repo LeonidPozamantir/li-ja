@@ -1,11 +1,16 @@
 package leo.lija.system;
 
+import leo.lija.chess.Board;
+import leo.lija.chess.Move;
+import leo.lija.chess.Piece;
+import leo.lija.chess.Pos;
 import leo.lija.system.entities.DbClock;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -132,4 +137,8 @@ public class Fixtures {
         ),
         "d8 d2"
     );
+
+    public Move newMove(Piece piece, Pos orig, Pos dest) {
+        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), false, false);
+    }
 }

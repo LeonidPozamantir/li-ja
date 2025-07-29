@@ -5,11 +5,14 @@ import leo.lija.chess.utils.Pair;
 import leo.lija.system.Utils;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.EventDecoderMap;
+import leo.lija.system.entities.event.MoveEvent;
 import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.digester.ArrayStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +50,23 @@ public class EventStack {
                  }
                  else res = e;
                  return res;
-              }).toList().reversed()
+              }).collect(Collectors.toCollection(ArrayList::new)).reversed()
         );
     }
 
+    private Integer version() {
+        if (events.isEmpty()) return 0;
+        return events.getLast().getFirst();
+    }
+
     public EventStack withMove(Move move) {
+        withEvents(List.of(MoveEvent.apply(move)));
         return this;
+    }
+
+    private void withEvents(List<Event> newEvents) {
+        Integer v = version() + 1;
+        events.addAll(newEvents.stream().map(e -> Pair.of(v, e)).toList());
     }
 
     public static final int MAX_EVENTS = 16;
@@ -76,11 +90,15 @@ public class EventStack {
                             .flatMap(decoder -> decoder.decode(data)
                                 .map(event -> Pair.of(version, event))));
                 }).filter(Optional::isPresent).map(Optional::get)
-                .toList()
+                .collect(Collectors.toCollection(ArrayStack::new))
         );
     }
 
-    public static EventStack apply(Event ...events) {
+    public static EventStack apply() {
+        return new EventStack(new ArrayList<>());
+    }
+
+    public static EventStack build(Event ...events) {
         return new EventStack(
             IntStream.range(0, events.length)
                 .boxed()

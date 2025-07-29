@@ -38,8 +38,11 @@ import static leo.lija.chess.Pos.B8;
 import static leo.lija.chess.Pos.C1;
 import static leo.lija.chess.Pos.C3;
 import static leo.lija.chess.Pos.D1;
+import static leo.lija.chess.Pos.D2;
 import static leo.lija.chess.Pos.D4;
+import static leo.lija.chess.Pos.D5;
 import static leo.lija.chess.Pos.D6;
+import static leo.lija.chess.Pos.D7;
 import static leo.lija.chess.Pos.D8;
 import static leo.lija.chess.Pos.E1;
 import static leo.lija.chess.Pos.E5;
@@ -58,7 +61,7 @@ class EventStackTest extends Fixtures {
     @Test
     @DisplayName("encode and decode all events without loss")
     void encodeDecode() {
-        EventStack stack = EventStack.apply(
+        EventStack stack = EventStack.build(
             new StartEvent(),
             new MoveEvent(G4, C3, BLACK),
             new PossibleMovesEvent(Map.of(A7, List.of(A8, B8))),
@@ -98,7 +101,7 @@ class EventStackTest extends Fixtures {
         @Test
         @DisplayName("empty duplicated possible move events")
         void emptyDuplicated() {
-            assertThat(EventStack.apply(
+            assertThat(EventStack.build(
                 new StartEvent(),
                 new MoveEvent(G4, C3, BLACK),
                 new PossibleMovesEvent(Map.of(A7, List.of(A8, B8))),
@@ -108,7 +111,7 @@ class EventStackTest extends Fixtures {
                 new PossibleMovesEvent(Map.of(A5, List.of(A8, B8))),
                 new MoretimeEvent(WHITE, 15),
                 new EndEvent()
-            ).optimize()).isEqualTo(EventStack.apply(
+            ).optimize()).isEqualTo(EventStack.build(
                 new StartEvent(),
                 new MoveEvent( G4,  C3,  BLACK),
                 new PossibleMovesEvent(Map.of()),
@@ -131,12 +134,41 @@ class EventStackTest extends Fixtures {
                 Stream.generate(() -> someEvent).limit(nb + 40),
                 Stream.of(endEvent)
             ).toArray(Event[]::new);
-            EventStack stack = EventStack.apply(events);
+            EventStack stack = EventStack.build(events);
             List<Event> expected = Stream.concat(
                 Stream.generate(() -> someEvent).limit(nb - 1),
                 Stream.of(endEvent)
             ).toList();
             assertThat(stack.optimize().getEvents().stream().map(Pair::getSecond).toList()).isEqualTo(expected);
+        }
+    }
+
+    @Nested
+    @DisplayName("apply move events")
+    class ApplyMoveEvents {
+
+        @Test
+        @DisplayName("start with no events")
+        void startWithNoEvents() {
+            assertThat(EventStack.apply().getEvents()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("add a move event")
+        void addMoveEvent() {
+            EventStack stack = EventStack.apply().withMove(newMove(WHITE.pawn(), D2, D4));
+            assertThat(stack.getEvents()).isEqualTo(List.of(Pair.of(1, new MoveEvent(D2, D4, WHITE))));
+        }
+
+        @Test
+        @DisplayName("add two move events")
+        void addTwoMoveEvents() {
+            EventStack stack = EventStack.apply().withMove(newMove(WHITE.pawn(), D2, D4))
+                .withMove(newMove(BLACK.pawn(), D7, D5));
+            assertThat(stack.getEvents()).isEqualTo(List.of(
+                Pair.of(1, new MoveEvent(D2, D4, WHITE)),
+                Pair.of(2, new MoveEvent(D7, D5, BLACK))
+            ));
         }
     }
 }
