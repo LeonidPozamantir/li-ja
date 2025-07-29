@@ -198,7 +198,7 @@ class EventStackTest extends Fixtures {
 
         @Test
         void castling() {
-            EventStack stack = addMoves(EventStack.apply(), newMove(WHITE.king(), E1, G1, true));
+            EventStack stack = addMoves(EventStack.apply(), newMoveWithCastle(WHITE.king(), E1, G1, Optional.of(Pair.of(H1, F1))));
             assertThat(stack.getEvents()).isEqualTo(List.of(
                 Pair.of(1, new MoveEvent(E1, G1, WHITE)),
                 Pair.of(2, new CastlingEvent(Pair.of(E1, G1), Pair.of(H1, F1), WHITE))
