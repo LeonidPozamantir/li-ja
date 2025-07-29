@@ -1,7 +1,7 @@
 package leo.lija.system.entities.event;
 
+import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
-import leo.lija.system.Piotr;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ public class PromotionEventDecoder implements EventDecoder {
         char r = chars[0];
         char p = chars[1];
         return Role.promotable(r)
-            .flatMap(role -> Optional.ofNullable(Piotr.decodePos.get(p))
+            .flatMap(role -> Pos.piotr(p)
                 .map(pos -> new PromotionEvent(role, pos)));
     }
 }

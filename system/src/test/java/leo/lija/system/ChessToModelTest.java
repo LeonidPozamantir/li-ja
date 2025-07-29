@@ -2,10 +2,13 @@ package leo.lija.system;
 
 import io.vavr.collection.List;
 import leo.lija.chess.Game;
+import leo.lija.chess.Move;
 import leo.lija.chess.format.VisualFormat;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.event.MoveEvent;
+import leo.lija.system.entities.event.PossibleMovesEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,12 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.C3;
+import static leo.lija.chess.Pos.D2;
+import static leo.lija.chess.Pos.D4;
 import static leo.lija.chess.Pos.F5;
 import static leo.lija.chess.Pos.H1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,6 +136,24 @@ R  QK  q
                 assertThat(dbg2.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
                     .isEqualTo(dbGame.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("update events")
+    class UpdateEvents {
+
+        @Test
+        @DisplayName("simple move")
+        void simpleMove() {
+            DbGame dbGame = newDbGameWithoutEvents;
+            Game game = newDbGame.toChess();
+            Pair<Game, Move> newGameMove = game.apply(D2, D4, null);
+            dbGame.update(newGameMove.getFirst(), newGameMove.getSecond());
+            assertThat(dbGame.playerByColor("white").map(DbPlayer::eventStack).get().getEvents()).containsExactly(
+                Pair.of(1, new MoveEvent(D2, D4, WHITE)),
+                Pair.of(2, new PossibleMovesEvent(Map.of()))
+            );
         }
     }
 

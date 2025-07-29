@@ -1,11 +1,9 @@
 package leo.lija.system.entities;
 
-import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.Utils;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.EventDecoderMap;
-import leo.lija.system.entities.event.MoveEvent;
 import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

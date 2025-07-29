@@ -1,7 +1,6 @@
 package leo.lija.system.entities.event;
 
 import leo.lija.chess.Pos;
-import leo.lija.system.Piotr;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +17,8 @@ public class PossibleMovesEventDecoder implements EventDecoder {
                 .map(line -> {
                     char o = line.charAt(0);
                     String ds = line.substring(1);
-                    Pos orig = Piotr.decodePos.get(o);
-                    List<Pos> dests = ds.chars().mapToObj(c -> (char) c).map(c -> Piotr.decodePos.get(c)).toList();
+                    Pos orig = Pos.piotr(o).get();
+                    List<Pos> dests = ds.chars().mapToObj(c -> (char) c).map(c -> Pos.piotr(c).get()).toList();
                     return Map.entry(orig, dests);
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         ));

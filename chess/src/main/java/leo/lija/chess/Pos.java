@@ -25,6 +25,8 @@ public class Pos {
     @EqualsAndHashCode.Include
     @Getter
     private final int y;
+    @Getter
+    private final char piotr;
 
     private Optional<Optional<Pos>> cachedUp = Optional.empty();
     private Optional<Optional<Pos>> cachedDown = Optional.empty();
@@ -158,70 +160,74 @@ public class Pos {
         return String.valueOf((char) (x + 96));
     }
 
-    public static final Pos A1 = new Pos(1, 1);
-    public static final Pos A2 = new Pos(1, 2);
-    public static final Pos A3 = new Pos(1, 3);
-    public static final Pos A4 = new Pos(1, 4);
-    public static final Pos A5 = new Pos(1, 5);
-    public static final Pos A6 = new Pos(1, 6);
-    public static final Pos A7 = new Pos(1, 7);
-    public static final Pos A8 = new Pos(1, 8);
-    public static final Pos B1 = new Pos(2, 1);
-    public static final Pos B2 = new Pos(2, 2);
-    public static final Pos B3 = new Pos(2, 3);
-    public static final Pos B4 = new Pos(2, 4);
-    public static final Pos B5 = new Pos(2, 5);
-    public static final Pos B6 = new Pos(2, 6);
-    public static final Pos B7 = new Pos(2, 7);
-    public static final Pos B8 = new Pos(2, 8);
-    public static final Pos C1 = new Pos(3, 1);
-    public static final Pos C2 = new Pos(3, 2);
-    public static final Pos C3 = new Pos(3, 3);
-    public static final Pos C4 = new Pos(3, 4);
-    public static final Pos C5 = new Pos(3, 5);
-    public static final Pos C6 = new Pos(3, 6);
-    public static final Pos C7 = new Pos(3, 7);
-    public static final Pos C8 = new Pos(3, 8);
-    public static final Pos D1 = new Pos(4, 1);
-    public static final Pos D2 = new Pos(4, 2);
-    public static final Pos D3 = new Pos(4, 3);
-    public static final Pos D4 = new Pos(4, 4);
-    public static final Pos D5 = new Pos(4, 5);
-    public static final Pos D6 = new Pos(4, 6);
-    public static final Pos D7 = new Pos(4, 7);
-    public static final Pos D8 = new Pos(4, 8);
-    public static final Pos E1 = new Pos(5, 1);
-    public static final Pos E2 = new Pos(5, 2);
-    public static final Pos E3 = new Pos(5, 3);
-    public static final Pos E4 = new Pos(5, 4);
-    public static final Pos E5 = new Pos(5, 5);
-    public static final Pos E6 = new Pos(5, 6);
-    public static final Pos E7 = new Pos(5, 7);
-    public static final Pos E8 = new Pos(5, 8);
-    public static final Pos F1 = new Pos(6, 1);
-    public static final Pos F2 = new Pos(6, 2);
-    public static final Pos F3 = new Pos(6, 3);
-    public static final Pos F4 = new Pos(6, 4);
-    public static final Pos F5 = new Pos(6, 5);
-    public static final Pos F6 = new Pos(6, 6);
-    public static final Pos F7 = new Pos(6, 7);
-    public static final Pos F8 = new Pos(6, 8);
-    public static final Pos G1 = new Pos(7, 1);
-    public static final Pos G2 = new Pos(7, 2);
-    public static final Pos G3 = new Pos(7, 3);
-    public static final Pos G4 = new Pos(7, 4);
-    public static final Pos G5 = new Pos(7, 5);
-    public static final Pos G6 = new Pos(7, 6);
-    public static final Pos G7 = new Pos(7, 7);
-    public static final Pos G8 = new Pos(7, 8);
-    public static final Pos H1 = new Pos(8, 1);
-    public static final Pos H2 = new Pos(8, 2);
-    public static final Pos H3 = new Pos(8, 3);
-    public static final Pos H4 = new Pos(8, 4);
-    public static final Pos H5 = new Pos(8, 5);
-    public static final Pos H6 = new Pos(8, 6);
-    public static final Pos H7 = new Pos(8, 7);
-    public static final Pos H8 = new Pos(8, 8);
+    public static Optional<Pos> piotr(Character c) {
+        return Optional.ofNullable(allPiotrs.get(c));
+    }
+
+    public static final Pos A1 = new Pos(1, 1, 'a');
+    public static final Pos B1 = new Pos(2, 1, 'b');
+    public static final Pos C1 = new Pos(3, 1, 'c');
+    public static final Pos D1 = new Pos(4, 1, 'd');
+    public static final Pos E1 = new Pos(5, 1, 'e');
+    public static final Pos F1 = new Pos(6, 1, 'f');
+    public static final Pos G1 = new Pos(7, 1, 'g');
+    public static final Pos H1 = new Pos(8, 1, 'h');
+    public static final Pos A2 = new Pos(1, 2, 'i');
+    public static final Pos B2 = new Pos(2, 2, 'j');
+    public static final Pos C2 = new Pos(3, 2, 'k');
+    public static final Pos D2 = new Pos(4, 2, 'l');
+    public static final Pos E2 = new Pos(5, 2, 'm');
+    public static final Pos F2 = new Pos(6, 2, 'n');
+    public static final Pos G2 = new Pos(7, 2, 'o');
+    public static final Pos H2 = new Pos(8, 2, 'p');
+    public static final Pos A3 = new Pos(1, 3, 'q');
+    public static final Pos B3 = new Pos(2, 3, 'r');
+    public static final Pos C3 = new Pos(3, 3, 's');
+    public static final Pos D3 = new Pos(4, 3, 't');
+    public static final Pos E3 = new Pos(5, 3, 'u');
+    public static final Pos F3 = new Pos(6, 3, 'v');
+    public static final Pos G3 = new Pos(7, 3, 'w');
+    public static final Pos H3 = new Pos(8, 3, 'x');
+    public static final Pos A4 = new Pos(1, 4, 'y');
+    public static final Pos B4 = new Pos(2, 4, 'z');
+    public static final Pos C4 = new Pos(3, 4, 'A');
+    public static final Pos D4 = new Pos(4, 4, 'B');
+    public static final Pos E4 = new Pos(5, 4, 'C');
+    public static final Pos F4 = new Pos(6, 4, 'D');
+    public static final Pos G4 = new Pos(7, 4, 'E');
+    public static final Pos H4 = new Pos(8, 4, 'F');
+    public static final Pos A5 = new Pos(1, 5, 'G');
+    public static final Pos B5 = new Pos(2, 5, 'H');
+    public static final Pos C5 = new Pos(3, 5, 'I');
+    public static final Pos D5 = new Pos(4, 5, 'J');
+    public static final Pos E5 = new Pos(5, 5, 'K');
+    public static final Pos F5 = new Pos(6, 5, 'L');
+    public static final Pos G5 = new Pos(7, 5, 'M');
+    public static final Pos H5 = new Pos(8, 5, 'N');
+    public static final Pos A6 = new Pos(1, 6, 'O');
+    public static final Pos B6 = new Pos(2, 6, 'P');
+    public static final Pos C6 = new Pos(3, 6, 'Q');
+    public static final Pos D6 = new Pos(4, 6, 'R');
+    public static final Pos E6 = new Pos(5, 6, 'S');
+    public static final Pos F6 = new Pos(6, 6, 'T');
+    public static final Pos G6 = new Pos(7, 6, 'U');
+    public static final Pos H6 = new Pos(8, 6, 'V');
+    public static final Pos A7 = new Pos(1, 7, 'W');
+    public static final Pos B7 = new Pos(2, 7, 'X');
+    public static final Pos C7 = new Pos(3, 7, 'Y');
+    public static final Pos D7 = new Pos(4, 7, 'Z');
+    public static final Pos E7 = new Pos(5, 7, '0');
+    public static final Pos F7 = new Pos(6, 7, '1');
+    public static final Pos G7 = new Pos(7, 7, '2');
+    public static final Pos H7 = new Pos(8, 7, '3');
+    public static final Pos A8 = new Pos(1, 8, '4');
+    public static final Pos B8 = new Pos(2, 8, '5');
+    public static final Pos C8 = new Pos(3, 8, '6');
+    public static final Pos D8 = new Pos(4, 8, '7');
+    public static final Pos E8 = new Pos(5, 8, '8');
+    public static final Pos F8 = new Pos(6, 8, '9');
+    public static final Pos G8 = new Pos(7, 8, '!');
+    public static final Pos H8 = new Pos(8, 8, '?');
 
     private static final Map<String, Pos> allKeys = Map.ofEntries(
             Map.entry("a1", A1), Map.entry("a2", A2), Map.entry("a3", A3), Map.entry("a4", A4), Map.entry("a5", A5), Map.entry("a6", A6), Map.entry("a7", A7), Map.entry("a8", A8),
@@ -242,6 +248,8 @@ public class Pos {
                 return Pair.of(Pair.of(i, j), allKeys.get(key));
             }))
         .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+
+    private static final Map<Character, Pos> allPiotrs = all().stream().collect(Collectors.toMap(pos -> pos.piotr, Function.identity()));
 
     public static Collection<Pos> all() {
         return allKeys.values();

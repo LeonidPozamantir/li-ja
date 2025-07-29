@@ -41,8 +41,12 @@ public class Situation {
 		return cachedDestinations.get();
 	}
 
+	public Optional<Pos> kingPos() {
+		return board.kingPosOf(color);
+	}
+
 	public boolean check() {
-		return board.kingPosOf(color).map(king -> board.actorsOf(color.getOpposite()).stream().anyMatch(a -> a.threatens(king)))
+		return kingPos().map(king -> board.actorsOf(color.getOpposite()).stream().anyMatch(a -> a.threatens(king)))
 			.orElse(false);
 	}
 

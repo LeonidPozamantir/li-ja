@@ -3,7 +3,6 @@ package leo.lija.system.entities.event;
 import leo.lija.chess.Color;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
-import leo.lija.system.Piotr;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
@@ -18,10 +17,6 @@ public class CastlingEvent implements Event {
 
     @Override
     public Optional<String> encode() {
-        return Optional.ofNullable(Piotr.encodePos.get(king.getFirst()))
-            .flatMap(k1 -> Optional.ofNullable(Piotr.encodePos.get(king.getSecond()))
-                .flatMap(k2 -> Optional.ofNullable(Piotr.encodePos.get(rook.getFirst()))
-                    .flatMap(r1 -> Optional.ofNullable(Piotr.encodePos.get(rook.getSecond()))
-                        .map(r2 -> "c" + k1 + k2 + r1 + r2 + color.getLetter()))));
+        return Optional.of("c" + king.getFirst().getPiotr() + king.getSecond().getPiotr() + rook.getFirst().getPiotr() + rook.getSecond().getPiotr() + color.getLetter());
     }
 }

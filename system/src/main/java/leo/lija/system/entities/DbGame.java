@@ -17,8 +17,10 @@ import leo.lija.chess.History;
 import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
+import leo.lija.chess.Role;
+import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
-import leo.lija.system.Piotr;
+import leo.lija.system.entities.event.CheckEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.AccessLevel;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -145,8 +148,8 @@ public class DbGame {
     }
 
     private Optional<Pair<Pos, Piece>> posPiece(char posCode, char roleCode, Color color) {
-        return Optional.ofNullable(Piotr.decodePos.get(posCode))
-            .flatMap(pos -> Optional.ofNullable(Piotr.decodeRole.get(roleCode))
+        return Pos.piotr(posCode)
+            .flatMap(pos -> Role.fen(roleCode)
                 .map(role -> Pair.of(pos, new Piece(color, role))));
     }
 
@@ -165,22 +168,24 @@ public class DbGame {
 
     public void update(Game game, Move move) {
         List<Event> events = Event.fromMove(move);
+        Situation situation = game.situation();
         players = players.stream()
             .map(player -> {
                 Color color = Color.apply(player.getColor()).get();
                 String newPs = Stream.concat(
                     game.getBoard().getPieces().entrySet().stream()
                         .filter(e -> e.getValue().is(color))
-                        .map(e -> Piotr.encodePos.get(e.getKey()).toString() + e.getValue().role().fen),
+                        .map(e -> String.valueOf(e.getKey().getPiotr()) + e.getValue().role().fen),
                     game.getDeads().toJavaStream()
                         .filter(p -> p.getSecond().is(color))
-                        .map(p -> Piotr.encodePos.get(p.getFirst()).toString() + Character.toUpperCase(p.getSecond().role().fen))
+                        .map(p -> String.valueOf(p.getFirst().getPiotr()) + Character.toUpperCase(p.getSecond().role().fen))
                 ).collect(Collectors.joining(" "));
 
                 List<Event> newEvents = new ArrayList<>(events);
-                newEvents.addAll(List.of(
-                    new PossibleMovesEvent(color == game.getPlayer() ? game.situation().destinations() : Map.of())
-                ));
+                newEvents.addAll(Stream.of(
+                    new PossibleMovesEvent(color == game.getPlayer() ? situation.destinations() : Map.of()),
+                    situation.check() ? situation.kingPos().map(CheckEvent::new).orElse(null) : null
+                ).filter(Objects::nonNull).toList());
                 String newEvts = player.eventStack().withEvents(newEvents).optimize().encode();
 
                 return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());

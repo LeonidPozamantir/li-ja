@@ -3,7 +3,6 @@ package leo.lija.system.entities.event;
 import leo.lija.chess.Color;
 import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
-import leo.lija.system.Piotr;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
@@ -18,9 +17,7 @@ public class MoveEvent implements Event {
 
     @Override
     public Optional<String> encode() {
-        return Optional.ofNullable(Piotr.encodePos.get(orig))
-            .flatMap(o -> Optional.ofNullable(Piotr.encodePos.get(dest))
-                .map(d -> "m" + o + d + color.getLetter()));
+        return Optional.of("m" + orig.getPiotr() + dest.getPiotr() + color.getLetter());
     }
 
     public static MoveEvent apply(Move move) {
