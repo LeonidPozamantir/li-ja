@@ -5,6 +5,7 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
+import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbClock;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -151,15 +152,15 @@ public class Fixtures {
     }
 
     public Move newMoveWithPromotion(Piece piece, Pos orig, Pos dest, Optional<Role> promotion) {
-        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), promotion, false, false);
+        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), promotion, Optional.empty(), false);
     }
 
-    public Move newMove(Piece piece, Pos orig, Pos dest, boolean castles) {
-        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), castles, false);
+    public Move newMoveWithCastle(Piece piece, Pos orig, Pos dest, Optional<Pair<Pos, Pos>> castle) {
+        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), castle, false);
     }
 
     public Move newMove(Piece piece, Pos orig, Pos dest, Optional<Pos> capture, boolean enpassant) {
-        return new Move(piece, orig, dest, new Board(), new Board(), capture, Optional.empty(), false, enpassant);
+        return new Move(piece, orig, dest, new Board(), new Board(), capture, Optional.empty(), Optional.empty(), enpassant);
     }
 
     public final Move anyMove = newMove(WHITE.pawn(), D2, D4);

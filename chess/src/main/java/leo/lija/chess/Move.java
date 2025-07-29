@@ -1,6 +1,7 @@
 package leo.lija.chess;
 
 import leo.lija.chess.exceptions.ChessRulesException;
+import leo.lija.chess.utils.Pair;
 import lombok.With;
 
 import java.util.Optional;
@@ -15,7 +16,7 @@ public record Move(
     @With Board after,
     Optional<Pos> capture,
     @With Optional<Role> promotion,
-    boolean castles,
+    Optional<Pair<Pos, Pos>> castle,
     boolean enpassant
 ) {
 
@@ -26,12 +27,12 @@ public record Move(
     }
 
     public Move withHistory(History h) {
-        return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castles, enpassant);
+        return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castle, enpassant);
     }
 
     public Board afterWithPositionHashesUpdated() {
         return after.updateHistory(h -> {
-           if (piece.is(PAWN) || captures() || promotes() || castles) return h.withoutPositionHashes();
+           if (piece.is(PAWN) || captures() || promotes() || castles()) return h.withoutPositionHashes();
            return h.withNewPositionHash(after.positionHash());
         });
     }
@@ -43,6 +44,10 @@ public record Move(
 
     public boolean promotes() {
         return promotion.isPresent();
+    }
+
+    public boolean castles() {
+        return castle.isPresent();
     }
 
     public Color color() {

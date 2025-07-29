@@ -147,7 +147,7 @@ public class Actor {
 					.flatMap(b -> b.move(kingPos, newKingPos.get()))
 					.flatMap(b -> b.place(color.rook(), newRookPos.get()))
 					.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)));
-				return newBoard.map(b -> move(newKingPos.get(), b, true));
+				return newBoard.map(b -> moveCastle(newKingPos.get(), b, Optional.of(Pair.of(rookPos, newRookPos.get()))));
 			});
 	}
 
@@ -254,22 +254,22 @@ public class Actor {
 	}
 
 	private Move move(Pos dest, Board after, Optional<Pos> capture) {
-		return move(dest, after, capture, false, Optional.empty(), false);
+		return move(dest, after, capture, Optional.empty(), Optional.empty(), false);
 	}
 
 	private Move moveEnPassant(Pos dest, Board after) {
-		return move(dest, after, Optional.empty(), false, Optional.empty(), true);
+		return move(dest, after, Optional.empty(), Optional.empty(), Optional.empty(), true);
 	}
 
-	private Move move(Pos dest, Board after, boolean castle) {
+	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pos, Pos>> castle) {
 		return move(dest, after, Optional.empty(), castle, Optional.empty(), false);
 	}
 
 	private Move movePromote(Pos dest, Board after, Optional<Role> promotion) {
-		return move(dest, after, Optional.empty(), false, promotion, false);
+		return move(dest, after, Optional.empty(), Optional.empty(), promotion, false);
 	}
 
-	private Move move(Pos dest, Board after, Optional<Pos> capture, boolean castle, Optional<Role> promotion, boolean enpassant) {
+	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pos, Pos>> castle, Optional<Role> promotion, boolean enpassant) {
 		return new Move(piece, pos, dest, board, after, capture, promotion, castle, enpassant);
 	}
 
