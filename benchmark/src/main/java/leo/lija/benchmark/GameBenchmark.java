@@ -149,7 +149,7 @@ public class GameBenchmark {
     }
 
     private DbPlayer newDbPlayer(String id, String color, String ps) {
-        return new DbPlayer(id, color, ps, null, null, "0s|1Msystem White creates the game|2Msystem Black joins the game|3r/ipkkf590ldrr", 1280);
+        return new DbPlayer(id, color, ps, null, null, "0s|1Msystem White creates the game|2Msystem Black joins the game", 1280);
     }
 
 

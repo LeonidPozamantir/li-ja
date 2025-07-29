@@ -54,19 +54,18 @@ public class EventStack {
         );
     }
 
-    private Integer version() {
+    public Integer version() {
         if (events.isEmpty()) return 0;
         return events.getLast().getFirst();
     }
 
-    public EventStack withMove(Move move) {
-        withEvents(List.of(MoveEvent.apply(move)));
+    public EventStack withEvents(List<Event> newEvents) {
+        Integer[] v = {version()};
+        events.addAll(newEvents.stream().map(e -> {
+            v[0]++;
+            return Pair.of(v[0], e);
+        }).toList());
         return this;
-    }
-
-    private void withEvents(List<Event> newEvents) {
-        Integer v = version() + 1;
-        events.addAll(newEvents.stream().map(e -> Pair.of(v, e)).toList());
     }
 
     public static final int MAX_EVENTS = 16;

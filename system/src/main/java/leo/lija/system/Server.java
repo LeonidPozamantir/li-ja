@@ -40,8 +40,7 @@ public class Server {
                 Pair<Game, Move> newChessGameAndMove = chessGame.apply(orig, dest, promotion);
                 Game newChessGame = newChessGameAndMove.getFirst();
                 Move move = newChessGameAndMove.getSecond();
-                game.update(newChessGame);
-                game.eventStacks().replaceAll((player, eventStack) -> eventStack.withMove(move).optimize());
+                game.update(newChessGame, move);
                 repo.save(game);
                 return newChessGame.situation().destinations();
             })

@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor
@@ -30,6 +32,10 @@ public class DbPlayer {
     private Boolean isWinner;
     private String evts;
     private Integer elo;
+
+    public EventStack eventStack() {
+        return EventStack.decode(evts);
+    }
 
     public boolean isAi() {
         return aiLevel != null;

@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.EventStack;
 import leo.lija.system.entities.event.CastlingEvent;
@@ -20,8 +21,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static leo.lija.chess.Color.BLACK;
@@ -45,14 +48,20 @@ import static leo.lija.chess.Pos.D6;
 import static leo.lija.chess.Pos.D7;
 import static leo.lija.chess.Pos.D8;
 import static leo.lija.chess.Pos.E1;
+import static leo.lija.chess.Pos.E3;
 import static leo.lija.chess.Pos.E5;
+import static leo.lija.chess.Pos.E6;
 import static leo.lija.chess.Pos.E8;
+import static leo.lija.chess.Pos.F1;
 import static leo.lija.chess.Pos.F3;
 import static leo.lija.chess.Pos.F5;
 import static leo.lija.chess.Pos.F6;
+import static leo.lija.chess.Pos.G1;
 import static leo.lija.chess.Pos.G3;
 import static leo.lija.chess.Pos.G4;
+import static leo.lija.chess.Pos.H1;
 import static leo.lija.chess.Role.QUEEN;
+import static leo.lija.chess.Role.ROOK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("an event stack should")
@@ -147,6 +156,10 @@ class EventStackTest extends Fixtures {
     @DisplayName("apply move events")
     class ApplyMoveEvents {
 
+        private EventStack addMoves(EventStack eventStack, Move...moves) {
+            return Arrays.stream(moves).reduce(eventStack, (stack, move) -> stack.withEvents(Event.fromMove(move)), (s1, s2) -> s1);
+        }
+
         @Test
         @DisplayName("start with no events")
         void startWithNoEvents() {
@@ -154,17 +167,50 @@ class EventStackTest extends Fixtures {
         }
 
         @Test
-        @DisplayName("add a move event")
-        void addMoveEvent() {
-            EventStack stack = EventStack.apply().withMove(newMove(WHITE.pawn(), D2, D4));
+        void move() {
+            EventStack stack = addMoves(EventStack.apply(), newMove(WHITE.pawn(), D2, D4));
             assertThat(stack.getEvents()).isEqualTo(List.of(Pair.of(1, new MoveEvent(D2, D4, WHITE))));
         }
 
         @Test
-        @DisplayName("add two move events")
-        void addTwoMoveEvents() {
-            EventStack stack = EventStack.apply().withMove(newMove(WHITE.pawn(), D2, D4))
-                .withMove(newMove(BLACK.pawn(), D7, D5));
+        void capture() {
+            EventStack stack = addMoves(EventStack.apply(), newMove(WHITE.pawn(), D2, E3, Optional.of(E3)));
+            assertThat(stack.getEvents()).isEqualTo(List.of(Pair.of(1, new MoveEvent(D2, E3, WHITE))));
+        }
+
+        @Test
+        void enpassant() {
+            EventStack stack = addMoves(EventStack.apply(), newMove(WHITE.pawn(), D5, E6, Optional.of(E5), true));
+            assertThat(stack.getEvents()).isEqualTo(List.of(
+                Pair.of(1, new MoveEvent(D5, E6, WHITE)),
+                Pair.of(2, new EnpassantEvent(E5))
+            ));
+        }
+
+        @Test
+        void promotion() {
+            EventStack stack = addMoves(EventStack.apply(), newMoveWithPromotion(WHITE.pawn(), D7, D8, Optional.of(ROOK)));
+            assertThat(stack.getEvents()).isEqualTo(List.of(
+                Pair.of(1, new MoveEvent(D7, D8, WHITE)),
+                Pair.of(2, new PromotionEvent(ROOK, D8))
+            ));
+        }
+
+        @Test
+        void castling() {
+            EventStack stack = addMoves(EventStack.apply(), newMove(WHITE.king(), E1, G1, true));
+            assertThat(stack.getEvents()).isEqualTo(List.of(
+                Pair.of(1, new MoveEvent(E1, G1, WHITE)),
+                Pair.of(2, new CastlingEvent(Pair.of(E1, G1), Pair.of(H1, F1), WHITE))
+            ));
+        }
+
+        @Test
+        @DisplayName("two moves")
+        void twoMoves() {
+            EventStack stack = addMoves(EventStack.apply(),
+                newMove(WHITE.pawn(), D2, D4),
+                newMove(BLACK.pawn(), D7, D5));
             assertThat(stack.getEvents()).isEqualTo(List.of(
                 Pair.of(1, new MoveEvent(D2, D4, WHITE)),
                 Pair.of(2, new MoveEvent(D7, D5, BLACK))

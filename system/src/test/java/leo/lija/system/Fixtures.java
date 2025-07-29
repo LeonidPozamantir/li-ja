@@ -4,6 +4,7 @@ import leo.lija.chess.Board;
 import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
+import leo.lija.chess.Role;
 import leo.lija.system.entities.DbClock;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -15,6 +16,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static leo.lija.chess.Color.WHITE;
+import static leo.lija.chess.Pos.D2;
+import static leo.lija.chess.Pos.D4;
 import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
 import static leo.lija.system.entities.DbGame.PLAYER_ID_SIZE;
 
@@ -139,6 +143,24 @@ public class Fixtures {
     );
 
     public Move newMove(Piece piece, Pos orig, Pos dest) {
-        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), false, false);
+        return newMove(piece, orig, dest, Optional.empty());
     }
+
+    public Move newMove(Piece piece, Pos orig, Pos dest, Optional<Pos> capture) {
+        return newMove(piece, orig, dest, capture, false);
+    }
+
+    public Move newMoveWithPromotion(Piece piece, Pos orig, Pos dest, Optional<Role> promotion) {
+        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), promotion, false, false);
+    }
+
+    public Move newMove(Piece piece, Pos orig, Pos dest, boolean castles) {
+        return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), castles, false);
+    }
+
+    public Move newMove(Piece piece, Pos orig, Pos dest, Optional<Pos> capture, boolean enpassant) {
+        return new Move(piece, orig, dest, new Board(), new Board(), capture, Optional.empty(), false, enpassant);
+    }
+
+    public final Move anyMove = newMove(WHITE.pawn(), D2, D4);
 }

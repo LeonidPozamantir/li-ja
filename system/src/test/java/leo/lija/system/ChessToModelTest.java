@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("chess to model conversion")
 class ChessToModelTest extends Fixtures {
 
-    private VisualFormat visual = new VisualFormat();
+    private final VisualFormat visual = new VisualFormat();
 
     @Nested
     @DisplayName("new game")
@@ -41,7 +41,7 @@ class ChessToModelTest extends Fixtures {
 
             @BeforeAll
             void init() {
-                dbg2.update(game);
+                dbg2.update(game, anyMove);
             }
 
             @Test
@@ -91,7 +91,7 @@ R  QK  q
             @BeforeAll
             void setup() {
                 dbg2 = dbGame.copy();
-                dbg2.update(game);
+                dbg2.update(game, anyMove);
             }
 
             @Test
@@ -116,7 +116,7 @@ R  QK  q
             @BeforeAll
             void setup() {
                 dbg2 = newDbGame.copy();
-                dbg2.update(game);
+                dbg2.update(game, anyMove);
             }
 
             @Test

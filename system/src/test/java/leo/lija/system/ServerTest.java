@@ -3,9 +3,13 @@ package leo.lija.system;
 import leo.lija.chess.Pos;
 import leo.lija.chess.format.VisualFormat;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.EventStack;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -100,21 +104,28 @@ RNBQKBNR
 
         @Nested
         @DisplayName("be persisted")
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
         class Persisted {
+            DbGame game;
+            Optional<DbGame> found;
+
+            @BeforeAll
+            void init() {
+                game = insert();
+                play(game);
+                found = repo.game(game.getId());
+            }
+
             @Test
             @DisplayName("update turns")
             void updateTurns() {
-                DbGame game = insert();
-                play(game);
-                assertThat(repo.game(game.getId()).get().getTurns()).isEqualTo(27);
+                assertThat(found.get().getTurns()).isEqualTo(27);
             }
 
             @Test
             @DisplayName("update board")
             void updateBoard() {
-                DbGame game = insert();
-                play(game);
-                assertThat(visualFormat.newLine(repo.game(game.getId()).get().toChess().getBoard().visual())).isEqualTo("""
+                assertThat(visualFormat.newLine(found.get().toChess().getBoard().visual())).isEqualTo("""
   kr  nr
 p  n ppp
 B p p
@@ -124,6 +135,23 @@ B p p
  PPK PP
        q
 """);
+            }
+
+            @Nested
+            @DisplayName("event stacks")
+            class EventStacks {
+                Optional<EventStack> stack = found.flatMap(g -> g.playerByColor("white")).map(DbPlayer::eventStack);
+
+                @Test
+                @DisplayName("high version number")
+                void highVersionNumber() {
+                    assertThat(stack.get().version()).isGreaterThan(20);
+                }
+
+                @Test
+                void rotated() {
+                    assertThat(stack.get().getEvents().size()).isEqualTo(16);
+                }
             }
         }
     }

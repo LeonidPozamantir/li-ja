@@ -14,10 +14,13 @@ import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.History;
+import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.Piotr;
+import leo.lija.system.entities.event.Event;
+import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -160,7 +163,8 @@ public class DbGame {
         });
     }
 
-    public void update(Game game) {
+    public void update(Game game, Move move) {
+        List<Event> events = Event.fromMove(move);
         players = players.stream()
             .map(player -> {
                 Color color = Color.apply(player.getColor()).get();
@@ -172,20 +176,17 @@ public class DbGame {
                         .filter(p -> p.getSecond().is(color))
                         .map(p -> Piotr.encodePos.get(p.getFirst()).toString() + Character.toUpperCase(p.getSecond().role().fen))
                 ).collect(Collectors.joining(" "));
-                return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getEvts(), player.getElo());
+
+                List<Event> newEvents = new ArrayList<>(events);
+                newEvents.addAll(List.of(
+                    new PossibleMovesEvent(color == game.getPlayer() ? game.situation().destinations() : Map.of())
+                ));
+                String newEvts = player.eventStack().withEvents(newEvents).optimize().encode();
+
+                return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
             }).toList();
         pgn = game.getPgnMoves();
         turns = game.getTurns();
-    }
-
-    public Map<DbPlayer, EventStack> eventStacks() {
-        return players.stream().collect(Collectors.toMap(Function.identity(), player -> EventStack.decode(player.getEvts())));
-    }
-
-    public void withEventStacks(Map<DbPlayer, EventStack> stacks) {
-        players.stream().forEach(player -> {
-            if (stacks.containsKey(player)) player.setEvts(stacks.get(player).encode());
-        });
     }
 
     public static final int GAME_ID_SIZE = 8;
