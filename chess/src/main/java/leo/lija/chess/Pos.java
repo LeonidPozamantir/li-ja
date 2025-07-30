@@ -41,52 +41,36 @@ public class Pos {
     private Optional<String> cachedKey = Optional.empty();
 
     public Optional<Pos> up() {
-        if (cachedUp.isEmpty()) cachedUp = Optional.of(shiftUp(1));
+        if (cachedUp.isEmpty()) cachedUp = Optional.of(posAt(x, y + 1));
         return cachedUp.get();
     }
     public Optional<Pos> down() {
-        if (cachedDown.isEmpty()) cachedDown = Optional.of(shiftDown(1));
+        if (cachedDown.isEmpty()) cachedDown = Optional.of(posAt(x, y - 1));
         return cachedDown.get();
     }
     public Optional<Pos> left() {
-        if (cachedLeft.isEmpty()) cachedLeft = Optional.of(shiftLeft(1));
+        if (cachedLeft.isEmpty()) cachedLeft = Optional.of(posAt(x - 1, y));
         return cachedLeft.get();
     }
     public Optional<Pos> right() {
-        if (cachedRight.isEmpty()) cachedRight = Optional.of(shiftRight(1));
+        if (cachedRight.isEmpty()) cachedRight = Optional.of(posAt(x + 1, y));
         return cachedRight.get();
     }
     public Optional<Pos> upLeft() {
-        if (cachedUpLeft.isEmpty()) cachedUpLeft = Optional.of(shiftUp(1).flatMap(p -> p.shiftLeft(1)));
+        if (cachedUpLeft.isEmpty()) cachedUpLeft = Optional.of(up().flatMap(Pos::left));
         return cachedUpLeft.get();
     }
     public Optional<Pos> upRight() {
-        if (cachedUpRight.isEmpty()) cachedUpRight = Optional.of(shiftUp(1).flatMap(p -> p.shiftRight(1)));
+        if (cachedUpRight.isEmpty()) cachedUpRight = Optional.of(up().flatMap(Pos::right));
         return cachedUpRight.get();
     }
     public Optional<Pos> downLeft() {
-        if (cachedDownLeft.isEmpty()) cachedDownLeft = Optional.of(shiftDown(1).flatMap(p -> p.shiftLeft(1)));
+        if (cachedDownLeft.isEmpty()) cachedDownLeft = Optional.of(down().flatMap(Pos::left));
         return cachedDownLeft.get();
     }
     public Optional<Pos> downRight() {
-        if (cachedDownRight.isEmpty()) cachedDownRight = Optional.of(shiftDown(1).flatMap(p -> p.shiftRight(1)));
+        if (cachedDownRight.isEmpty()) cachedDownRight = Optional.of(down().flatMap(Pos::right));
         return cachedDownRight.get();
-    }
-
-    public Optional<Pos> shiftUp(int n) {
-        return posAt(x, y + n);
-    }
-
-    public Optional<Pos> shiftDown(int n) {
-        return posAt(x, y - n);
-    }
-
-    public Optional<Pos> shiftLeft(int n) {
-        return posAt(x - n, y);
-    }
-
-    public Optional<Pos> shiftRight(int n) {
-        return posAt(x + n, y);
     }
 
     public List<Pos> multShiftLeft(Predicate<Pos> stop) {
