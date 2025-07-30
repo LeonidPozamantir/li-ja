@@ -29,6 +29,16 @@ public record History (
 		)), List.of());
 	}
 
+	public boolean isLastMove(Pos p1, Pos p2) {
+		return lastMove.isPresent() && lastMove.get().getFirst().equals(p1) && lastMove.get().getSecond().equals(p2);
+	}
+
+	public boolean threefoldRepetition() {
+		return positionHashes.size() > 6 && positionHashes.headOption().map(hash ->
+			positionHashes.count(h -> h.equals(hash)) >= 3
+		).getOrElse(false);
+	}
+
 	public boolean canCastle(Color color, Side side) {
 		Pair<Boolean, Boolean> castlesColor = colorCastles(color);
 		return side == Side.KING_SIDE ? castlesColor.getFirst() : castlesColor.getSecond();

@@ -3,22 +3,14 @@ package leo.lija.chess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static leo.lija.chess.Pos.A4;
 import static leo.lija.chess.Pos.B4;
 import static leo.lija.chess.Pos.C4;
-import static leo.lija.chess.Pos.C5;
-import static leo.lija.chess.Pos.D3;
 import static leo.lija.chess.Pos.D4;
 import static leo.lija.chess.Pos.D5;
-import static leo.lija.chess.Pos.D6;
-import static leo.lija.chess.Pos.D8;
 import static leo.lija.chess.Pos.E4;
-import static leo.lija.chess.Pos.E5;
 import static leo.lija.chess.Pos.F4;
 import static leo.lija.chess.Pos.G4;
-import static leo.lija.chess.Pos.G5;
 import static leo.lija.chess.Pos.H4;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
