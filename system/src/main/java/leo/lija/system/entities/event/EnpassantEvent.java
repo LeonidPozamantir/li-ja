@@ -4,15 +4,13 @@ import leo.lija.chess.Pos;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class EnpassantEvent implements Event {
     private Pos killed;
 
     @Override
-    public Optional<String> encode() {
-        return Optional.of("E" + killed.getPiotr());
+    public String encode() {
+        return "E" + killed.getPiotr();
     }
 }

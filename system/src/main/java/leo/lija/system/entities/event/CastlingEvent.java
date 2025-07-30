@@ -6,8 +6,6 @@ import leo.lija.chess.utils.Pair;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class CastlingEvent implements Event {
@@ -16,7 +14,7 @@ public class CastlingEvent implements Event {
     private Color color;
 
     @Override
-    public Optional<String> encode() {
-        return Optional.of("c" + king.getFirst().getPiotr() + king.getSecond().getPiotr() + rook.getFirst().getPiotr() + rook.getSecond().getPiotr() + color.getLetter());
+    public String encode() {
+        return "c" + king.getFirst().getPiotr() + king.getSecond().getPiotr() + rook.getFirst().getPiotr() + rook.getSecond().getPiotr() + color.getLetter();
     }
 }

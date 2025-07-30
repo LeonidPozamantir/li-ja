@@ -4,8 +4,6 @@ import leo.lija.chess.Color;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class MoretimeEvent implements Event {
@@ -13,7 +11,7 @@ public class MoretimeEvent implements Event {
     private int seconds;
 
     @Override
-    public Optional<String> encode() {
-        return Optional.of("T" + color.getLetter() + seconds);
+    public String encode() {
+        return "T" + color.getLetter() + seconds;
     }
 }

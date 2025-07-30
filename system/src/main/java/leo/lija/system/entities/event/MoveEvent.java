@@ -6,8 +6,6 @@ import leo.lija.chess.Pos;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class MoveEvent implements Event {
@@ -16,8 +14,8 @@ public class MoveEvent implements Event {
     private Color color;
 
     @Override
-    public Optional<String> encode() {
-        return Optional.of("m" + orig.getPiotr() + dest.getPiotr() + color.getLetter());
+    public String encode() {
+        return "m" + orig.getPiotr() + dest.getPiotr() + color.getLetter();
     }
 
     public static MoveEvent apply(Move move) {

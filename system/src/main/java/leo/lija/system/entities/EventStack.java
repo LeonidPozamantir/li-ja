@@ -31,8 +31,8 @@ public class EventStack {
             .map(e -> {
                 Integer version = e.getFirst();
                 Event event = e.getSecond();
-                return event.encode().map(code -> version.toString() + code);
-            }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.joining("|"));
+                return version.toString() + event.encode();
+            }).collect(Collectors.joining("|"));
     }
 
     public EventStack optimize() {

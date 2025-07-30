@@ -43,7 +43,7 @@ public enum Role {
     public static final Map<String, Role> allPromotableByName = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(Role::toString, Function.identity())));
     public static final Map<Character, Role> allPromotableByFen = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(r -> r.fen, Function.identity())));
 
-    public static Optional<Role> fen(Character c) {
+    public static Optional<Role> byFen(Character c) {
         return Optional.ofNullable(allByFen.get(c));
     }
 

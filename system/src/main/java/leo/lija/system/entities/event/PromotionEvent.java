@@ -5,8 +5,6 @@ import leo.lija.chess.Role;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PromotionEvent implements Event {
@@ -14,7 +12,7 @@ public class PromotionEvent implements Event {
     private Pos pos;
 
     @Override
-    public Optional<String> encode() {
-        return Optional.of("P" + role.fen + pos.getPiotr());
+    public String encode() {
+        return "P" + role.fen + pos.getPiotr();
     }
 }

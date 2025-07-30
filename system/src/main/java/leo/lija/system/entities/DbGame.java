@@ -149,7 +149,7 @@ public class DbGame {
 
     private Optional<Pair<Pos, Piece>> posPiece(char posCode, char roleCode, Color color) {
         return Pos.piotr(posCode)
-            .flatMap(pos -> Role.fen(roleCode)
+            .flatMap(pos -> Role.byFen(roleCode)
                 .map(role -> Pair.of(pos, new Piece(color, role))));
     }
 
