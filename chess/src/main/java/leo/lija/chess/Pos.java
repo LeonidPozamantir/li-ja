@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -229,29 +228,11 @@ public class Pos {
     public static final Pos G8 = new Pos(7, 8, '!');
     public static final Pos H8 = new Pos(8, 8, '?');
 
-    private static final Map<String, Pos> allKeys = Map.ofEntries(
-            Map.entry("a1", A1), Map.entry("a2", A2), Map.entry("a3", A3), Map.entry("a4", A4), Map.entry("a5", A5), Map.entry("a6", A6), Map.entry("a7", A7), Map.entry("a8", A8),
-            Map.entry("b1", B1), Map.entry("b2", B2), Map.entry("b3", B3), Map.entry("b4", B4), Map.entry("b5", B5), Map.entry("b6", B6), Map.entry("b7", B7), Map.entry("b8", B8),
-            Map.entry("c1", C1), Map.entry("c2", C2), Map.entry("c3", C3), Map.entry("c4", C4), Map.entry("c5", C5), Map.entry("c6", C6), Map.entry("c7", C7), Map.entry("c8", C8),
-            Map.entry("d1", D1), Map.entry("d2", D2), Map.entry("d3", D3), Map.entry("d4", D4), Map.entry("d5", D5), Map.entry("d6", D6), Map.entry("d7", D7), Map.entry("d8", D8),
-            Map.entry("e1", E1), Map.entry("e2", E2), Map.entry("e3", E3), Map.entry("e4", E4), Map.entry("e5", E5), Map.entry("e6", E6), Map.entry("e7", E7), Map.entry("e8", E8),
-            Map.entry("f1", F1), Map.entry("f2", F2), Map.entry("f3", F3), Map.entry("f4", F4), Map.entry("f5", F5), Map.entry("f6", F6), Map.entry("f7", F7), Map.entry("f8", F8),
-            Map.entry("g1", G1), Map.entry("g2", G2), Map.entry("g3", G3), Map.entry("g4", G4), Map.entry("g5", G5), Map.entry("g6", G6), Map.entry("g7", G7), Map.entry("g8", G8),
-            Map.entry("h1", H1), Map.entry("h2", H2), Map.entry("h3", H3), Map.entry("h4", H4), Map.entry("h5", H5), Map.entry("h6", H6), Map.entry("h7", H7), Map.entry("h8", H8)
-    );
+    private static List<Pos> all = List.of(A1, B1, C1, D1, E1, F1, G1, H1, A2, B2, C2, D2, E2, F2, G2, H2, A3, B3, C3, D3, E3, F3, G3, H3, A4, B4, C4, D4, E4, F4, G4, H4, A5, B5, C5, D5, E5, F5, G5, H5, A6, B6, C6, D6, E6, F6, G6, H6, A7, B7, C7, D7, E7, F7, G7, H7, A8, B8, C8, D8, E8, F8, G8, H8);
 
-    private static final Map<Pair<Integer, Integer>, Pos> allCoords = IntStream.rangeClosed(1, 8)
-        .boxed()
-        .flatMap(i -> IntStream.rangeClosed(1, 8)
-            .mapToObj(j -> {
-                String key = xToString(i) + j;
-                return Pair.of(Pair.of(i, j), allKeys.get(key));
-            }))
-        .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+    private static final Map<String, Pos> allKeys = all.stream().collect(Collectors.toMap(Pos::key, Function.identity()));
 
-    private static final Map<Character, Pos> allPiotrs = all().stream().collect(Collectors.toMap(pos -> pos.piotr, Function.identity()));
+    private static final Map<Character, Pos> allPiotrs = all.stream().collect(Collectors.toMap(pos -> pos.piotr, Function.identity()));
 
-    public static Collection<Pos> all() {
-        return allKeys.values();
-    }
+    private static final Map<Pair<Integer, Integer>, Pos> allCoords = all.stream().collect(Collectors.toMap(p -> Pair.of(p.x, p.y), Function.identity()));
 }
