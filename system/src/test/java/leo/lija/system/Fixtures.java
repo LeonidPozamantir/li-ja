@@ -1,6 +1,7 @@
 package leo.lija.system;
 
 import leo.lija.chess.Board;
+import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
@@ -46,17 +47,11 @@ public class Fixtures {
         null
     );
 
-    DbGame newDbGameWithoutEvents;
-
-    {
-        newDbGameWithoutEvents = newDbGame.copy();
-        DbPlayer whiteWoEvents = newDbPlayer("white", "ip ar jp bn kp cb lp dq mp ek np fb op gn pp hr");
-        DbPlayer blackWoEvents = newDbPlayer("black", "Wp 4r Xp 5n Yp 6b Zp 7q 0p 8k 1p 9b 2p !n 3p ?r");
-        whiteWoEvents.setEvts("");
-        blackWoEvents.setEvts("");
-        newDbGameWithoutEvents.setPlayers(List.of(whiteWoEvents, blackWoEvents));
+    public DbGame newDbGameWithBoard(Board b) {
+        DbGame g = newDbGame.copy();
+        g.update(new Game(b), anyMove);
+        return g;
     }
-
 
     public DbGame newDbGameWithRandomIds() {
         List<DbPlayer> players = newDbGame.getPlayers().stream().map(p -> new DbPlayer(randomString(PLAYER_ID_SIZE), p.getColor(), p.getPs(), p.getAiLevel(), p.getIsWinner(),

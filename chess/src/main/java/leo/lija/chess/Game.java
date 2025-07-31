@@ -28,7 +28,11 @@ public class Game {
     private Optional<Situation> cachedSituation = Optional.empty();
 
     public Game() {
-        this(new Board(), WHITE);
+        this(new Board());
+    }
+
+    public Game(Board board) {
+        this(board, WHITE);
     }
 
     public Game(Board board, Color player) {

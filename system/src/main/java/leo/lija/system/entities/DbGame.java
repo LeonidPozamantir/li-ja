@@ -21,6 +21,7 @@ import leo.lija.chess.Role;
 import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.event.CheckEvent;
+import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.AccessLevel;
@@ -77,7 +78,7 @@ public class DbGame {
     }
 
     public DbGame copy() {
-        return new DbGame(id, players, pgn, status, turns, clock, lastMove);
+        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove);
     }
 
     public Optional<DbPlayer> playerById(String id) {
@@ -183,8 +184,9 @@ public class DbGame {
 
                 List<Event> newEvents = new ArrayList<>(events);
                 newEvents.addAll(Stream.of(
-                    new PossibleMovesEvent(color == game.getPlayer() ? situation.destinations() : Map.of()),
-                    situation.check() ? situation.kingPos().map(CheckEvent::new).orElse(null) : null
+                    situation.check() ? situation.kingPos().map(CheckEvent::new).orElse(null) : null,
+                    situation.end() ? new EndEvent() : null,
+                    new PossibleMovesEvent(color == game.getPlayer() ? situation.destinations() : Map.of())
                 ).filter(Objects::nonNull).toList());
                 String newEvts = player.eventStack().withEvents(newEvents).optimize().encode();
 

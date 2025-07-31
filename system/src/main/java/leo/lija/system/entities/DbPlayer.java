@@ -31,6 +31,10 @@ public class DbPlayer {
     private String evts;
     private Integer elo;
 
+    public DbPlayer copy() {
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo);
+    }
+
     public EventStack eventStack() {
         return EventStack.decode(evts);
     }

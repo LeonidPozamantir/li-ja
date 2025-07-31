@@ -162,10 +162,10 @@ public class Actor {
 	}
 
 	private List<Move> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
-		Set<Pos> tos = dirs.stream()
+		List<Pos> tos = dirs.stream()
 			.map(dir -> dir.apply(pos))
 			.filter(Optional::isPresent).map(Optional::get)
-			.collect(Collectors.toSet());
+			.collect(Collectors.toList());
 		tos.removeAll(friends());
 		return tos.stream().map(to -> enemies().contains(to)
 			? move(to, board.taking(pos, to).get(), Optional.of(to))
