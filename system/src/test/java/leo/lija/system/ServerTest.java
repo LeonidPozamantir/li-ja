@@ -1,6 +1,7 @@
 package leo.lija.system;
 
 import leo.lija.chess.Pos;
+import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.format.VisualFormat;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @DisplayName("the server should")
@@ -48,6 +50,13 @@ class ServerTest extends Fixtures {
     @Nested
     @DisplayName("play a single move")
     class PlaySingleMove {
+
+        @Test
+        @DisplayName("wrong player")
+        void wrongPlayer() {
+            DbGame game = insert();
+            assertThatThrownBy(() -> move(game, "d7 d5")).isInstanceOf(ChessRulesException.class);
+        }
 
         @Test
         @DisplayName("report success")
