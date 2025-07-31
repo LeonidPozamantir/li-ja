@@ -1,6 +1,7 @@
 package leo.lija.chess;
 
 import leo.lija.chess.exceptions.ChessRulesException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import static leo.lija.chess.Role.QUEEN;
 public class Situation {
 
 	final Board board;
+	@Getter
 	final Color color;
 
 	private Optional<Map<Pos, List<Pos>>> cachedDestinations = Optional.empty();
@@ -60,6 +62,10 @@ public class Situation {
 
 	public boolean autoDraw() {
 		return board.autodraw();
+	}
+
+	public boolean threefoldRepetition() {
+		return board.getHistory().threefoldRepetition();
 	}
 
 	public boolean end() {
