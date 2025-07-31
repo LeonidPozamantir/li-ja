@@ -58,6 +58,14 @@ public class Situation {
 		return !check() && moves().isEmpty();
 	}
 
+	public boolean autoDraw() {
+		return board.autodraw();
+	}
+
+	public boolean end() {
+		return checkmate() || stalemate() || autoDraw();
+	}
+
 	public Move move(Pos from, Pos to, Role promotion) {
 		if (!promotion.isPromotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 
