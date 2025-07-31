@@ -23,10 +23,14 @@ public record History (
 	}
 
 	public History(Optional<Pair<Pos, Pos>> lastMove) {
+		this(lastMove, List.of());
+	}
+
+	public History(Optional<Pair<Pos, Pos>> lastMove, List<String> positionHashes) {
 		this(lastMove, new EnumMap<>(Map.of(
 			WHITE, Pair.of(true, true),
 			BLACK, Pair.of(true, true)
-		)), List.of());
+		)), positionHashes);
 	}
 
 	public boolean isLastMove(Pos p1, Pos p2) {
@@ -69,12 +73,14 @@ public record History (
 	}
 
 	public History withNewPositionHash(String hash) {
-		return new History(lastMove, castles, positionHashes.prepend(hash));
+		return new History(lastMove, castles, positionHashes.prepend(hash.substring(0, HASH_SIZE)));
 	}
 
 	private Pair<Boolean, Boolean> colorCastles(Color color) {
 		return castles.getOrDefault(color, Pair.of(true, true));
 	}
+
+	public static final int HASH_SIZE = 5;
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {
 		return new History(Optional.empty(), new EnumMap<>(Map.of(color, Pair.of(kingSide, queenSide))), List.of());

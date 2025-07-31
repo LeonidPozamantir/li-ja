@@ -3,9 +3,12 @@ package leo.lija.system;
 import leo.lija.chess.Pos;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.format.VisualFormat;
+import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.EventStack;
+import leo.lija.system.entities.event.Event;
+import leo.lija.system.entities.event.ThreefoldEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -165,5 +168,46 @@ B p p
         }
     }
 
+    @Nested
+    @DisplayName("play to threefold repetition")
+    class PlayToThreefoldRepetition {
+        List<String> moves = List.of("b1 c3", "b8 c6", "c3 b1", "c6 b8", "b1 c3", "b8 c6", "c3 b1", "c6 b8", "b1 c3", "b8 c6");
+
+        List<Map<Pos, List<Pos>>> play(DbGame game) {
+            return moves.stream().map(m -> move(game, m).get()).toList();
+        }
+
+        @Test
+        @DisplayName("report success")
+        void reportSuccess() {
+            DbGame game = insert();
+            assertThat(play(game)).size().isGreaterThan(0);
+        }
+
+        @Nested
+        @DisplayName("be persisted")
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        class Persisted {
+            DbGame game;
+            Optional<DbGame> found;
+            Optional<List<Pair<Integer, Event>>> events;
+
+            @BeforeAll
+            void init() {
+                game = insert();
+                play(game);
+                found = repo.game(game.getId());
+                events = found.flatMap(g -> g.playerByColor("white").map(p -> p.eventStack().getEvents()));
+            }
+
+            @Test
+            @DisplayName("propose threefold")
+            void proposeThreefold() {
+                System.out.println(events.get().stream().map(Pair::getSecond).toList());
+                assertThat(events.get().stream().map(Pair::getSecond).toList()).contains(new ThreefoldEvent());
+            }
+        }
+
+    }
 
 }

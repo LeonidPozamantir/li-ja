@@ -44,7 +44,8 @@ public class Fixtures {
         10,
         0,
         null,
-        null
+        null,
+        ""
     );
 
     public DbGame newDbGameWithBoard(Board b) {
@@ -56,7 +57,7 @@ public class Fixtures {
     public DbGame newDbGameWithRandomIds() {
         List<DbPlayer> players = newDbGame.getPlayers().stream().map(p -> new DbPlayer(randomString(PLAYER_ID_SIZE), p.getColor(), p.getPs(), p.getAiLevel(), p.getIsWinner(),
             p.getEvts(), p.getElo())).toList();
-        return new DbGame(randomString(GAME_ID_SIZE), players, newDbGame.getPgn(), newDbGame.getStatus(), newDbGame.getTurns(), newDbGame.getClock(), newDbGame.getLastMove());
+        return new DbGame(randomString(GAME_ID_SIZE), players, newDbGame.getPgn(), newDbGame.getStatus(), newDbGame.getTurns(), newDbGame.getClock(), newDbGame.getLastMove(), newDbGame.getPositionHashes());
     }
 
     DbPlayer newDbPlayer(String color, String ps) {
@@ -85,7 +86,8 @@ public class Fixtures {
         31,
         24,
         null,
-        null
+        null,
+        ""
     );
 
     DbGame dbGame2 = new DbGame(
@@ -103,7 +105,8 @@ public class Fixtures {
             1200,
             Map.of("white", 196.25f, "black", 304.1f)
         ),
-        "a7 c7"
+        "a7 c7",
+        ""
     );
 
     DbGame dbGame3 = new DbGame(
@@ -116,7 +119,8 @@ public class Fixtures {
         30,
         81,
         null,
-        "a3 a8"
+        "a3 a8",
+        ""
     );
 
     DbGame dbGame4 = new DbGame(
@@ -129,7 +133,8 @@ public class Fixtures {
         31,
         24,
         null,
-        null
+        null,
+        ""
     );
 
     DbGame dbGame5 = new DbGame(
@@ -147,7 +152,8 @@ public class Fixtures {
             60,
             Map.of("white", 27.61f, "black", 60.24f)
         ),
-        "d8 d2"
+        "d8 d2",
+        ""
     );
 
     public Move newMove(Piece piece, Pos orig, Pos dest) {

@@ -164,7 +164,8 @@ public class GameBenchmark {
             10,
             0,
             null,
-            null
+            null,
+            ""
         );
         repo.save(game);
         play(game);

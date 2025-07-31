@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
@@ -60,8 +61,9 @@ public class DbGame {
     @Setter
     private DbClock clock;
     private String lastMove;
+    private String positionHashes;
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove) {
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -69,10 +71,11 @@ public class DbGame {
         this.turns = turns;
         this.clock = clock;
         this.lastMove = lastMove;
+        this.positionHashes = positionHashes;
     }
 
     public DbGame copy() {
-        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove);
+        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes);
     }
 
     public Optional<DbPlayer> playerById(String id) {
@@ -116,13 +119,19 @@ public class DbGame {
             return new Clock(color, c.getIncrement(), c.getLimit(), Map.of(WHITE, whiteTime, BLACK, blackTime));
         });
         return new Game(
-            new Board(pieces, new History(getLastMoveChess())),
+            new Board(pieces, new History(getLastMoveChess(), splitPositionHashes())),
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
             oc,
             io.vavr.collection.List.ofAll(deads),
             turns
         );
+    }
+
+    private io.vavr.collection.List<String> splitPositionHashes() {
+        return io.vavr.collection.List.ofAll(IntStream.range(0, (positionHashes.length() / History.HASH_SIZE))
+            .mapToObj(i -> positionHashes.substring(i * History.HASH_SIZE, (i + 1) * History.HASH_SIZE))
+            .collect(Collectors.toList()));
     }
 
     private void addToPiecesAndDeads(String pieceCode, Color color, Map<Pos, Piece> pieces, List<Pair<Pos, Piece>> deads) {
@@ -152,10 +161,10 @@ public class DbGame {
         return Optional.ofNullable(lastMove).flatMap(lm -> {
             Matcher matcher = MOVE_STRING.matcher(lm);
             if (matcher.find()) {
-                Optional<Pos> from = posAt(matcher.group(1));
-                Optional<Pos> to = posAt(matcher.group(2));
-                if (from.isEmpty() || to.isEmpty()) return Optional.empty();
-                return Optional.of(Pair.of(from.get(), to.get()));
+                Optional<Pos> o = posAt(matcher.group(1));
+                Optional<Pos> d = posAt(matcher.group(2));
+                if (o.isEmpty() || d.isEmpty()) return Optional.empty();
+                return Optional.of(Pair.of(o.get(), d.get()));
             }
             return Optional.empty();
         });
@@ -177,6 +186,7 @@ public class DbGame {
             }).toList();
         pgn = game.getPgnMoves();
         turns = game.getTurns();
+        positionHashes = game.getBoard().getHistory().positionHashes().mkString();
     }
 
     public static final int GAME_ID_SIZE = 8;

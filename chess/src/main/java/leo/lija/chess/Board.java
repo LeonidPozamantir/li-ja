@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -208,7 +209,7 @@ public class Board {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] hashBytes = md.digest(positionHash.getBytes());
-            return (String.format("%02x", hashBytes[0]) + String.format("%02x", hashBytes[1]) + String.format("%02x", hashBytes[2])).substring(0,5);
+            return HexFormat.of().formatHex(hashBytes);
         } catch (NoSuchAlgorithmException e) {
             throw new ChessException("MD5 algorithm not found", e);
         }
