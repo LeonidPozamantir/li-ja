@@ -11,12 +11,12 @@ import leo.lija.system.entities.DbPlayer;
 import java.util.List;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes, String castles) {
-        super(id, players, pgn, status, turns, clock, lastMove, positionHashes, castles);
+    public RichDbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove) {
+        super(id, players, pgn, status, turns, clock, lastMove);
     }
 
     public RichDbGame(DbGame game) {
-        this(game.getId(), game.getPlayers(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove(), game.getPositionHashes(), game.getCastles());
+        this(game.getId(), game.getPlayers(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove());
     }
 
     @Override

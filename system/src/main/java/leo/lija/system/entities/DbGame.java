@@ -66,8 +66,13 @@ public class DbGame {
     private String lastMove;
     private String positionHashes;
     private String castles;
+    private boolean isRated;
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes, String castles) {
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove) {
+        this(id, players, pgn, status, turns, clock, lastMove, "", "KQkq", false);
+    }
+
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes, String castles, boolean isRated) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -77,10 +82,11 @@ public class DbGame {
         this.lastMove = lastMove;
         this.positionHashes = positionHashes;
         this.castles = castles;
+        this.isRated = isRated;
     }
 
     public DbGame copy() {
-        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes, castles);
+        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes, castles, isRated);
     }
 
     public Optional<DbPlayer> playerById(String id) {
@@ -89,6 +95,10 @@ public class DbGame {
 
     public Optional<DbPlayer> playerByColor(String color) {
         return Optional.ofNullable(playersByColor().get(color));
+    }
+
+    public DbPlayer player() {
+        return playerByColor(0 == turns % 2 ? "white" : "black").get();
     }
 
     public Optional<String> fullIdOf(DbPlayer player) {

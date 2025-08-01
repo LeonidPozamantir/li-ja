@@ -44,9 +44,7 @@ public class Fixtures {
         10,
         0,
         null,
-        null,
-        "",
-        "KQkq"
+        null
     );
 
     public DbGame newDbGameWithBoard(Board b) {
@@ -92,9 +90,7 @@ public class Fixtures {
         31,
         24,
         null,
-        null,
-        "",
-        "KQkq"
+        null
     );
 
     DbGame dbGame2 = new DbGame(
@@ -112,9 +108,7 @@ public class Fixtures {
             1200,
             Map.of("white", 196.25f, "black", 304.1f)
         ),
-        "a7 c7",
-        "",
-        "KQkq"
+        "a7 c7"
     );
 
     DbGame dbGame3 = new DbGame(
@@ -127,9 +121,7 @@ public class Fixtures {
         30,
         81,
         null,
-        "a3 a8",
-        "",
-        "KQkq"
+        "a3 a8"
     );
 
     DbGame dbGame4 = new DbGame(
@@ -142,9 +134,7 @@ public class Fixtures {
         31,
         24,
         null,
-        null,
-        "",
-        "KQkq"
+        null
     );
 
     DbGame dbGame5 = new DbGame(
@@ -162,9 +152,7 @@ public class Fixtures {
             60,
             Map.of("white", 27.61f, "black", 60.24f)
         ),
-        "d8 d2",
-        "",
-        "KQkq"
+        "d8 d2"
     );
 
     public Move newMove(Piece piece, Pos orig, Pos dest) {

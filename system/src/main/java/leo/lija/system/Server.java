@@ -42,10 +42,15 @@ public class Server {
                 Game newChessGame = newChessGameAndMove.getFirst();
                 Move move = newChessGameAndMove.getSecond();
                 game.update(newChessGame, move);
+                if (game.player().isAi()) aiResponse();
                 repo.save(game);
                 return newChessGame.situation().destinations();
             })
             .orElseThrow(() -> new AppException("Wrong move"));
+    }
+
+    private void aiResponse() {
+
     }
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString) {
