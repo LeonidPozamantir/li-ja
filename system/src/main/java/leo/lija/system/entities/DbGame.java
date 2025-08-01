@@ -211,6 +211,10 @@ public class DbGame {
         else if (situation.autoDraw()) status = DRAW;
     }
 
+    public boolean playable() {
+        return status < ABORTED;
+    }
+
     public static final int GAME_ID_SIZE = 8;
     public static final int PLAYER_ID_SIZE = 4;
     public static final int FULL_ID_SIZE = 12;

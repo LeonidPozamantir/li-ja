@@ -233,7 +233,7 @@ K
 PP
 K  r
 """))));
-            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(ChessRulesException.class);
+            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(AppException.class);
         }
 
         @Test
@@ -242,7 +242,7 @@ K  r
             DbGame dbGame = insert(randomizeIds(newDbGameWithBoard(visualFormat.str2Obj("""
       k
 K     B"""))));
-            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(ChessRulesException.class);
+            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(AppException.class);
         }
     }
 
