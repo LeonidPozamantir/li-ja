@@ -18,6 +18,8 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
+import leo.lija.chess.Side;
+import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.event.Event;
 import lombok.AccessLevel;
@@ -27,6 +29,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,8 +65,9 @@ public class DbGame {
     private DbClock clock;
     private String lastMove;
     private String positionHashes;
+    private String castles;
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes) {
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes, String castles) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -72,10 +76,11 @@ public class DbGame {
         this.clock = clock;
         this.lastMove = lastMove;
         this.positionHashes = positionHashes;
+        this.castles = castles;
     }
 
     public DbGame copy() {
-        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes);
+        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes, castles);
     }
 
     public Optional<DbPlayer> playerById(String id) {
@@ -119,19 +124,13 @@ public class DbGame {
             return new Clock(color, c.getIncrement(), c.getLimit(), Map.of(WHITE, whiteTime, BLACK, blackTime));
         });
         return new Game(
-            new Board(pieces, new History(getLastMoveChess(), splitPositionHashes())),
+            new Board(pieces, toChessHistory()),
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
             oc,
             io.vavr.collection.List.ofAll(deads),
             turns
         );
-    }
-
-    private io.vavr.collection.List<String> splitPositionHashes() {
-        return io.vavr.collection.List.ofAll(IntStream.range(0, (positionHashes.length() / History.HASH_SIZE))
-            .mapToObj(i -> positionHashes.substring(i * History.HASH_SIZE, (i + 1) * History.HASH_SIZE))
-            .collect(Collectors.toList()));
     }
 
     private void addToPiecesAndDeads(String pieceCode, Color color, Map<Pos, Piece> pieces, List<Pair<Pos, Piece>> deads) {
@@ -157,8 +156,8 @@ public class DbGame {
                 .map(role -> Pair.of(pos, new Piece(color, role))));
     }
 
-    private Optional<Pair<Pos, Pos>> getLastMoveChess() {
-        return Optional.ofNullable(lastMove).flatMap(lm -> {
+    private History toChessHistory() {
+        Optional<Pair<Pos, Pos>> historyLastMove = Optional.ofNullable(lastMove).flatMap(lm -> {
             Matcher matcher = MOVE_STRING.matcher(lm);
             if (matcher.find()) {
                 Optional<Pos> o = posAt(matcher.group(1));
@@ -168,9 +167,22 @@ public class DbGame {
             }
             return Optional.empty();
         });
+
+        EnumMap<Color, Pair<Boolean, Boolean>> historyCastles = new EnumMap<>(Map.of(
+            WHITE, Pair.of(castles.contains("K"), castles.contains("Q")),
+            BLACK, Pair.of(castles.contains("k"), castles.contains("q"))
+        ));
+
+        io.vavr.collection.List<String> historyPositionHashes = io.vavr.collection.List.ofAll(IntStream.range(0, (positionHashes.length() / History.HASH_SIZE))
+            .mapToObj(i -> positionHashes.substring(i * History.HASH_SIZE, (i + 1) * History.HASH_SIZE))
+            .toList());
+
+        return new History(historyLastMove, historyCastles, historyPositionHashes);
     }
 
     public void update(Game game, Move move) {
+        History history = game.getBoard().getHistory();
+        Situation situation = game.situation();
         List<Event> events = new ArrayList<>(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
         players = players.stream()
@@ -186,10 +198,31 @@ public class DbGame {
             }).toList();
         pgn = game.getPgnMoves();
         turns = game.getTurns();
-        positionHashes = game.getBoard().getHistory().positionHashes().mkString();
+        positionHashes = history.positionHashes().mkString();
+        castles = List.of(
+            history.canCastle(WHITE, Side.KING_SIDE) ? "K" : "",
+            history.canCastle(WHITE, Side.QUEEN_SIDE) ? "Q" : "",
+            history.canCastle(BLACK, Side.KING_SIDE) ? "k" : "",
+            history.canCastle(BLACK, Side.QUEEN_SIDE) ? "q" : ""
+        ).stream().collect(Collectors.joining());
+
+        if (situation.checkmate()) status = MATE;
+        else if (situation.stalemate()) status = STALEMATE;
+        else if (situation.autoDraw()) status = DRAW;
     }
 
     public static final int GAME_ID_SIZE = 8;
     public static final int PLAYER_ID_SIZE = 4;
     public static final int FULL_ID_SIZE = 12;
+
+    private static final int CREATED = 10;
+    private static final int STARTED = 20;
+    private static final int ABORTED = 25;
+    private static final int MATE = 30;
+    private static final int RESIGN = 31;
+    private static final int STALEMATE = 32;
+    private static final int TIMEOUT = 33;
+    private static final int DRAW = 34;
+    private static final int OUTOFTIME = 35;
+    private static final int CHEAT = 36;
 }

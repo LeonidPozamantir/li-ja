@@ -9,6 +9,7 @@ import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.EventStack;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.ThreefoldEvent;
+import leo.lija.system.exceptions.AppException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,10 +38,13 @@ class ServerTest extends Fixtures {
     private VisualFormat visualFormat = new VisualFormat();
 
     DbGame insert() {
-        DbGame game = newDbGameWithRandomIds();
-        repoJpa.save(game);
-        return game;
+        return insert(newDbGameWithRandomIds());
     }
+    DbGame insert(DbGame dbGame) {
+        repoJpa.save(dbGame);
+        return dbGame;
+    }
+
     Optional<Map<Pos, List<Pos>>> move(DbGame game, String m) {
         return game.playerByColor("white")
             .flatMap(player -> game.fullIdOf(player)
@@ -203,11 +207,43 @@ B p p
             @Test
             @DisplayName("propose threefold")
             void proposeThreefold() {
-                System.out.println(events.get().stream().map(Pair::getSecond).toList());
                 assertThat(events.get().stream().map(Pair::getSecond).toList()).contains(new ThreefoldEvent());
             }
         }
+    }
 
+    @Test
+    @DisplayName("play on playing game")
+    void playOnPlayingGame() {
+        DbGame dbGame = insert(randomizeIds(newDbGameWithBoard(visualFormat.str2Obj("""
+PP kr
+K
+"""))));
+        assertThat(move(dbGame, "a1 b1")).isPresent();
+    }
+
+    @Nested
+    @DisplayName("play on finished game")
+    class PlayOnFinishedGame {
+
+        @Test
+        @DisplayName("by checkmate")
+        void byCheckmate() {
+            DbGame dbGame = insert(randomizeIds(newDbGameWithBoard(visualFormat.str2Obj("""
+PP
+K  r
+"""))));
+            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(ChessRulesException.class);
+        }
+
+        @Test
+        @DisplayName("by autodraw")
+        void byAutodraw() {
+            DbGame dbGame = insert(randomizeIds(newDbGameWithBoard(visualFormat.str2Obj("""
+      k
+K     B"""))));
+            assertThatThrownBy(() -> move(dbGame, "a1 b1")).isInstanceOf(ChessRulesException.class);
+        }
     }
 
 }
