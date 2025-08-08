@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +34,6 @@ class ServerTest extends Fixtures {
     private GameRepo repo;
     @Autowired
     private Server server;
-    @Autowired GameRepoJpa repoJpa;
 
     private VisualFormat visualFormat = new VisualFormat();
 
@@ -41,12 +41,12 @@ class ServerTest extends Fixtures {
         return insert(newDbGameWithRandomIds());
     }
     DbGame insert(DbGame dbGame) {
-        repoJpa.save(dbGame);
+        repo.insert(dbGame);
         return dbGame;
     }
 
     Optional<Map<Pos, List<Pos>>> move(DbGame game, String m) {
-        return game.playerByColor("white")
+        return game.playerByColor(WHITE)
             .flatMap(player -> game.fullIdOf(player)
                 .map(fullId -> server.playMove(fullId, m)));
     }
@@ -156,7 +156,7 @@ B p p
             @Nested
             @DisplayName("event stacks")
             class EventStacks {
-                Optional<EventStack> stack = found.flatMap(g -> g.playerByColor("white")).map(DbPlayer::eventStack);
+                Optional<EventStack> stack = found.flatMap(g -> g.playerByColor(WHITE)).map(DbPlayer::eventStack);
 
                 @Test
                 @DisplayName("high version number")
@@ -201,7 +201,7 @@ B p p
                 game = insert();
                 play(game);
                 found = repo.game(game.getId());
-                events = found.flatMap(g -> g.playerByColor("white").map(p -> p.eventStack().getEvents()));
+                events = found.flatMap(g -> g.playerByColor(WHITE).map(p -> p.eventStack().getEvents()));
             }
 
             @Test

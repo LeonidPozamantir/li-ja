@@ -14,8 +14,8 @@ import static leo.lija.chess.Role.ROOK;
 
 @Getter
 public enum Color {
-    WHITE(2, 5, 7, 'w'),
-    BLACK(7, 4, 2, 'b');
+    WHITE(2, 5, 7, 'w', "white"),
+    BLACK(7, 4, 2, 'b', "black");
 
     public Piece of(Role role) {
         return new Piece(this, role);
@@ -26,12 +26,14 @@ public enum Color {
     private int passablePawnY;
     private int promotablePawnY;
     private char letter;
+    private String name;
 
-    Color(int unmovedPawnY, int passablePawnY, int promotablePawnY, char letter) {
+    Color(int unmovedPawnY, int passablePawnY, int promotablePawnY, char letter, String name) {
         this.unmovedPawnY = unmovedPawnY;
         this.passablePawnY = passablePawnY;
         this.promotablePawnY = promotablePawnY;
         this.letter = letter;
+        this.name = name;
     }
 
     static {

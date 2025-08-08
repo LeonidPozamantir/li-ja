@@ -1,17 +1,18 @@
 package leo.lija.system;
 
+import leo.lija.chess.Clock;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
-import leo.lija.system.entities.DbClock;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove) {
+    public RichDbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
         super(id, players, pgn, status, turns, clock, lastMove);
     }
 

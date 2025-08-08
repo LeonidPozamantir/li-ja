@@ -1,14 +1,6 @@
 package leo.lija.system.entities;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Board;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
@@ -43,36 +35,28 @@ import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.posAt;
 import static leo.lija.system.Utils.MOVE_STRING;
 
-@Entity
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Data
 public class DbGame {
 
-    @Id
     private String id;
-
-    @ElementCollection(fetch = FetchType.EAGER)
     private List<DbPlayer> players;
-
-    @NotNull
-    @Column(nullable = false)
     private String pgn;
     private int status;
     @Setter
     private int turns;
-    @Embedded
     @Setter
-    private DbClock clock;
-    private String lastMove;
+    private Optional<Clock> clock;
+    private Optional<String> lastMove;
     private String positionHashes;
     private String castles;
     private boolean isRated;
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove) {
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
         this(id, players, pgn, status, turns, clock, lastMove, "", "KQkq", false);
     }
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, DbClock clock, String lastMove, String positionHashes, String castles, boolean isRated) {
+    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -93,12 +77,12 @@ public class DbGame {
         return Optional.ofNullable(playersById().get(id));
     }
 
-    public Optional<DbPlayer> playerByColor(String color) {
+    public Optional<DbPlayer> playerByColor(Color color) {
         return Optional.ofNullable(playersByColor().get(color));
     }
 
     public DbPlayer player() {
-        return playerByColor(0 == turns % 2 ? "white" : "black").get();
+        return playerByColor(0 == turns % 2 ? WHITE : BLACK).get();
     }
 
     public Optional<String> fullIdOf(DbPlayer player) {
@@ -106,38 +90,33 @@ public class DbGame {
         return Optional.empty();
     }
 
-    private Map<String, DbPlayer> playersByColor() {
+    private Map<Color, DbPlayer> playersByColor() {
         if (cachedPlayersByColor.isEmpty()) cachedPlayersByColor = Optional.of(players.stream().collect(Collectors.toMap(DbPlayer::getColor, Function.identity())));
         return cachedPlayersByColor.get();
     }
+
     private Map<String, DbPlayer> playersById() {
         if (cachedPlayersById.isEmpty()) cachedPlayersById = Optional.of(players.stream().collect(Collectors.toMap(DbPlayer::getId, Function.identity())));
         return cachedPlayersById.get();
     }
-    @Transient
-    private Optional<Map<String, DbPlayer>> cachedPlayersByColor = Optional.empty();
-    @Transient
+
+    private Optional<Map<Color, DbPlayer>> cachedPlayersByColor = Optional.empty();
+
     private Optional<Map<String, DbPlayer>> cachedPlayersById = Optional.empty();
 
     public Game toChess() {
         Map<Pos, Piece> pieces = new java.util.HashMap<>();
         List<Pair<Pos, Piece>> deads = new ArrayList<>();
         players.forEach(player -> {
-            Color color = Color.apply(player.getColor()).get();
+            Color color = player.getColor();
             Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> addToPiecesAndDeads(pieceCode, color, pieces, deads));
         });
 
-        Optional<Clock> oc = Optional.ofNullable(clock).map(c -> {
-            Color color = Color.apply(c.getColor()).get();
-            Float whiteTime = c.getTimes().get("white");
-            Float blackTime = c.getTimes().get("black");
-            return new Clock(color, c.getIncrement(), c.getLimit(), Map.of(WHITE, whiteTime, BLACK, blackTime));
-        });
         return new Game(
             new Board(pieces, toChessHistory()),
             0 == turns % 2 ? WHITE : BLACK,
             pgn,
-            oc,
+            clock,
             io.vavr.collection.List.ofAll(deads),
             turns
         );
@@ -167,7 +146,7 @@ public class DbGame {
     }
 
     private History toChessHistory() {
-        Optional<Pair<Pos, Pos>> historyLastMove = Optional.ofNullable(lastMove).flatMap(lm -> {
+        Optional<Pair<Pos, Pos>> historyLastMove = lastMove.flatMap(lm -> {
             Matcher matcher = MOVE_STRING.matcher(lm);
             if (matcher.find()) {
                 Optional<Pos> o = posAt(matcher.group(1));
@@ -197,11 +176,10 @@ public class DbGame {
         events.addAll(Event.fromSituation(game.situation()));
         players = players.stream()
             .map(player -> {
-                Color color = Color.apply(player.getColor()).get();
-                String newPs = DbPlayer.encodePieces(game.getBoard().getPieces(), game.getDeads(), color);
+                String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
 
                 List<Event> newEvents = new ArrayList<>(events);
-                newEvents.add(Event.possibleMoves(game.situation(), color));
+                newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
                 String newEvts = player.newEvts(newEvents);
 
                 return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
@@ -219,6 +197,7 @@ public class DbGame {
         if (situation.checkmate()) status = MATE;
         else if (situation.stalemate()) status = STALEMATE;
         else if (situation.autoDraw()) status = DRAW;
+        clock = game.getClock();
     }
 
     public boolean playable() {

@@ -24,18 +24,9 @@ import java.util.stream.Stream;
 @Data
 public class DbPlayer {
 
-    @NotNull
-    @Column(nullable = false)
     private String id;
-
-    @NotNull
-    @Column(nullable = false)
-    private String color;
-
-    @NotNull
-    @Column(nullable = false)
+    private Color color;
     private String ps;
-
     private Integer aiLevel;
     private Boolean isWinner;
     private String evts;
@@ -53,11 +44,7 @@ public class DbPlayer {
         return eventStack().withEvents(events).optimize().encode();
     }
 
-    public boolean isAi() {
-        return aiLevel != null;
-    }
-
-    public static String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads, Color color) {
+    public String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
         return Stream.concat(
             pieces.entrySet().stream()
                 .filter(e -> e.getValue().is(color))
@@ -66,6 +53,10 @@ public class DbPlayer {
                 .filter(p -> p.getSecond().is(color))
                 .map(p -> String.valueOf(p.getFirst().getPiotr()) + Character.toUpperCase(p.getSecond().role().fen))
         ).collect(Collectors.joining(" "));
+    }
+
+    public boolean isAi() {
+        return aiLevel != null;
     }
 
 }

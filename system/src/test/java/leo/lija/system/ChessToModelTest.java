@@ -1,6 +1,8 @@
 package leo.lija.system;
 
 import java.util.List;
+
+import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.format.VisualFormat;
 import leo.lija.chess.utils.Pair;
@@ -84,16 +86,16 @@ class ChessToModelTest extends Fixtures {
             @Test
             @DisplayName("white pieces")
             void whitePieces() {
-                assertThat(dbg2.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
-                    dbGame.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
+                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
+                    dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
                 );
             }
 
             @Test
             @DisplayName("black pieces")
             void blackPieces() {
-                assertThat(dbg2.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
-                    dbGame.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
+                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
+                    dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
                 );
             }
         }
@@ -133,14 +135,14 @@ R  QK  q
 
             @Test
             void white() {
-                assertThat(dbg2.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
+                    .isEqualTo(dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
             }
 
             @Test
             void black() {
-                assertThat(dbg2.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
+                    .isEqualTo(dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
             }
         }
 
@@ -158,14 +160,14 @@ R  QK  q
 
             @Test
             void white() {
-                assertThat(dbg2.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor("white").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
+                    .isEqualTo(dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
             }
 
             @Test
             void black() {
-                assertThat(dbg2.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor("black").map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
+                    .isEqualTo(dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
             }
         }
     }
@@ -174,7 +176,7 @@ R  QK  q
     @DisplayName("update events")
     class UpdateEvents {
 
-        private Optional<List<Pair<Integer, Event>>> playerEvents(DbGame dbg, String color) {
+        private Optional<List<Pair<Integer, Event>>> playerEvents(DbGame dbg, Color color) {
             return Optional.of(dbg).flatMap(g -> g.playerByColor(color).map(p -> p.eventStack().getEvents()));
         }
 
@@ -186,7 +188,7 @@ R  QK  q
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, "white").get()).containsExactly(
+                assertThat(playerEvents(dbg, WHITE).get()).containsExactly(
                     Pair.of(1, new MoveEvent(D2, D4, WHITE)),
                     Pair.of(2, new PossibleMovesEvent(Map.of()))
                 );
@@ -195,7 +197,7 @@ R  QK  q
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, "black").get()).containsExactly(
+                assertThat(playerEvents(dbg, BLACK).get()).containsExactly(
                     Pair.of(1, new MoveEvent(D2, D4, WHITE)),
                     Pair.of(2, new PossibleMovesEvent(Map.of(G7, List.of(G6, G5), F7, List.of(F6, F5), D7, List.of(D6, D5), A7, List.of(A6, A5), G8, List.of(F6, H6), C7, List.of(C6, C5), B8, List.of(A6, C6), B7, List.of(B6, B5), H7, List.of(H6, H5), E7, List.of(E6, E5))))
                 );
@@ -223,13 +225,13 @@ RNBQK  R
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, "white").get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
             }
 
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, "black").get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
             }
         }
 
@@ -254,13 +256,13 @@ RNBRKR R
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, "white").get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
             }
 
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, "black").get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
             }
         }
 
@@ -284,13 +286,13 @@ K
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, "white").get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
             }
 
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, "black").get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
             }
         }
     }

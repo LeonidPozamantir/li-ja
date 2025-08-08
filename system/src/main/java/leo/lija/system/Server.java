@@ -34,7 +34,7 @@ public class Server {
                 Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
                 Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));
                 Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
-                Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId).orElseThrow(() -> new AppException("Wrong ID " + fullId));
+                Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId).orElseThrow(() -> new AppException("No game found for " + fullId));
                 DbGame game = gameAndPlayer.getFirst();
                 if (!game.playable()) throw new AppException("Game is not playable");
                 Game chessGame = game.toChess();

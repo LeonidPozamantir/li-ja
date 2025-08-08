@@ -1,6 +1,5 @@
 package leo.lija.system;
 
-import io.vavr.Tuple2;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Game;
 import leo.lija.chess.format.VisualFormat;
@@ -8,8 +7,6 @@ import leo.lija.chess.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
@@ -127,7 +124,8 @@ K kPP
                 BLACK,
                 5,
                 1200,
-                Map.of(WHITE, 196.25f, BLACK, 304.1f)
+                196.25f,
+                304.1f
             ));
         }
     }

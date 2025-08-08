@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -23,14 +24,11 @@ class GameRepoTest extends Fixtures {
     @Autowired
     private GameRepo repo;
 
-    @Autowired
-    private GameRepoJpa jpa;
-
     DbGame anyGame;
 
     @BeforeAll
     void init() {
-        jpa.save(newDbGameWithRandomIds());
+        repo.insert(newDbGameWithRandomIds());
         anyGame = repo.anyGame().get();
     }
 
@@ -41,12 +39,12 @@ class GameRepoTest extends Fixtures {
         @Test
         @DisplayName("non-existing")
         void nonExisting() {
-            assertThat(repo.findById("haha")).isEmpty();
+            assertThat(repo.game("haha")).isEmpty();
         }
 
         @Test
         void existing() {
-            Optional<DbGame> g = repo.findById(anyGame.getId());
+            Optional<DbGame> g = repo.game(anyGame.getId());
             assertThat(g).isPresent();
             assertThat(g.get().getId()).isEqualTo(anyGame.getId());
         }
@@ -61,9 +59,8 @@ class GameRepoTest extends Fixtures {
         class PrivateId {
             @Test
             @DisplayName("non-existing")
-            @Disabled("incorrect id; test will be deleted in May")
             void nonExisting() {
-                assertThat(repo.player("huhu")).isEmpty();
+                assertThat(repo.player("huhuhuhu")).isEmpty();
             }
 
             @Test
@@ -79,7 +76,7 @@ class GameRepoTest extends Fixtures {
             @Test
             @DisplayName("non-existing")
             void nonExisting() {
-                assertThat(repo.player(anyGame.getId(),"huhu")).isEmpty();
+                assertThat(repo.player("hahahaha",WHITE)).isEmpty();
             }
 
             @Test
@@ -100,13 +97,13 @@ class GameRepoTest extends Fixtures {
 
         @BeforeAll
         void init() {
-            jpa.save(game);
+            repo.insert(game);
         }
 
         @Test
         @DisplayName("find the saved game")
         void findSaved() {
-            assertThat(repo.findById(game.getId())).isPresent();
+            assertThat(repo.game(game.getId())).isPresent();
         }
     }
 
@@ -119,7 +116,7 @@ class GameRepoTest extends Fixtures {
 
         @BeforeAll
         void init() {
-            jpa.save(game);
+            repo.insert(game);
             game.setTurns(game.getTurns() + 1);
             repo.save(game);
         }
@@ -128,7 +125,7 @@ class GameRepoTest extends Fixtures {
         @DisplayName("find the updated game")
         @Disabled("clock is fetched incorrectly; test will be deleted in May")
         void findUpdated() {
-            assertThat(repo.findById(game.getId())).contains(game);
+            assertThat(repo.game(game.getId())).contains(game);
         }
     }
 }

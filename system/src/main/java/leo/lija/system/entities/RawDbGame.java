@@ -1,0 +1,89 @@
+package leo.lija.system.entities;
+
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import leo.lija.chess.Clock;
+import leo.lija.chess.Color;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+import java.util.Optional;
+
+@Entity
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@Data
+public class RawDbGame {
+
+    @Id
+    private String id;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<RawDbPlayer> players;
+
+    @NotNull
+    @Column(nullable = false)
+    private String pgn;
+    private int status;
+    @Setter
+    private int turns;
+    @Embedded
+    @Setter
+    private RawDbClock clock;
+    private String lastMove;
+    private String positionHashes;
+    private String castles;
+    private boolean isRated;
+
+    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove) {
+        this(id, players, pgn, status, turns, clock, lastMove, "", "KQkq", false);
+    }
+
+    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String positionHashes, String castles, boolean isRated) {
+        this.id = id;
+        this.players = players;
+        this.pgn = pgn;
+        this.status = status;
+        this.turns = turns;
+        this.clock = clock;
+        this.lastMove = lastMove;
+        this.positionHashes = positionHashes;
+        this.castles = castles;
+        this.isRated = isRated;
+    }
+
+    public Optional<DbGame> decode() {
+        if (players.size() < 2) return Optional.empty();
+        return players.get(0).decode()
+            .flatMap(player1 -> players.get(1).decode()
+                .map(player2 -> {
+                    List<DbPlayer> validPlayers = List.of(player1, player2);
+                    List<Color> colors = validPlayers.stream().map(DbPlayer::getColor).toList();
+                    Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
+                    return new DbGame(id, validPlayers, pgn, status, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
+                }));
+    }
+
+    public static RawDbGame encode(DbGame dbGame) {
+        return new RawDbGame(
+            dbGame.getId(),
+            dbGame.getPlayers().stream().map(RawDbPlayer::encode).toList(),
+            dbGame.getPgn(),
+            dbGame.getStatus(),
+            dbGame.getTurns(),
+            dbGame.getClock().map(RawDbClock::encode).orElse(null),
+            dbGame.getLastMove().orElse(null),
+            dbGame.getPositionHashes(),
+            dbGame.getCastles(),
+            dbGame.isRated()
+        );
+    }
+}
