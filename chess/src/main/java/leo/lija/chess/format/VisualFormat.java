@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 
 public class VisualFormat implements Format<Board> {
 
-    private final Map<Character, Role> pieces = Role.all.stream().collect(HashMap::new, (m, r) -> m.put(r.fen, r), Map::putAll);
-
     public String newLine(String str) {
         return str + "\n";
     }
@@ -51,9 +49,9 @@ public class VisualFormat implements Format<Board> {
             for (int x = 0; x < line.length(); x++) {
                 char c = line.charAt(x);
                 if (c != ' ') {
-                    Role role = pieces.get(Character.toLowerCase(c));
-                    if (role != null) {
-                        boardPieces.put(Pos.posAt(x + 1, 8 - y).get(), new Piece(Color.apply(Character.isUpperCase(c)), role));
+                    Optional<Role> role = Role.byFen(Character.toLowerCase(c));
+                    if (role.isPresent()) {
+                        boardPieces.put(Pos.posAt(x + 1, 8 - y).get(), Color.apply(Character.isUpperCase(c)).of(role.get()));
                     }
                 }
             }
