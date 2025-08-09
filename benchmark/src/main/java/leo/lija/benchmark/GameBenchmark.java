@@ -1,9 +1,10 @@
 package leo.lija.benchmark;
 
+import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
-import leo.lija.system.GameRepoJpa;
+import leo.lija.system.GameRepo;
 import leo.lija.system.LijaApplication;
 import leo.lija.system.Server;
 import leo.lija.system.entities.DbGame;
@@ -28,6 +29,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.A1;
 import static leo.lija.chess.Pos.A2;
@@ -71,14 +73,14 @@ import static leo.lija.chess.Pos.H3;
 @Measurement(iterations = 10, time = 10)
 public class GameBenchmark {
 
-    private static GameRepoJpa repo;
+    private static GameRepo repo;
     private static Server server;
     private static ConfigurableApplicationContext context;
 
     @Setup(Level.Trial)
     public static void setContext() {
         context = SpringApplication.run(LijaApplication.class);
-        repo = context.getBean(GameRepoJpa.class);
+        repo = context.getBean(GameRepo.class);
         server = context.getBean(Server.class);
     }
 
@@ -136,7 +138,7 @@ public class GameBenchmark {
     List<String> moves = List.of("e2 e4", "d7 d5", "e4 d5", "d8 d5", "b1 c3", "d5 a5", "d2 d4", "c7 c6", "g1 f3", "c8 g4", "c1 f4", "e7 e6", "h2 h3", "g4 f3", "d1 f3", "f8 b4", "f1 e2", "b8 d7", "a2 a3", "e8 c8", "a3 b4", "a5 a1", "e1 d2", "a1 h1", "f3 c6", "b7 c6", "e2 a6");
 
     private List<Map<Pos, List<Pos>>> play(DbGame game) {
-        return moves.stream().map(m -> move(game, m).get()).toList();
+        return moves.stream().map(m -> move(game, m)).toList();
     }
 
     Random random = new Random();
@@ -147,25 +149,26 @@ public class GameBenchmark {
         return (char) (random.nextInt(25) + 97);
     }
 
-    private DbPlayer newDbPlayer(String id, String color, String ps) {
+    private DbPlayer newDbPlayer(String id, Color color, String ps) {
         return new DbPlayer(id, color, ps, null, null, "0s|1Msystem White creates the game|2Msystem Black joins the game", 1280);
     }
 
 
     @Benchmark
     public void timeSystemImmortal() {
-        DbPlayer white = newDbPlayer(randomString(4), "white", "ip ar jp bn kp cb lp dq mp ek np fb op gn pp hr");
-        DbPlayer black = newDbPlayer(randomString(4), "black", "Wp 4r Xp 5n Yp 6b Zp 7q 0p 8k 1p 9b 2p !n 3p ?r");
+        DbPlayer white = newDbPlayer(randomString(4), WHITE, "ip ar jp bn kp cb lp dq mp ek np fb op gn pp hr");
+        DbPlayer black = newDbPlayer(randomString(4), BLACK, "Wp 4r Xp 5n Yp 6b Zp 7q 0p 8k 1p 9b 2p !n 3p ?r");
         DbGame game = new DbGame(
             randomString(8),
-            List.of(white, black),
+            white,
+            black,
             "",
             10,
             0,
-            null,
-            null
+            Optional.empty(),
+            Optional.empty()
         );
-        repo.save(game);
+        repo.insert(game);
         play(game);
     }
 }

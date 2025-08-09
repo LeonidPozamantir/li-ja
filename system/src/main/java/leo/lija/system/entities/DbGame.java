@@ -25,7 +25,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -209,7 +209,7 @@ public class DbGame {
         return status < ABORTED;
     }
 
-    public DbGame mapPlayers(Function<DbPlayer, DbPlayer> f) {
+    public DbGame mapPlayers(UnaryOperator<DbPlayer> f) {
         whitePlayer = f.apply(whitePlayer);
         blackPlayer = f.apply(blackPlayer);
         return this;
