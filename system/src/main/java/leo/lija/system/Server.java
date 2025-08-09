@@ -25,6 +25,7 @@ import static leo.lija.system.Utils.MOVE_STRING;
 public class Server {
 
     private final GameRepo repo;
+    private final Ai ai;
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString, Optional<String> promString) {
         return decodeMoveString(moveString)
@@ -42,15 +43,18 @@ public class Server {
                 Game newChessGame = newChessGameAndMove.getFirst();
                 Move move = newChessGameAndMove.getSecond();
                 game.update(newChessGame, move);
-                if (game.player().isAi()) aiResponse();
+                if (game.player().isAi()) aiResponse(game);
                 repo.save(game);
                 return newChessGame.situation().destinations();
             })
             .orElseThrow(() -> new AppException("Wrong move"));
     }
 
-    private void aiResponse() {
-
+    private void aiResponse(DbGame dbGame) {
+        Pair<Game, Move> newChessGameAndMove = ai.apply(dbGame);
+        Game newChessGame = newChessGameAndMove.getFirst();
+        Move move = newChessGameAndMove.getSecond();
+        dbGame.update(newChessGame, move);
     }
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString) {

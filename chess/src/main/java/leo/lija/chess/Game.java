@@ -47,6 +47,10 @@ public class Game {
         this(board, player, pgnMoves, clock, deads, 0);
     }
 
+    public Pair<Game, Move> apply(Pos from, Pos to) {
+        return apply(from, to, null);
+    }
+
     public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
         if (promotion == null) promotion = QUEEN;
         Move move =  situation().move(from, to, promotion);

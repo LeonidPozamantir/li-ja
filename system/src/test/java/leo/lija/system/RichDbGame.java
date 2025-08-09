@@ -35,7 +35,7 @@ public class RichDbGame extends DbGame {
     }
 
     public RichDbGame afterMove(Pos orig, Pos dest) {
-        Pair<Game, Move> pair = this.toChess().apply(orig, dest, null);
+        Pair<Game, Move> pair = this.toChess().apply(orig, dest);
         this.update(pair.getFirst(), pair.getSecond());
         return this;
     }
