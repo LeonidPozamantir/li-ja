@@ -1,41 +1,10 @@
 package leo.lija.system;
 
-import leo.lija.chess.Board;
-import leo.lija.chess.Game;
-import leo.lija.chess.Move;
-import leo.lija.chess.utils.Pair;
-import leo.lija.system.entities.DbGame;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+public class StupidAiTest extends AiTest {
 
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@DisplayName("the stupid AI should")
-class StupidAiTest extends Fixtures {
-
-    Ai ai = new StupidAi();
-
-    @Test
-    @DisplayName("play the first move")
-    void firstMove() {
-        DbGame dbGame = newDbGame;
-        Pair<Game, Move> gm = ai.apply(dbGame);
-        Game game = gm.getFirst();
-        assertThat(game.getBoard()).isNotEqualTo(new Board());
+    StupidAiTest() {
+        this.ai = new StupidAi();
+        this.name = "stupid";
     }
 
-    @Test
-    @DisplayName("play 20 moves")
-    void play20Moves() {
-        DbGame dbg = newDbGame.copy();
-        IntStream.rangeClosed(1, 20).forEach((i) -> {
-            Pair<Game, Move> gm = ai.apply(dbg);
-            Game game = gm.getFirst();
-            Move move = gm.getSecond();
-            dbg.update(game, move);
-        });
-        assertThat(dbg.getTurns()).isEqualTo(20);
-    }
 }
