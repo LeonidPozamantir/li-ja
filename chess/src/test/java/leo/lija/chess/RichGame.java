@@ -3,6 +3,7 @@ package leo.lija.chess;
 import io.vavr.collection.List;
 import leo.lija.chess.utils.Pair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,7 +27,12 @@ public class RichGame extends Game {
 
     @SafeVarargs
     public final RichGame playMoves(Pair<Pos, Pos>... moves) {
-        return Arrays.stream(moves)
+        return playMovesList(java.util.List.of(moves));
+
+    }
+
+    public final RichGame playMovesList(java.util.List<Pair<Pos, Pos>> moves) {
+        return moves.stream()
             .reduce(this, (g, move) -> g.playMove(move.getFirst(), move.getSecond()), (s1, s2) -> s1);
     }
 
