@@ -3,7 +3,6 @@ package leo.lija.chess;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import java.util.Map;
 
@@ -21,7 +20,7 @@ public class Clock {
     private final float blackTime;
 
     public Map<Color, Float> times() {
-        return Map.of(WHITE, whiteTime, BLACK, blackTime);   // TODO: consider making lazy
+        return Map.of(WHITE, whiteTime, BLACK, blackTime);   // leo: consider making lazy
     }
 
 }

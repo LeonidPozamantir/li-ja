@@ -40,7 +40,8 @@ import static leo.lija.system.Utils.MOVE_STRING;
 public class DbGame {
 
     private String id;
-    private List<DbPlayer> players;
+    private DbPlayer whitePlayer;
+    private DbPlayer blackPlayer;
     private String pgn;
     private int status;
     @Setter
@@ -52,13 +53,14 @@ public class DbGame {
     private String castles;
     private boolean isRated;
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
-        this(id, players, pgn, status, turns, clock, lastMove, "", "KQkq", false);
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, "", "KQkq", false);
     }
 
-    public DbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated) {
         this.id = id;
-        this.players = players;
+        this.whitePlayer = whitePlayer;
+        this.blackPlayer = blackPlayer;
         this.pgn = pgn;
         this.status = status;
         this.turns = turns;
@@ -70,44 +72,45 @@ public class DbGame {
     }
 
     public DbGame copy() {
-        return new DbGame(id, players.stream().map(DbPlayer::copy).toList(), pgn, status, turns, clock, lastMove, positionHashes, castles, isRated);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, positionHashes, castles, isRated);
+    }
+
+    public List<DbPlayer> players() {
+        return List.of(whitePlayer, blackPlayer);
+    }
+
+    public Map<Color, DbPlayer> playersByColor() {
+        return Map.of(WHITE, whitePlayer, BLACK, blackPlayer);
+    }
+
+    public DbPlayer player(Color color) {
+        return switch (color) {
+            case WHITE -> whitePlayer;
+            case BLACK -> blackPlayer;
+        };
     }
 
     public Optional<DbPlayer> playerById(String id) {
-        return Optional.ofNullable(playersById().get(id));
-    }
-
-    public Optional<DbPlayer> playerByColor(Color color) {
-        return Optional.ofNullable(playersByColor().get(color));
+        return players().stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 
     public DbPlayer player() {
-        return playerByColor(0 == turns % 2 ? WHITE : BLACK).get();
+        return player(0 == turns % 2 ? WHITE : BLACK);
     }
 
     public Optional<String> fullIdOf(DbPlayer player) {
-        if (players.contains(player)) return Optional.of(id + player.getId());
+        if (players().contains(player)) return Optional.of(id + player.getId());
         return Optional.empty();
     }
 
-    private Map<Color, DbPlayer> playersByColor() {
-        if (cachedPlayersByColor.isEmpty()) cachedPlayersByColor = Optional.of(players.stream().collect(Collectors.toMap(DbPlayer::getColor, Function.identity())));
-        return cachedPlayersByColor.get();
+    public String fullIdOf(Color color) {
+        return id + player(color).getId();
     }
-
-    private Map<String, DbPlayer> playersById() {
-        if (cachedPlayersById.isEmpty()) cachedPlayersById = Optional.of(players.stream().collect(Collectors.toMap(DbPlayer::getId, Function.identity())));
-        return cachedPlayersById.get();
-    }
-
-    private Optional<Map<Color, DbPlayer>> cachedPlayersByColor = Optional.empty();
-
-    private Optional<Map<String, DbPlayer>> cachedPlayersById = Optional.empty();
 
     public Game toChess() {
         Map<Pos, Piece> pieces = new java.util.HashMap<>();
         List<Pair<Pos, Piece>> deads = new ArrayList<>();
-        players.forEach(player -> {
+        players().forEach(player -> {
             Color color = player.getColor();
             Arrays.stream(player.getPs().split(" ")).toList().forEach(pieceCode -> addToPiecesAndDeads(pieceCode, color, pieces, deads));
         });
@@ -174,16 +177,8 @@ public class DbGame {
         Situation situation = game.situation();
         List<Event> events = new ArrayList<>(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
-        players = players.stream()
-            .map(player -> {
-                String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
-
-                List<Event> newEvents = new ArrayList<>(events);
-                newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
-                String newEvts = player.newEvts(newEvents);
-
-                return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
-            }).toList();
+        whitePlayer = updatePlayer(game, whitePlayer, events);
+        blackPlayer = updatePlayer(game, blackPlayer, events);
         pgn = game.getPgnMoves();
         turns = game.getTurns();
         positionHashes = history.positionHashes().mkString();
@@ -200,8 +195,24 @@ public class DbGame {
         clock = game.getClock();
     }
 
+    private DbPlayer updatePlayer(Game game, DbPlayer player, List<Event> events) {
+        String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
+
+        List<Event> newEvents = new ArrayList<>(events);
+        newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
+        String newEvts = player.newEvts(newEvents);
+
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
+    }
+
     public boolean playable() {
         return status < ABORTED;
+    }
+
+    public DbGame mapPlayers(Function<DbPlayer, DbPlayer> f) {
+        whitePlayer = f.apply(whitePlayer);
+        blackPlayer = f.apply(blackPlayer);
+        return this;
     }
 
     public static final int GAME_ID_SIZE = 8;

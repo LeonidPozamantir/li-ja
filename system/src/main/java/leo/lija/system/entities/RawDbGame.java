@@ -62,20 +62,18 @@ public class RawDbGame {
 
     public Optional<DbGame> decode() {
         if (players.size() < 2) return Optional.empty();
-        return players.get(0).decode()
-            .flatMap(player1 -> players.get(1).decode()
-                .map(player2 -> {
-                    List<DbPlayer> validPlayers = List.of(player1, player2);
-                    List<Color> colors = validPlayers.stream().map(DbPlayer::getColor).toList();
+        return players.stream().filter(p -> p.getColor().equals("white")).findFirst().flatMap(RawDbPlayer::decode)
+            .flatMap(whitePlayer -> players.stream().filter(p -> p.getColor().equals("black")).findFirst().flatMap(RawDbPlayer::decode)
+                .map(blackPlayer -> {
                     Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
-                    return new DbGame(id, validPlayers, pgn, status, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
+                    return new DbGame(id, whitePlayer, blackPlayer, pgn, status, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
                 }));
     }
 
     public static RawDbGame encode(DbGame dbGame) {
         return new RawDbGame(
             dbGame.getId(),
-            dbGame.getPlayers().stream().map(RawDbPlayer::encode).toList(),
+            dbGame.players().stream().map(RawDbPlayer::encode).toList(),
             dbGame.getPgn(),
             dbGame.getStatus(),
             dbGame.getTurns(),

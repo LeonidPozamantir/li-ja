@@ -27,7 +27,7 @@ public class RawDbClock {
     public Optional<Clock> decode() {
         return Optional.ofNullable(color).flatMap(c -> Color.apply(color)
             .flatMap(trueColor -> Optional.ofNullable(times.get("white"))
-                .flatMap(whiteTime -> Optional.ofNullable(times.get("white"))
+                .flatMap(whiteTime -> Optional.ofNullable(times.get("black"))
                     .map(blackTime -> new Clock(trueColor, increment, limit, whiteTime, blackTime)))));
     }
 

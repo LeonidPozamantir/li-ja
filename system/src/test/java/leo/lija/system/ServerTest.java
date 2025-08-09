@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -45,12 +46,10 @@ class ServerTest extends Fixtures {
         return dbGame;
     }
 
-    Optional<Map<Pos, List<Pos>>> move(DbGame game, String m) {
-        return game.playerByColor(WHITE)
-            .flatMap(player -> game.fullIdOf(player)
-                .map(fullId -> server.playMove(fullId, m)));
+    Map<Pos, List<Pos>> move(DbGame game, String m) {
+        return server.playMove(game.fullIdOf(WHITE), m);
     }
-    Optional<Map<Pos, List<Pos>>> move(DbGame game) {
+    Map<Pos, List<Pos>> move(DbGame game) {
         return move(game, "d2 d4");
     }
 
@@ -69,7 +68,7 @@ class ServerTest extends Fixtures {
         @DisplayName("report success")
         void reportSuccess() {
             DbGame game = insert();
-            assertThat(move(game)).isPresent();
+            assertThatCode(() -> move(game)).doesNotThrowAnyException();
         }
 
         @Nested
@@ -108,7 +107,7 @@ RNBQKBNR
         List<String> moves = List.of("e2 e4", "d7 d5", "e4 d5", "d8 d5", "b1 c3", "d5 a5", "d2 d4", "c7 c6", "g1 f3", "c8 g4", "c1 f4", "e7 e6", "h2 h3", "g4 f3", "d1 f3", "f8 b4", "f1 e2", "b8 d7", "a2 a3", "e8 c8", "a3 b4", "a5 a1", "e1 d2", "a1 h1", "f3 c6", "b7 c6", "e2 a6");
 
         List<Map<Pos, List<Pos>>> play(DbGame game) {
-            return moves.stream().map(m -> move(game, m).get()).toList();
+            return moves.stream().map(m -> move(game, m)).toList();
         }
 
         @Test
@@ -156,7 +155,7 @@ B p p
             @Nested
             @DisplayName("event stacks")
             class EventStacks {
-                Optional<EventStack> stack = found.flatMap(g -> g.playerByColor(WHITE)).map(DbPlayer::eventStack);
+                Optional<EventStack> stack = found.map(g -> g.player(WHITE)).map(DbPlayer::eventStack);
 
                 @Test
                 @DisplayName("high version number")
@@ -178,7 +177,7 @@ B p p
         List<String> moves = List.of("b1 c3", "b8 c6", "c3 b1", "c6 b8", "b1 c3", "b8 c6", "c3 b1", "c6 b8", "b1 c3", "b8 c6");
 
         List<Map<Pos, List<Pos>>> play(DbGame game) {
-            return moves.stream().map(m -> move(game, m).get()).toList();
+            return moves.stream().map(m -> move(game, m)).toList();
         }
 
         @Test
@@ -201,7 +200,7 @@ B p p
                 game = insert();
                 play(game);
                 found = repo.game(game.getId());
-                events = found.flatMap(g -> g.playerByColor(WHITE).map(p -> p.eventStack().getEvents()));
+                events = found.map(g -> g.player(WHITE)).map(p -> p.eventStack().getEvents());
             }
 
             @Test
@@ -219,7 +218,7 @@ B p p
 PP kr
 K
 """))));
-        assertThat(move(dbGame, "a1 b1")).isPresent();
+        assertThatCode(() -> move(dbGame, "a1 b1")).doesNotThrowAnyException();
     }
 
     @Nested

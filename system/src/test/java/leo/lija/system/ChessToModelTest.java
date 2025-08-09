@@ -86,16 +86,16 @@ class ChessToModelTest extends Fixtures {
             @Test
             @DisplayName("white pieces")
             void whitePieces() {
-                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
-                    dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
+                assertThat(sortPs(dbg2.player(WHITE).getPs())).isEqualTo(
+                    sortPs(dbGame.player(WHITE).getPs())
                 );
             }
 
             @Test
             @DisplayName("black pieces")
             void blackPieces() {
-                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)).isEqualTo(
-                    dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs)
+                assertThat(sortPs(dbg2.player(BLACK).getPs())).isEqualTo(
+                    sortPs(dbGame.player(BLACK).getPs())
                 );
             }
         }
@@ -135,14 +135,16 @@ R  QK  q
 
             @Test
             void white() {
-                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(sortPs(dbg2.player(WHITE).getPs())).isEqualTo(
+                    sortPs(dbGame.player(WHITE).getPs())
+                );
             }
 
             @Test
             void black() {
-                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(sortPs(dbg2.player(BLACK).getPs())).isEqualTo(
+                    sortPs(dbGame.player(BLACK).getPs())
+                );
             }
         }
 
@@ -160,14 +162,16 @@ R  QK  q
 
             @Test
             void white() {
-                assertThat(dbg2.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor(WHITE).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(sortPs(dbg2.player(WHITE).getPs())).isEqualTo(
+                    sortPs(dbGame.player(WHITE).getPs())
+                );
             }
 
             @Test
             void black() {
-                assertThat(dbg2.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs))
-                    .isEqualTo(dbGame.playerByColor(BLACK).map(DbPlayer::getPs).map(ChessToModelTest.this::sortPs));
+                assertThat(sortPs(dbg2.player(BLACK).getPs())).isEqualTo(
+                    sortPs(dbGame.player(BLACK).getPs())
+                );
             }
         }
     }
@@ -177,7 +181,7 @@ R  QK  q
     class UpdateEvents {
 
         private Optional<List<Pair<Integer, Event>>> playerEvents(DbGame dbg, Color color) {
-            return Optional.of(dbg).flatMap(g -> g.playerByColor(color).map(p -> p.eventStack().getEvents()));
+            return Optional.of(dbg).map(g -> g.player(color).eventStack().getEvents());
         }
 
         @Nested

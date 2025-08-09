@@ -65,7 +65,7 @@ class GameRepoTest extends Fixtures {
 
             @Test
             void existing() {
-                DbPlayer player = anyGame.getPlayers().getFirst();
+                DbPlayer player = anyGame.players().getFirst();
                 assertThat(anyGame.fullIdOf(player).flatMap(repo::player).get().getSecond().getId()).isEqualTo(player.getId());
             }
         }
@@ -81,7 +81,7 @@ class GameRepoTest extends Fixtures {
 
             @Test
             void existing() {
-                DbPlayer player = anyGame.getPlayers().getFirst();
+                DbPlayer player = anyGame.players().getFirst();
                 assertThat(repo.player(anyGame.getId(), player.getColor()).get().getSecond().getId()).isEqualTo(player.getId());
             }
         }

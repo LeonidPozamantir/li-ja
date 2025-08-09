@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, List<DbPlayer> players, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
-        super(id, players, pgn, status, turns, clock, lastMove);
+    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
+        super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove);
     }
 
     public RichDbGame(DbGame game) {
-        this(game.getId(), game.getPlayers(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove());
+        this(game.getId(), game.getWhitePlayer(), game.getBlackPlayer(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove());
     }
 
     @Override
@@ -26,7 +26,11 @@ public class RichDbGame extends DbGame {
     }
 
     public RichDbGame withoutEvents() {
-        getPlayers().stream().forEach(p -> p.setEvts(""));
+        mapPlayers(p -> {
+            DbPlayer cp = p.copy();
+            cp.setEvts("");
+            return cp;
+        });
         return this;
     }
 

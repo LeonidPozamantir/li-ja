@@ -28,6 +28,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.A1;
 import static leo.lija.chess.Pos.A2;
 import static leo.lija.chess.Pos.A3;
@@ -128,10 +129,8 @@ public class GameBenchmark {
             }, (s1, s2) -> s1);
     }
 
-    private Optional<Map<Pos, List<Pos>>> move(DbGame game, String m) {
-        return game.playerByColor("white")
-            .flatMap(player -> game.fullIdOf(player)
-                .map(fullId -> server.playMove(fullId, m)));
+    private Map<Pos, List<Pos>> move(DbGame game, String m) {
+        return server.playMove(game.fullIdOf(WHITE), m);
     }
 
     List<String> moves = List.of("e2 e4", "d7 d5", "e4 d5", "d8 d5", "b1 c3", "d5 a5", "d2 d4", "c7 c6", "g1 f3", "c8 g4", "c1 f4", "e7 e6", "h2 h3", "g4 f3", "d1 f3", "f8 b4", "f1 e2", "b8 d7", "a2 a3", "e8 c8", "a3 b4", "a5 a1", "e1 d2", "a1 h1", "f3 c6", "b7 c6", "e2 a6");

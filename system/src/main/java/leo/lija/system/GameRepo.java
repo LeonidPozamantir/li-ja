@@ -38,8 +38,7 @@ public class GameRepo {
 
     public Optional<Pair<DbGame, DbPlayer>> player(String gameId, Color color) {
         return game(gameId.substring(0, GAME_ID_SIZE))
-            .flatMap(g -> g.playerByColor(color)
-                .map(p -> Pair.of(g, p)));
+            .map(g -> Pair.of(g, g.player(color)));
     }
 
     public void save(DbGame game) {
@@ -48,7 +47,7 @@ public class GameRepo {
     }
 
     public Optional<String> insert(DbGame game) {
-        return Optional.of(repo.save(encode(game)).getId()); // TODO: probably we should check that id does not exist and else fail?
+        return Optional.of(repo.save(encode(game)).getId()); // leo: probably we should check that id does not exist and else fail?
     }
 
     public Optional<DbGame> anyGame() {

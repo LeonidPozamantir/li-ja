@@ -98,7 +98,7 @@ class EventStackTest extends Fixtures {
     @Test
     @DisplayName("decode and re-encode production data events")
     void decodeEncodeProduction() {
-        assertThat(dbGame5.getPlayers()).allMatch(player ->
+        assertThat(dbGame5.players()).allMatch(player ->
             (EventStack.decode(player.getEvts())).encode().equals(player.getEvts())
         );
     }
