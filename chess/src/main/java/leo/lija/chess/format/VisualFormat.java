@@ -56,7 +56,7 @@ public class VisualFormat implements Format<Board> {
                 }
             }
         }
-        return new Board(boardPieces).withHistory(History.noCastle());
+        return new Board(boardPieces);
     }
 
     public Situation str2Sit(String str, Color color) {

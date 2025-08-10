@@ -100,7 +100,7 @@ R   K  R
         @Test
         @DisplayName("can import a new board")
         void importNewBoard() {
-            assertThat(visual.str2Obj(newBoardFormat)).isEqualTo(new Board().withHistory(History.noCastle()));
+            assertThat(visual.str2Obj(newBoardFormat)).isEqualTo(new Board());
         }
 
         @Test

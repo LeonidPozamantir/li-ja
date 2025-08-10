@@ -15,8 +15,11 @@ import static leo.lija.chess.Side.QUEEN_SIDE;
 
 public record History (
 	Optional<Pair<Pos, Pos>> lastMove,
-	EnumMap<Color, Pair<Boolean, Boolean>> castles,
-	List<String> positionHashes
+	List<String> positionHashes,
+	boolean whiteCastleKingSide,
+	boolean whiteCastleQueenSide,
+	boolean blackCastleKingSide,
+	boolean blackCastleQueenSide
 ) {
 	public History() {
 		this(Optional.empty());
@@ -27,10 +30,7 @@ public record History (
 	}
 
 	public History(Optional<Pair<Pos, Pos>> lastMove, List<String> positionHashes) {
-		this(lastMove, new EnumMap<>(Map.of(
-			WHITE, Pair.of(true, true),
-			BLACK, Pair.of(true, true)
-		)), positionHashes);
+		this(lastMove, positionHashes, true, true, true, true);
 	}
 
 	public boolean isLastMove(Pos p1, Pos p2) {
@@ -44,49 +44,57 @@ public record History (
 	}
 
 	public boolean canCastle(Color color, Side side) {
-		Pair<Boolean, Boolean> castlesColor = colorCastles(color);
-		return side == Side.KING_SIDE ? castlesColor.getFirst() : castlesColor.getSecond();
+		if (side == KING_SIDE && color == WHITE) return whiteCastleKingSide;
+		if (side == QUEEN_SIDE && color == WHITE) return whiteCastleQueenSide;
+		if (side == KING_SIDE && color == BLACK) return blackCastleKingSide;
+		if (side == QUEEN_SIDE && color == BLACK) return blackCastleQueenSide;
+		return false;
 	}
 
 	public boolean canCastle(Color color) {
 		return canCastle(color, KING_SIDE) || canCastle(color, QUEEN_SIDE);
 	}
 
-	public History withoutCastle(Color color, Side side) {
-		Pair<Boolean, Boolean> castlesColor = colorCastles(color);
-		EnumMap<Color, Pair<Boolean, Boolean>> newCastles = new EnumMap<>(castles);
-		newCastles.put(color, Pair.of(
-			!side.equals(KING_SIDE) && castlesColor.getFirst(),
-			!side.equals(QUEEN_SIDE) && castlesColor.getSecond()
-		));
-		return new History(lastMove, newCastles, positionHashes);
+	public History withoutCastles(Color color) {
+		return switch (color) {
+			case WHITE -> new History(lastMove, positionHashes, false, false, blackCastleKingSide, blackCastleQueenSide);
+			case BLACK -> new History(lastMove, positionHashes, whiteCastleKingSide, whiteCastleQueenSide, false, false);
+		};
 	}
 
-	public History withoutCastles(Color color) {
-		EnumMap<Color, Pair<Boolean, Boolean>> newCastles = new EnumMap<>(castles);
-		newCastles.put(color, Pair.of(false, false));
-		return new History(lastMove, newCastles, positionHashes);
+	public History withoutCastle(Color color, Side side) {
+		if (side == KING_SIDE && color == WHITE) return new History(lastMove, positionHashes, false, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
+		if (side == QUEEN_SIDE && color == WHITE) return new History(lastMove, positionHashes, whiteCastleKingSide, false, blackCastleKingSide, blackCastleQueenSide);
+		if (side == KING_SIDE && color == BLACK) return new History(lastMove, positionHashes, whiteCastleKingSide, whiteCastleQueenSide, false, blackCastleQueenSide);
+		if (side == QUEEN_SIDE && color == BLACK) return new History(lastMove, positionHashes, whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, false);
+		return null;
 	}
 
 	public History withoutPositionHashes() {
-		return new History(lastMove, castles, List.of());
+		return new History(lastMove, List.of(), whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
 	}
 
 	public History withNewPositionHash(String hash) {
-		return new History(lastMove, castles, positionHashes.prepend(hash.substring(0, HASH_SIZE)));
+		return new History(lastMove, positionHashes.prepend(hash.substring(0, HASH_SIZE)), whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
 	}
 
-	private Pair<Boolean, Boolean> colorCastles(Color color) {
-		return castles.getOrDefault(color, Pair.of(true, true));
+	public String castleNotation() {
+		return (whiteCastleKingSide ? "K" : "") +
+			(whiteCastleQueenSide ? "Q" : "") +
+			(blackCastleKingSide ? "k" : "") +
+			(blackCastleQueenSide ? "q" : "");
 	}
 
 	public static final int HASH_SIZE = 5;
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {
-		return new History(Optional.empty(), new EnumMap<>(Map.of(color, Pair.of(kingSide, queenSide))), List.of());
+		return switch (color) {
+			case WHITE -> new History(Optional.empty(), List.empty(), kingSide, queenSide, true, true);
+			case BLACK -> new History(Optional.empty(), List.empty(), true, true, kingSide, queenSide);
+		};
 	}
 
 	public static History noCastle() {
-		return new History(Optional.empty(), new EnumMap<>(Color.class), List.of());
+		return new History().withoutCastles(WHITE).withoutCastles(BLACK);
 	}
 }

@@ -160,16 +160,16 @@ public class DbGame {
             return Optional.empty();
         });
 
-        EnumMap<Color, Pair<Boolean, Boolean>> historyCastles = new EnumMap<>(Map.of(
-            WHITE, Pair.of(castles.contains("K"), castles.contains("Q")),
-            BLACK, Pair.of(castles.contains("k"), castles.contains("q"))
-        ));
+        boolean whiteCastleKingSide = castles.contains("K");
+        boolean whiteCastleQueenSide = castles.contains("Q");
+        boolean blackCastleKingSide = castles.contains("k");
+        boolean blackCastleQueenSide = castles.contains("q");
 
         io.vavr.collection.List<String> historyPositionHashes = io.vavr.collection.List.ofAll(IntStream.range(0, (positionHashes.length() / History.HASH_SIZE))
             .mapToObj(i -> positionHashes.substring(i * History.HASH_SIZE, (i + 1) * History.HASH_SIZE))
             .toList());
 
-        return new History(historyLastMove, historyCastles, historyPositionHashes);
+        return new History(historyLastMove, historyPositionHashes, whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
     }
 
     public void update(Game game, Move move) {
