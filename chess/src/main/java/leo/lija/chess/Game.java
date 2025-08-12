@@ -80,4 +80,12 @@ public class Game {
         return Arrays.asList(pgnMoves.split(" "));
     }
 
+    public int halfMoveClock() {
+        return board.getHistory().positionHashes().size();
+    }
+
+    public int fullMoveNumber() {
+        return 1 + turns / 2;
+    }
+
 }
