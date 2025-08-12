@@ -2,10 +2,13 @@ package leo.lija.chess.format;
 
 
 import leo.lija.chess.Board;
-import leo.lija.chess.History;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static leo.lija.chess.Pos.A6;
 import static leo.lija.chess.Pos.B3;
@@ -18,10 +21,6 @@ import static leo.lija.chess.Pos.G8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class FormatVisualTest {

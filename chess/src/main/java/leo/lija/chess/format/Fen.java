@@ -48,18 +48,18 @@ public class Fen implements Format<Game> {
     private String exportBoard(Board board) {
         List<String> outs = new ArrayList<>();
         for (int j = 8; j >= 1; j--) {
-            String out = "";
+            StringBuilder out = new StringBuilder("");
             int empty = 0;
             for (int i = 1; i <= 8; i++) {
                 Optional<Piece> optPiece = board.at(i, j);
                 if (optPiece.isEmpty()) empty++;
-                else if (empty == 0) out += optPiece.get().fen();
+                else if (empty == 0) out.append(optPiece.get().fen());
                 else {
-                    out += Integer.toString(empty) + optPiece.get().fen();
+                    out.append(empty).append(optPiece.get().fen());
                     empty = 0;
                 }
             }
-            if (empty == 0) outs.add(out); else outs.add(out + empty);
+            if (empty == 0) outs.add(out.toString()); else outs.add(out.toString() + empty);
         }
         return outs.stream().collect(Collectors.joining("/"));
     }

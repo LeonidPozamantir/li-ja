@@ -61,10 +61,6 @@ public class Server {
         return playMove(fullId, moveString, Optional.empty());
     }
 
-    private Map<DbPlayer, EventStack> moveToEvents(Move move) {
-        return Map.of();
-    }
-
     private Optional<Pair<String, String>> decodeMoveString(String moveString) {
         Matcher matcher = MOVE_STRING.matcher(moveString);
         if (matcher.find()) {
