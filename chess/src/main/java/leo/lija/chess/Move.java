@@ -1,5 +1,6 @@
 package leo.lija.chess;
 
+import io.vavr.collection.List;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.utils.Pair;
 import lombok.With;
@@ -30,10 +31,12 @@ public record Move(
         return new Move(piece, orig, dest, before, after.withHistory(h), capture, promotion, castle, enpassant);
     }
 
-    public Board afterWithPositionHashesUpdated() {
+    public Board finalizeAfter() {
         return after.updateHistory(h -> {
-           if (piece.is(PAWN) || captures() || promotes() || castles()) return h.withoutPositionHashes();
-           return h.withNewPositionHash(after.positionHash());
+            List<String> positionHashes = piece.is(PAWN) || captures() || promotes() || castles()
+                ? List.empty()
+                : h.positionHashesWith(after.positionHash());
+            return new History(Optional.of(Pair.of(orig, dest)), positionHashes, h.whiteCastleKingSide(), h.whiteCastleQueenSide(), h.blackCastleKingSide(), h.blackCastleQueenSide());
         });
     }
 

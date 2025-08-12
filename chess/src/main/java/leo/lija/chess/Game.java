@@ -54,7 +54,7 @@ public class Game {
     public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
         if (promotion == null) promotion = QUEEN;
         Move move =  situation().move(from, to, promotion);
-        Game newGame = new Game(move.afterWithPositionHashesUpdated(), player.getOpposite());
+        Game newGame = new Game(move.finalizeAfter(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
         String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
         Optional<Pos> cpos = move.capture();

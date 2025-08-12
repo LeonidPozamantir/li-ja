@@ -75,14 +75,19 @@ public record History (
 	}
 
 	public History withNewPositionHash(String hash) {
-		return new History(lastMove, positionHashes.prepend(hash.substring(0, HASH_SIZE)), whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
+		return new History(lastMove, positionHashesWith(hash), whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
+	}
+
+	public List<String> positionHashesWith(String hash) {
+		return positionHashes.prepend(hash.substring(0, HASH_SIZE));
 	}
 
 	public String castleNotation() {
-		return (whiteCastleKingSide ? "K" : "") +
+		String notation = (whiteCastleKingSide ? "K" : "") +
 			(whiteCastleQueenSide ? "Q" : "") +
 			(blackCastleKingSide ? "k" : "") +
 			(blackCastleQueenSide ? "q" : "");
+		return notation.isEmpty() ? "-" : notation;
 	}
 
 	public static final int HASH_SIZE = 5;
