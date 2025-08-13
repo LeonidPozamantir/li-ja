@@ -8,14 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class ReverseEngineering {
 
-    private final Game from;
-    private final Game to;
+    private final Game fromGame;
+    private final Board to;
+    private final Board from;
+
+    public ReverseEngineering(Game fromGame, Board to) {
+        this.fromGame = fromGame;
+        this.to = to;
+        from = fromGame.board;
+    }
 
     public Optional<Pair<Pos, Pos>> move() {
-        if (to.turns != from.turns + 1) return Optional.empty();
+        if (from.getPieces().equals(to.getPieces())) return Optional.empty();
         return findMove();
     }
 
@@ -28,15 +34,15 @@ public class ReverseEngineering {
     }
 
     private Optional<Pos> findPieceNewPos(Pos pos, Piece piece) {
-        return Optional.ofNullable(from.situation().destinations().get(pos))
+        return Optional.ofNullable(fromGame.situation().destinations().get(pos))
             .flatMap(dests -> dests.stream()
-                .filter(d -> to.board.at(d).map(p -> p.is(piece.color())).orElse(false))
+                .filter(d -> to.at(d).map(p -> p.is(piece.color())).orElse(false))
                 .findFirst());
     }
 
     private List<Pair<Pos, Piece>> findMovedPieces() {
-        Map<Pos, Piece> fromPlayerPieces = from.board.piecesOf(from.player);
-        Map<Pos, Piece> toPlayerPieces = to.board.piecesOf(from.player);
+        Map<Pos, Piece> fromPlayerPieces = from.piecesOf(fromGame.player);
+        Map<Pos, Piece> toPlayerPieces = to.piecesOf(fromGame.player);
 
         return fromPlayerPieces.entrySet().stream()
             .map(e -> {

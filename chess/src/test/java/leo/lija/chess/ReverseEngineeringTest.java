@@ -42,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReverseEngineeringTest extends BaseChess {
 
     private Optional<Pair<Pos, Pos>> findMove(Game g1, Game g2) {
-        return (new ReverseEngineering(g1, g2)).move();
+        return (new ReverseEngineering(g1, g2.board)).move();
     }
 
     private Game play(Game game, Pair<Pos, Pos> ...moves) {
