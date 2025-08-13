@@ -16,7 +16,7 @@ public class Fen implements Format<Game> {
 
     @Override
     public Game str2Obj(String source) {
-        return new Game();
+        throw new RuntimeException("Not implemented");
     }
 
     @Override

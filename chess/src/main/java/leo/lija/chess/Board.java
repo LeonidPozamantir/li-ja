@@ -84,6 +84,10 @@ public class Board {
         return Optional.ofNullable(actors().get(at));
     }
 
+    public Map<Pos, Piece> piecesOf(Color c) {
+        return pieces.entrySet().stream().filter(e -> e.getValue().is(c)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     public Optional<Pos> kingPosOf(Color color) {
         if (cachedKingPos.isEmpty()) {
             Map<Color, Pos> kingPos = pieces.entrySet().stream()
