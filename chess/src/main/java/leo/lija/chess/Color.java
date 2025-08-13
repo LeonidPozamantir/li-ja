@@ -61,6 +61,11 @@ public enum Color {
     }
 
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public static Color apply(boolean b) {
         return b ? WHITE : BLACK;
     }

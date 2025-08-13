@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static leo.lija.chess.Role.KING;
+import static leo.lija.chess.Role.ROOK;
+
 public class ReverseEngineering {
 
     private final Game fromGame;
@@ -27,10 +30,28 @@ public class ReverseEngineering {
 
     private Optional<Pair<Pos, Pos>> findMove() {
         List<Pair<Pos, Piece>> movedPieces = findMovedPieces();
-        if (movedPieces.size() != 1) return Optional.empty();
-        Pos pos = movedPieces.get(0).getFirst();
-        Piece piece = movedPieces.get(0).getSecond();
-        return findPieceNewPos(pos, piece).map(np -> Pair.of(pos, np));
+        if (movedPieces.size() == 1) {
+            Pos pos = movedPieces.get(0).getFirst();
+            Piece piece = movedPieces.get(0).getSecond();
+            return findPieceNewPos(pos, piece).map(np -> Pair.of(pos, np));
+        }
+        if (movedPieces.size() == 2) {
+            Pos pos1 = movedPieces.get(0).getFirst();
+            Piece piece1 = movedPieces.get(0).getSecond();
+            Pos pos2 = movedPieces.get(1).getFirst();
+            Piece piece2 = movedPieces.get(1).getSecond();
+            if (piece1.is(KING) && piece2.is(ROOK)) return findCastle(pos2).map(np -> Pair.of(pos1, np));
+            if (piece1.is(ROOK) && piece2.is(KING)) return findCastle(pos1).map(np -> Pair.of(pos2, np));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Pos> findCastle(Pos rookPos) {
+        return switch (rookPos.getX()) {
+            case 1 -> Pos.posAt(3, rookPos.getY());
+            case 8 -> Pos.posAt(7, rookPos.getY());
+            default -> Optional.empty();
+        };
     }
 
     private Optional<Pos> findPieceNewPos(Pos pos, Piece piece) {
