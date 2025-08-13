@@ -11,6 +11,10 @@ public class RichGame extends Game {
         super(board, player, pgnMoves, clock, deads, turns);
     }
 
+    public RichGame(Game game) {
+        super(game.board, game.player, game.pgnMoves, game.clock, game.deads, game.turns);
+    }
+
     public RichGame(Board board, Color player) {
         super(board, player);
     }
