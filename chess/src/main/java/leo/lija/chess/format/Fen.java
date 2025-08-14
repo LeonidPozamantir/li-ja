@@ -8,6 +8,7 @@ import leo.lija.chess.Pos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static leo.lija.chess.Role.PAWN;
@@ -16,7 +17,9 @@ public class Fen implements Format<Game> {
 
     @Override
     public Game str2Obj(String source) {
-        throw new RuntimeException("Not implemented");
+        Pattern p = Pattern.compile("\\s*([\\w\\d/]+)\\s.+");
+        String useful = source.replace("/", "").replaceAll("\\s*([\\w\\d/]+)\\s.+", "$1");
+        return new Game();
     }
 
     @Override

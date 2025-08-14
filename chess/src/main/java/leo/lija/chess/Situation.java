@@ -1,8 +1,10 @@
 package leo.lija.chess;
 
 import leo.lija.chess.exceptions.ChessRulesException;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
@@ -12,10 +14,13 @@ import java.util.stream.Collectors;
 import static leo.lija.chess.Role.QUEEN;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Situation {
 
+	@EqualsAndHashCode.Include
 	final Board board;
 	@Getter
+	@EqualsAndHashCode.Include
 	final Color color;
 
 	private Optional<Map<Pos, List<Pos>>> cachedDestinations = Optional.empty();
