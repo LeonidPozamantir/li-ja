@@ -9,7 +9,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Clock;
-import leo.lija.chess.Color;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,10 +42,6 @@ public class RawDbGame {
     private String castles;
     private boolean isRated;
 
-    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove) {
-        this(id, players, pgn, status, turns, clock, lastMove, "", "KQkq", false);
-    }
-
     public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String positionHashes, String castles, boolean isRated) {
         this.id = id;
         this.players = players;
@@ -64,10 +59,11 @@ public class RawDbGame {
         if (players.size() < 2) return Optional.empty();
         return players.stream().filter(p -> p.getColor().equals("white")).findFirst().flatMap(RawDbPlayer::decode)
             .flatMap(whitePlayer -> players.stream().filter(p -> p.getColor().equals("black")).findFirst().flatMap(RawDbPlayer::decode)
-                .map(blackPlayer -> {
-                    Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
-                    return new DbGame(id, whitePlayer, blackPlayer, pgn, status, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
-                }));
+                .flatMap(blackPlayer -> Status.fromInt(status)
+                    .map(trueStatus -> {
+                        Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
+                        return new DbGame(id, whitePlayer, blackPlayer, pgn, trueStatus, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
+                })));
     }
 
     public static RawDbGame encode(DbGame dbGame) {
@@ -75,7 +71,7 @@ public class RawDbGame {
             dbGame.getId(),
             dbGame.players().stream().map(RawDbPlayer::encode).toList(),
             dbGame.getPgn(),
-            dbGame.getStatus(),
+            Status.toInt(dbGame.getStatus()),
             dbGame.getTurns(),
             dbGame.getClock().map(RawDbClock::encode).orElse(null),
             dbGame.getLastMove().orElse(null),

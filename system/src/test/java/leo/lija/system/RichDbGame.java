@@ -7,12 +7,13 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Status;
 
 import java.util.List;
 import java.util.Optional;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
+    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
         super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove);
     }
 

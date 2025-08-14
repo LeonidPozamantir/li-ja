@@ -21,7 +21,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +42,7 @@ public class DbGame {
     private DbPlayer whitePlayer;
     private DbPlayer blackPlayer;
     private String pgn;
-    private int status;
+    private Status status;
     @Setter
     private int turns;
     @Setter
@@ -53,11 +52,11 @@ public class DbGame {
     private String castles;
     private boolean isRated;
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
         this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, "", "KQkq", false);
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, int status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -189,9 +188,9 @@ public class DbGame {
             history.canCastle(BLACK, Side.QUEEN_SIDE) ? "q" : ""
         ).stream().collect(Collectors.joining());
 
-        if (situation.checkmate()) status = MATE;
-        else if (situation.stalemate()) status = STALEMATE;
-        else if (situation.autoDraw()) status = DRAW;
+        if (situation.checkmate()) status = Status.MATE;
+        else if (situation.stalemate()) status = Status.STALEMATE;
+        else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
     }
 
@@ -206,7 +205,7 @@ public class DbGame {
     }
 
     public boolean playable() {
-        return status < ABORTED;
+        return status.getValue() < Status.ABORTED.getValue();
     }
 
     public DbGame mapPlayers(UnaryOperator<DbPlayer> f) {
@@ -219,14 +218,4 @@ public class DbGame {
     public static final int PLAYER_ID_SIZE = 4;
     public static final int FULL_ID_SIZE = 12;
 
-    private static final int CREATED = 10;
-    private static final int STARTED = 20;
-    private static final int ABORTED = 25;
-    private static final int MATE = 30;
-    private static final int RESIGN = 31;
-    private static final int STALEMATE = 32;
-    private static final int TIMEOUT = 33;
-    private static final int DRAW = 34;
-    private static final int OUTOFTIME = 35;
-    private static final int CHEAT = 36;
 }
