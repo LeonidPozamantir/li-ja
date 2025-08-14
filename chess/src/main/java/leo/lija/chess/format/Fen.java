@@ -8,6 +8,8 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 import static leo.lija.chess.Pos.A8;
 import static leo.lija.chess.Role.PAWN;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Fen {
 
     public static Optional<Situation> str2Obj(String source) {
