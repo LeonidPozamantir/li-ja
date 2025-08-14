@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Role.QUEEN;
@@ -88,4 +89,7 @@ public class Game {
         return 1 + turns / 2;
     }
 
+    public Game updateBoard(UnaryOperator<Board> f) {
+        return new Game(f.apply(board), player, pgnMoves, clock, deads, turns);
+    }
 }

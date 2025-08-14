@@ -20,7 +20,7 @@ import static leo.lija.chess.Role.PAWN;
 
 public class Fen {
 
-    public Optional<Situation> str2Obj(String source) {
+    public static Optional<Situation> str2Obj(String source) {
         LinkedList<Character> boardChars = source.replace("/", "").replaceAll("\\s*([\\w/]+)\\s.+", "$1").chars()
             .mapToObj(c -> (char) c)
             .collect(Collectors.toCollection(() -> new LinkedList<>()));
@@ -32,7 +32,7 @@ public class Fen {
                 .map(pieces -> new Situation(new Board(pieces.stream().collect(Collectors.toMap(Pair::getFirst, Pair::getSecond))), color)));
     }
 
-    private Optional<List<Pair<Pos, Piece>>> board(LinkedList<Character> chars, Pos pos) {
+    private static Optional<List<Pair<Pos, Piece>>> board(LinkedList<Character> chars, Pos pos) {
         if (chars.isEmpty()) return Optional.of(List.of());
         else {
             char c = chars.getFirst();
@@ -50,7 +50,7 @@ public class Fen {
         }
     }
 
-    public String obj2Str(Game game) {
+    public static String obj2Str(Game game) {
         String lastMoveFen = game.getBoard().getHistory().lastMove()
             .flatMap(lastMove -> {
                 Pos orig = lastMove.getFirst();
@@ -75,14 +75,14 @@ public class Fen {
         ).stream().collect(Collectors.joining(" "));
     }
 
-    public Optional<Pos> tore(Pos pos, int n) {
+    public static Optional<Pos> tore(Pos pos, int n) {
         return Pos.posAt(
             (pos.getX() + n - 1) % 8 + 1,
             pos.getY() - (pos.getX() + n - 1) / 8
         );
     }
 
-    private String exportBoard(Board board) {
+    private static String exportBoard(Board board) {
         List<String> outs = new ArrayList<>();
         for (int j = 8; j >= 1; j--) {
             StringBuilder out = new StringBuilder("");

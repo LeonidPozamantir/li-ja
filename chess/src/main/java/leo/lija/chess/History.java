@@ -62,6 +62,10 @@ public record History (
 		};
 	}
 
+	public History withoutAnyCastles() {
+		return new History(lastMove, positionHashes, false, false, false, false);
+	}
+
 	public History withoutCastle(Color color, Side side) {
 		if (side == KING_SIDE && color == WHITE) return new History(lastMove, positionHashes, false, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
 		if (side == QUEEN_SIDE && color == WHITE) return new History(lastMove, positionHashes, whiteCastleKingSide, false, blackCastleKingSide, blackCastleQueenSide);
