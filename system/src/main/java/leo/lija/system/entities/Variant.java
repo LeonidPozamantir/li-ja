@@ -12,7 +12,9 @@ public record Variant(int id) {
     public static final Variant CHESS960 = new Variant(2);
 
     public static final List<Variant> all = List.of(STANDARD, CHESS960);
+
     public static final Map<Integer, Variant> byId = all.stream().collect(Collectors.toMap(Variant::id, Function.identity()));
+
     public static Optional<Variant> apply(Integer id) {
         return Optional.ofNullable(byId.get(id));
     }

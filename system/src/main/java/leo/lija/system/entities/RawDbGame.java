@@ -61,7 +61,7 @@ public class RawDbGame {
         if (players.size() < 2) return Optional.empty();
         return players.stream().filter(p -> p.getColor().equals("white")).findFirst().flatMap(RawDbPlayer::decode)
             .flatMap(whitePlayer -> players.stream().filter(p -> p.getColor().equals("black")).findFirst().flatMap(RawDbPlayer::decode)
-                .flatMap(blackPlayer -> Status.fromInt(status)
+                .flatMap(blackPlayer -> Status.apply(status)
                     .flatMap(trueStatus -> Variant.apply(variant)
                         .map(trueVariant -> {
                             Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
@@ -74,7 +74,7 @@ public class RawDbGame {
             dbGame.getId(),
             dbGame.players().stream().map(RawDbPlayer::encode).toList(),
             dbGame.getPgn(),
-            Status.toInt(dbGame.getStatus()),
+            dbGame.getStatus().id(),
             dbGame.getTurns(),
             dbGame.getClock().map(RawDbClock::encode).orElse(null),
             dbGame.getLastMove().orElse(null),

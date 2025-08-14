@@ -207,7 +207,7 @@ public class DbGame {
     }
 
     public boolean playable() {
-        return status.getValue() < Status.ABORTED.getValue();
+        return status.id() < Status.ABORTED.id();
     }
 
     public DbGame mapPlayers(UnaryOperator<DbPlayer> f) {

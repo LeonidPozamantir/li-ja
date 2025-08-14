@@ -1,30 +1,29 @@
 package leo.lija.system.entities;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
-public enum Status {
-    CREATED(10), STARTED(20), ABORTED(25), MATE(30), RESIGN(31), STALEMATE(32), TIMEOUT(33), DRAW(34), OUTOFTIME(35), CHEAT(36);
+public record Status(int id) {
 
-    @Getter
-    private final int value;
+    public static final Status CREATED = new Status(10);
+    public static final Status STARTED = new Status(20);
+    public static final Status ABORTED = new Status(25);
+    public static final Status MATE = new Status(30);
+    public static final Status RESIGN = new Status(31);
+    public static final Status STALEMATE = new Status(32);
+    public static final Status TIMEOUT = new Status(33);
+    public static final Status DRAW = new Status(34);
+    public static final Status OUTOFTIME = new Status(35);
+    public static final Status CHEAT = new Status(36);
 
-    public static int toInt(Status s) {
-        return s.value;
+    private static final List<Status> all = List.of(CREATED, STARTED, ABORTED, MATE, RESIGN, STALEMATE, TIMEOUT, DRAW, OUTOFTIME, CHEAT);
+
+    public static final Map<Integer, Status> byId = all.stream().collect(Collectors.toMap(Status::id, Function.identity()));
+
+    public static Optional<Status> apply(Integer id) {
+        return Optional.ofNullable(byId.get(id));
     }
-
-    public static final Map<Integer, Status> indexed = Collections.unmodifiableMap(Arrays.stream(values()).collect(Collectors.toMap(Status::toInt, Function.identity())));
-
-    public static Optional<Status> fromInt(int i) {
-        return Optional.ofNullable(indexed.get(i));
-    }
-
 }
