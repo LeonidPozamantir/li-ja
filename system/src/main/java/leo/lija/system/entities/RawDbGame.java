@@ -41,8 +41,9 @@ public class RawDbGame {
     private String positionHashes;
     private String castles;
     private boolean isRated;
+    private int variant;
 
-    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String positionHashes, String castles, boolean isRated) {
+    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String positionHashes, String castles, boolean isRated, int variant) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -53,6 +54,7 @@ public class RawDbGame {
         this.positionHashes = positionHashes;
         this.castles = castles;
         this.isRated = isRated;
+        this.variant = variant;
     }
 
     public Optional<DbGame> decode() {
@@ -60,10 +62,11 @@ public class RawDbGame {
         return players.stream().filter(p -> p.getColor().equals("white")).findFirst().flatMap(RawDbPlayer::decode)
             .flatMap(whitePlayer -> players.stream().filter(p -> p.getColor().equals("black")).findFirst().flatMap(RawDbPlayer::decode)
                 .flatMap(blackPlayer -> Status.fromInt(status)
-                    .map(trueStatus -> {
-                        Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
-                        return new DbGame(id, whitePlayer, blackPlayer, pgn, trueStatus, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated);
-                })));
+                    .flatMap(trueStatus -> Variant.fromInt(variant)
+                        .map(trueVariant -> {
+                            Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
+                            return new DbGame(id, whitePlayer, blackPlayer, pgn, trueStatus, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated, trueVariant);
+                }))));
     }
 
     public static RawDbGame encode(DbGame dbGame) {
@@ -77,7 +80,8 @@ public class RawDbGame {
             dbGame.getLastMove().orElse(null),
             dbGame.getPositionHashes(),
             dbGame.getCastles(),
-            dbGame.isRated()
+            dbGame.isRated(),
+            Variant.toInt(dbGame.getVariant())
         );
     }
 }
