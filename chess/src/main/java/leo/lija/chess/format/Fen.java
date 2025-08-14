@@ -1,28 +1,55 @@
 package leo.lija.chess.format;
 
 import leo.lija.chess.Board;
+import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
+import leo.lija.chess.Role;
+import leo.lija.chess.Situation;
+import leo.lija.chess.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static leo.lija.chess.Pos.A8;
 import static leo.lija.chess.Role.PAWN;
 
-public class Fen implements Format<Game> {
+public class Fen {
 
-    @Override
-    public Game str2Obj(String source) {
-        Pattern p = Pattern.compile("\\s*([\\w\\d/]+)\\s.+");
-        String useful = source.replace("/", "").replaceAll("\\s*([\\w\\d/]+)\\s.+", "$1");
-        return new Game();
+    public Optional<Situation> str2Obj(String source) {
+        LinkedList<Character> boardChars = source.replace("/", "").replaceAll("\\s*([\\w/]+)\\s.+", "$1").chars()
+            .mapToObj(c -> (char) c)
+            .collect(Collectors.toCollection(() -> new LinkedList<>()));
+
+        Optional<Color> colorOption = Color.apply(source.replaceAll("^[\\w/]+\\s(\\w).+$", "$1").charAt(0));
+
+        return colorOption
+            .flatMap(color -> board(boardChars, A8)
+                .map(pieces -> new Situation(new Board(pieces.stream().collect(Collectors.toMap(Pair::getFirst, Pair::getSecond))), color)));
     }
 
-    @Override
+    private Optional<List<Pair<Pos, Piece>>> board(LinkedList<Character> chars, Pos pos) {
+        if (chars.size() == 0) return Optional.of(List.of());
+        else {
+            char c = chars.getFirst();
+            chars.removeFirst();
+            if ((int) c < 58) {
+                return tore(pos, (int) c - 48).flatMap(p -> board(chars, p));
+            }
+            return Role.byFen(Character.toLowerCase(c))
+                .map(role -> {
+                    Pair<Pos, Piece> firstPair = Pair.of(pos, new Piece(Color.apply(Character.isUpperCase(c)), role));
+                    List<Pair<Pos, Piece>> otherPairs = tore(pos, 1).flatMap(p -> board(chars, p)).orElse(new LinkedList<>());
+                    otherPairs.addFirst(firstPair);
+                    return otherPairs;
+                });
+        }
+    }
+
     public String obj2Str(Game game) {
         String lastMoveFen = game.getBoard().getHistory().lastMove()
             .flatMap(lastMove -> {
@@ -46,6 +73,13 @@ public class Fen implements Format<Game> {
             Integer.toString(game.halfMoveClock()),
             Integer.toString(game.fullMoveNumber())
         ).stream().collect(Collectors.joining(" "));
+    }
+
+    public Optional<Pos> tore(Pos pos, int n) {
+        return Pos.posAt(
+            (pos.getX() + n - 1) % 8 + 1,
+            pos.getY() - (pos.getX() + n - 1) / 8
+        );
     }
 
     private String exportBoard(Board board) {

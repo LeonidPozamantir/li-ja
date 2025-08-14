@@ -17,6 +17,7 @@ import static leo.lija.chess.Role.QUEEN;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Situation {
 
+	@Getter
 	@EqualsAndHashCode.Include
 	final Board board;
 	@Getter
