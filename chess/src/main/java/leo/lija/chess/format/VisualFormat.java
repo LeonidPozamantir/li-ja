@@ -29,13 +29,12 @@ import java.util.stream.Stream;
  */
 
 
-public class VisualFormat implements Format<Board> {
+public class VisualFormat {
 
     public String newLine(String str) {
         return str + "\n";
     }
 
-    @Override
     public Board str2Obj(String str) {
         List<String> rawLines = List.of(str.split("\n"));
         List<String> lines;
@@ -63,7 +62,6 @@ public class VisualFormat implements Format<Board> {
         return new Situation(str2Obj(str), color);
     }
 
-    @Override
     public String obj2Str(Board board) {
         return obj2StrWithMarks(board, Map.of());
     }

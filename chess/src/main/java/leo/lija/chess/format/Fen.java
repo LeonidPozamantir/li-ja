@@ -33,12 +33,12 @@ public class Fen {
     }
 
     private Optional<List<Pair<Pos, Piece>>> board(LinkedList<Character> chars, Pos pos) {
-        if (chars.size() == 0) return Optional.of(List.of());
+        if (chars.isEmpty()) return Optional.of(List.of());
         else {
             char c = chars.getFirst();
             chars.removeFirst();
-            if ((int) c < 58) {
-                return tore(pos, (int) c - 48).flatMap(p -> board(chars, p));
+            if (c < 58) {
+                return tore(pos, c - 48).flatMap(p -> board(chars, p));
             }
             return Role.byFen(Character.toLowerCase(c))
                 .map(role -> {
