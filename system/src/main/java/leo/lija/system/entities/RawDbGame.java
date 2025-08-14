@@ -62,7 +62,7 @@ public class RawDbGame {
         return players.stream().filter(p -> p.getColor().equals("white")).findFirst().flatMap(RawDbPlayer::decode)
             .flatMap(whitePlayer -> players.stream().filter(p -> p.getColor().equals("black")).findFirst().flatMap(RawDbPlayer::decode)
                 .flatMap(blackPlayer -> Status.fromInt(status)
-                    .flatMap(trueStatus -> Variant.fromInt(variant)
+                    .flatMap(trueStatus -> Variant.apply(variant)
                         .map(trueVariant -> {
                             Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
                             return new DbGame(id, whitePlayer, blackPlayer, pgn, trueStatus, turns, validClock, Optional.ofNullable(lastMove), positionHashes, castles, isRated, trueVariant);
@@ -81,7 +81,7 @@ public class RawDbGame {
             dbGame.getPositionHashes(),
             dbGame.getCastles(),
             dbGame.isRated(),
-            Variant.toInt(dbGame.getVariant())
+            dbGame.getVariant().id()
         );
     }
 }
