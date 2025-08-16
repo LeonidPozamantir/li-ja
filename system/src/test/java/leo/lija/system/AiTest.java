@@ -19,6 +19,7 @@ abstract class AiTest extends Fixtures {
 
     protected Ai ai;
     protected String name;
+    protected int nbMoves;
 
     @Test
     @DisplayName("play the first move")
@@ -30,15 +31,15 @@ abstract class AiTest extends Fixtures {
     }
 
     @Test
-    @DisplayName("play 10 moves")
+    @DisplayName("play N moves")
     void play20Moves() {
         DbGame dbg = newDbGame.copy();
-        IntStream.rangeClosed(1, 10).forEach((i) -> {
+        IntStream.rangeClosed(1, nbMoves).forEach((i) -> {
             Pair<Game, Move> gm = ai.apply(dbg);
             Game game = gm.getFirst();
             Move move = gm.getSecond();
             dbg.update(game, move);
         });
-        assertThat(dbg.getTurns()).isEqualTo(10);
+        assertThat(dbg.getTurns()).isEqualTo(nbMoves);
     }
 }

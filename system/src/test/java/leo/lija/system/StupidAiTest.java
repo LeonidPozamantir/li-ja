@@ -7,6 +7,7 @@ public class StupidAiTest extends AiTest {
     StupidAiTest() {
         this.ai = new StupidAi();
         this.name = "stupid";
+        this.nbMoves = 10;
     }
 
 }

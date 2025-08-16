@@ -44,13 +44,6 @@ public class CraftyAi implements Ai {
 
         int level = 1;
 
-//        String newFen = getNewFen(Fen.obj2Str(oldGame));
-//        Situation newSituation = Fen.str2Obj(newFen).orElseThrow(() -> new AppException("Cannot parse engine FEN"));
-//        ReverseEngineering reverseEngineer = new ReverseEngineering(oldGame, newSituation.getBoard());
-//        Pair<Pos, Pos> poss = reverseEngineer.move().orElseThrow(() -> new AppException("Cannot reverse engineer engine move"));
-//        Pos orig = poss.getFirst();
-//        Pos dest = poss.getSecond();
-
         String strMove = runCrafty(Fen.obj2Str(oldGame), level);
         Pos orig = Pos.posAt(strMove.substring(0, 2)).get();
         Pos dest = Pos.posAt(strMove.substring(2, 4)).get();
@@ -60,7 +53,7 @@ public class CraftyAi implements Ai {
     @SneakyThrows
     private String runCrafty(String oldFen, int level) {
         File file = writeFile("lichess_crafty_", input(oldFen, level));
-        ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command() + " < " + file.getAbsolutePath());
+        ProcessBuilder builder = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", "/c", command() + " < " + file.getAbsolutePath());
         builder.redirectErrorStream(true);
         Process process = builder.start();
         return extractMove(new BufferedReader(new InputStreamReader(process.getInputStream())));
