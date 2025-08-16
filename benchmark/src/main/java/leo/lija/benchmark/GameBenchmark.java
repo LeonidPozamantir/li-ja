@@ -9,6 +9,7 @@ import leo.lija.system.LijaApplication;
 import leo.lija.system.Server;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Status;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Level;
@@ -163,7 +164,7 @@ public class GameBenchmark {
             white,
             black,
             "",
-            10,
+            Status.CREATED,
             0,
             Optional.empty(),
             Optional.empty()

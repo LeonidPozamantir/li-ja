@@ -1,9 +1,10 @@
-package leo.lija.system;
+package leo.lija.system.ai;
 
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.Ai;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.exceptions.AppException;
 import org.springframework.stereotype.Component;

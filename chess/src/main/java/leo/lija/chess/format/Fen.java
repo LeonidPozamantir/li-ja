@@ -24,11 +24,11 @@ import static leo.lija.chess.Role.PAWN;
 public class Fen {
 
     public static Optional<Situation> str2Obj(String source) {
-        LinkedList<Character> boardChars = source.replace("/", "").replaceAll("\\s*([\\w/]+)\\s.+", "$1").chars()
+        LinkedList<Character> boardChars = source.replace("/", "").replaceAll("\\s*([\\w/]+)\\s.*", "$1").chars()
             .mapToObj(c -> (char) c)
             .collect(Collectors.toCollection(() -> new LinkedList<>()));
 
-        Optional<Color> colorOption = Color.apply(source.replaceAll("^[\\w/]+\\s(\\w).+$", "$1").charAt(0));
+        Optional<Color> colorOption = Color.apply(source.replaceAll("^[\\w/]+\\s(\\w).*$", "$1").charAt(0));
 
         return colorOption
             .flatMap(color -> board(boardChars, A8)

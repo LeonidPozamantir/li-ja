@@ -1,5 +1,7 @@
 package leo.lija.system;
 
+import leo.lija.system.ai.CraftyAi;
+
 public class CraftyAiTest extends AiTest {
 
     CraftyAiTest() {
