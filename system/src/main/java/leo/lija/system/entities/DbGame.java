@@ -210,6 +210,11 @@ public class DbGame {
         return status.id() < Status.ABORTED.id();
     }
 
+    public Optional<Integer> aiLevel() {
+        return players().stream().filter(DbPlayer::isAi).findAny()
+            .flatMap(p -> Optional.ofNullable(p.getAiLevel()));
+    }
+
     public DbGame mapPlayers(UnaryOperator<DbPlayer> f) {
         whitePlayer = f.apply(whitePlayer);
         blackPlayer = f.apply(blackPlayer);

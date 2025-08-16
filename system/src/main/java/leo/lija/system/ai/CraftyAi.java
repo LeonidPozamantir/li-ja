@@ -42,9 +42,7 @@ public class CraftyAi implements Ai {
             oldGame = null;
         }
 
-        int level = 1;
-
-        String strMove = runCrafty(Fen.obj2Str(oldGame), level);
+        String strMove = runCrafty(Fen.obj2Str(oldGame), dbGame.aiLevel().orElse(1));
         Pos orig = Pos.posAt(strMove.substring(0, 2)).get();
         Pos dest = Pos.posAt(strMove.substring(2, 4)).get();
         return oldGame.apply(orig, dest);
