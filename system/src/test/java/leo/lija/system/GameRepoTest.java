@@ -2,6 +2,7 @@ package leo.lija.system;
 
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.RawDbGame;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
 
@@ -23,13 +25,15 @@ class GameRepoTest extends Fixtures {
 
     @Autowired
     private GameRepo repo;
+    @Autowired
+    private GameRepoJpa repoJpa;
 
     DbGame anyGame;
 
     @BeforeAll
     void init() {
         repo.insert(newDbGameWithRandomIds());
-        anyGame = repo.anyGame().get();
+        anyGame = repoJpa.findAll(PageRequest.of(0, 1)).stream().findAny().flatMap(RawDbGame::decode).get();
     }
 
     @Nested
@@ -95,14 +99,10 @@ class GameRepoTest extends Fixtures {
 
         DbGame game = newDbGameWithRandomIds();
 
-        @BeforeAll
-        void init() {
-            repo.insert(game);
-        }
-
         @Test
         @DisplayName("find the saved game")
         void findSaved() {
+            repo.insert(game);
             assertThat(repo.game(game.getId())).isPresent();
         }
     }
@@ -114,17 +114,12 @@ class GameRepoTest extends Fixtures {
 
         DbGame game = newDbGameWithRandomIds();
 
-        @BeforeAll
-        void init() {
+        @Test
+        @DisplayName("find the updated game")
+        void findUpdated() {
             repo.insert(game);
             game.setTurns(game.getTurns() + 1);
             repo.save(game);
-        }
-
-        @Test
-        @DisplayName("find the updated game")
-        @Disabled("clock is fetched incorrectly; test will be deleted in May")
-        void findUpdated() {
             assertThat(repo.game(game.getId())).contains(game);
         }
     }

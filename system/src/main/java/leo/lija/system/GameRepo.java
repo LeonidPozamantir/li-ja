@@ -5,6 +5,7 @@ import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.RawDbGame;
+import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,22 +24,28 @@ public class GameRepo {
         return repo.findById(id);
     }
 
-    public Optional<DbGame> game(String gameId) {
+    public DbGame game(String gameId) {
         if (gameId.length() == GAME_ID_SIZE) {
-            return findById(gameId).flatMap(this::decode);
+            return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
         }
-        return Optional.empty();
+        throw new AppException("Invalid game id " + gameId);
     }
 
-    public Optional<Pair<DbGame, DbPlayer>> player(String fullId) {
-        return game(fullId.substring(0, GAME_ID_SIZE))
-            .flatMap(g -> g.playerById(fullId.substring(GAME_ID_SIZE))
-                .map(p -> Pair.of(g, p)));
+    public Pair<DbGame, DbPlayer> player(String gameId, Color color) {
+        DbGame validGame = game(gameId);
+        return Pair.of(validGame, validGame.player(color));
     }
 
-    public Optional<Pair<DbGame, DbPlayer>> player(String gameId, Color color) {
-        return game(gameId.substring(0, GAME_ID_SIZE))
-            .map(g -> Pair.of(g, g.player(color)));
+    public Pair<DbGame, DbPlayer> player(String fullId) {
+        DbGame validGame = game(fullId.substring(0, GAME_ID_SIZE));
+        String playerId = fullId.substring(GAME_ID_SIZE);
+        DbPlayer player = validGame.playerById(playerId).orElseThrow(() -> new AppException("No player found for id " + playerId));
+        return Pair.of(validGame, player);
+    }
+
+    public DbGame playerGame(String fullId) {
+        Pair<DbGame, DbPlayer> gameAndPlayer = player(fullId);
+        return gameAndPlayer.getFirst();
     }
 
     public void save(DbGame game) {
@@ -54,11 +61,11 @@ public class GameRepo {
         return repo.findAll(PageRequest.of(0, 1)).stream().findAny().flatMap(this::decode);
     }
 
-    private Optional<DbGame> decode(RawDbGame raw) {
+    public Optional<DbGame> decode(RawDbGame raw) {
         return raw.decode();
     }
 
-    private RawDbGame encode(DbGame dbGame) {
+    public RawDbGame encode(DbGame dbGame) {
         return RawDbGame.encode(dbGame);
     }
 }
