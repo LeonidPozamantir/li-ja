@@ -56,4 +56,9 @@ public record Move(
     public Color color() {
         return piece.color();
     }
+
+    @Override
+    public String toString() {
+        return orig + " " + dest;
+    }
 }

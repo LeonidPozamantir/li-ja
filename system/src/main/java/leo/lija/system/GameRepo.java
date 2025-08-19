@@ -25,10 +25,10 @@ public class GameRepo {
     }
 
     public DbGame game(String gameId) {
-        if (gameId.length() == GAME_ID_SIZE) {
-            return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
+        if (gameId.length() != GAME_ID_SIZE) {
+            throw new AppException("Invalid game id " + gameId);
         }
-        throw new AppException("Invalid game id " + gameId);
+        return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
     }
 
     public Pair<DbGame, DbPlayer> player(String gameId, Color color) {
@@ -39,7 +39,7 @@ public class GameRepo {
     public Pair<DbGame, DbPlayer> player(String fullId) {
         DbGame validGame = game(fullId.substring(0, GAME_ID_SIZE));
         String playerId = fullId.substring(GAME_ID_SIZE);
-        DbPlayer player = validGame.player(playerId).orElseThrow(() -> new AppException("No player found for id " + playerId));
+        DbPlayer player = validGame.player(playerId).orElseThrow(() -> new AppException("No player found for id " + fullId));
         return Pair.of(validGame, player);
     }
 
@@ -49,7 +49,6 @@ public class GameRepo {
     }
 
     public void save(DbGame game) {
-        System.out.println("save " + game.getLastMove());
         if (game.getId() == null || !repo.existsById(game.getId())) return;
         repo.save(encode(game));
     }

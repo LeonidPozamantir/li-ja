@@ -102,7 +102,7 @@ class GameRepoTest extends Fixtures {
         @DisplayName("find the saved game")
         void findSaved() {
             repo.insert(game);
-            assertThatCode(() -> repo.game(game.getId())).doesNotThrowAnyException();
+            assertThat(repo.game(game.getId())).isEqualTo(game);
         }
     }
 
