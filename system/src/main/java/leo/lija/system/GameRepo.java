@@ -39,7 +39,7 @@ public class GameRepo {
     public Pair<DbGame, DbPlayer> player(String fullId) {
         DbGame validGame = game(fullId.substring(0, GAME_ID_SIZE));
         String playerId = fullId.substring(GAME_ID_SIZE);
-        DbPlayer player = validGame.playerById(playerId).orElseThrow(() -> new AppException("No player found for id " + playerId));
+        DbPlayer player = validGame.player(playerId).orElseThrow(() -> new AppException("No player found for id " + playerId));
         return Pair.of(validGame, player);
     }
 
@@ -49,6 +49,7 @@ public class GameRepo {
     }
 
     public void save(DbGame game) {
+        System.out.println("save " + game.getLastMove());
         if (game.getId() == null || !repo.existsById(game.getId())) return;
         repo.save(encode(game));
     }

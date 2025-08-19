@@ -91,7 +91,7 @@ public class DbGame {
         };
     }
 
-    public Optional<DbPlayer> playerById(String id) {
+    public Optional<DbPlayer> player(String id) {
         return players().stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 

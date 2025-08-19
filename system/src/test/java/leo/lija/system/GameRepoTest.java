@@ -3,8 +3,8 @@ package leo.lija.system;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.RawDbGame;
+import leo.lija.system.exceptions.AppException;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Optional;
-
 import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -43,14 +43,13 @@ class GameRepoTest extends Fixtures {
         @Test
         @DisplayName("non-existing")
         void nonExisting() {
-            assertThat(repo.game("haha")).isEmpty();
+            assertThatThrownBy(() -> repo.game("haha")).isInstanceOf(AppException.class);
         }
 
         @Test
         void existing() {
-            Optional<DbGame> g = repo.game(anyGame.getId());
-            assertThat(g).isPresent();
-            assertThat(g.get().getId()).isEqualTo(anyGame.getId());
+            DbGame g = repo.game(anyGame.getId());
+            assertThat(g.getId()).isEqualTo(anyGame.getId());
         }
     }
 
@@ -64,13 +63,13 @@ class GameRepoTest extends Fixtures {
             @Test
             @DisplayName("non-existing")
             void nonExisting() {
-                assertThat(repo.player("huhuhuhu")).isEmpty();
+                assertThatThrownBy(() -> repo.player("huhuhuhu")).isInstanceOf(AppException.class);
             }
 
             @Test
             void existing() {
                 DbPlayer player = anyGame.players().getFirst();
-                assertThat(anyGame.fullIdOf(player).flatMap(repo::player).get().getSecond().getId()).isEqualTo(player.getId());
+                assertThat(repo.player(anyGame.fullIdOf(player).get()).getSecond().getId()).isEqualTo(player.getId());
             }
         }
 
@@ -80,13 +79,13 @@ class GameRepoTest extends Fixtures {
             @Test
             @DisplayName("non-existing")
             void nonExisting() {
-                assertThat(repo.player("hahahaha",WHITE)).isEmpty();
+                assertThatThrownBy(() -> repo.player("hahahaha",WHITE)).isInstanceOf(AppException.class);
             }
 
             @Test
             void existing() {
                 DbPlayer player = anyGame.players().getFirst();
-                assertThat(repo.player(anyGame.getId(), player.getColor()).get().getSecond().getId()).isEqualTo(player.getId());
+                assertThat(repo.player(anyGame.getId(), player.getColor()).getSecond().getId()).isEqualTo(player.getId());
             }
         }
 
@@ -103,7 +102,7 @@ class GameRepoTest extends Fixtures {
         @DisplayName("find the saved game")
         void findSaved() {
             repo.insert(game);
-            assertThat(repo.game(game.getId())).isPresent();
+            assertThatCode(() -> repo.game(game.getId())).doesNotThrowAnyException();
         }
     }
 
@@ -120,7 +119,7 @@ class GameRepoTest extends Fixtures {
             repo.insert(game);
             game.setTurns(game.getTurns() + 1);
             repo.save(game);
-            assertThat(repo.game(game.getId())).contains(game);
+            assertThat(repo.game(game.getId())).isEqualTo(game);
         }
     }
 }
