@@ -180,7 +180,6 @@ B p p
         @Test
         @DisplayName("report success")
         void reportSuccess() {
-            DbGame game = insert();
             assertThat(play(insert(), moves).player(WHITE).eventStack().getEvents()).anyMatch(p -> p.getSecond().equals(new ThreefoldEvent()));
         }
 
@@ -222,7 +221,8 @@ K
 PP
 K  r
 """))));
-            assertThatThrownBy(() -> play(dbGame, List.of("a1 b1"))).isInstanceOf(AppException.class);
+            var movesList = List.of("a1 b1");
+            assertThatThrownBy(() -> play(dbGame, movesList)).isInstanceOf(AppException.class);
         }
 
         @Test
@@ -231,7 +231,8 @@ K  r
             DbGame dbGame = insert(randomizeIds(newDbGameWithBoard(visualFormat.str2Obj("""
       k
 K     B"""))));
-            assertThatThrownBy(() -> play(dbGame, List.of("a1 b1"))).isInstanceOf(AppException.class);
+            var movesList = List.of("a1 b1");
+            assertThatThrownBy(() -> play(dbGame, movesList)).isInstanceOf(AppException.class);
         }
     }
 

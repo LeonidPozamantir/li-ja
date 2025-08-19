@@ -2,6 +2,7 @@ package leo.lija.system;
 
 import leo.lija.chess.Clock;
 import leo.lija.chess.Game;
+import leo.lija.chess.PausedClock;
 import leo.lija.chess.format.VisualFormat;
 import leo.lija.chess.utils.Pair;
 import org.junit.jupiter.api.DisplayName;
@@ -120,12 +121,12 @@ K kPP
 
         @Test
         void clock() {
-            assertThat(game.getClock()).contains(new Clock(
+            assertThat(game.getClock()).contains(new PausedClock(
                 BLACK,
                 5,
                 1200,
-                196.25f,
-                304.1f
+                196250L,
+                304100L
             ));
         }
     }
