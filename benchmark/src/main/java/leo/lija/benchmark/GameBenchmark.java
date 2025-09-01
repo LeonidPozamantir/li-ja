@@ -122,13 +122,17 @@ public class GameBenchmark {
             Pair.of(E2, A6)
         );
     }
+
+    private Game playMove(Game game, Pos orig, Pos dest) {
+        return game.apply(orig, dest).getFirst();
+    }
     
     @SafeVarargs
     public final Game playMoves(Pair<Pos, Pos>... moves) {
         return Arrays.stream(moves)
             .reduce(new Game(), (g, move) -> {
                 g.situation().destinations();
-                return g.playMove(move.getFirst(), move.getSecond());
+                return playMove(g, move.getFirst(), move.getSecond());
             }, (s1, s2) -> s1);
     }
 
