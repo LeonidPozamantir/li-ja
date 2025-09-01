@@ -106,11 +106,11 @@ public class Fixtures {
         Status.MATE,
         55,
         Optional.of(new PausedClock(
-            BLACK,
-            5,
             1200,
-            196250L,
-            304100L
+            5,
+            BLACK,
+            196250,
+            304100
         )),
         Optional.of("a7 c7")
     );
@@ -145,11 +145,11 @@ public class Fixtures {
         Status.OUTOFTIME,
         55,
         Optional.of(new PausedClock(
-            BLACK,
-            0,
             60,
-            27610L,
-            60240L
+            0,
+            BLACK,
+            27610,
+            60240
         )),
         Optional.of("d8 d2")
     );

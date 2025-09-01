@@ -143,7 +143,7 @@ RN QK  R
 
             @Nested
             class Promotion {
-                Game game = new Game(visual.str2Obj("""
+                RichGame game = new RichGame(visual.str2Obj("""
   p  k
 K      """), BLACK);
 

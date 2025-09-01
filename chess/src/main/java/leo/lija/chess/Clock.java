@@ -10,18 +10,19 @@ import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.WHITE;
 
+// all durations are expressed in milliseconds
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode
 public abstract class Clock {
-    protected final Color color;
-    protected final int increment;
     protected final int limit;
-    protected final long whiteTime;
-    protected final long blackTime;
+    protected final int increment;
+    protected final Color color;
+    protected final int whiteTime;
+    protected final int blackTime;
     protected final long timer;
 
-    public long time(Color c) {
+    public int time(Color c) {
         return c == WHITE ? whiteTime : blackTime;
     }
 
@@ -37,17 +38,19 @@ public abstract class Clock {
         return Color.all.stream().collect(Collectors.toMap(Function.identity(), this::remainingTime));
     }
 
-    public long elapsedTime(Color c) {
+    public int elapsedTime(Color c) {
         return time(c);
     }
 
-    public int limitInMinutes() {
-        return limit / 60;
+    public int limitInSeconds() {
+        return limit / 1000;
     }
 
-    public long now() {
-        return System.currentTimeMillis();
+    public int limitInMinutes() {
+        return limitInSeconds() / 60;
     }
+
+    abstract RunningClock step();
 
     public int estimateTotalTime() {
         return limit + 30 * increment;

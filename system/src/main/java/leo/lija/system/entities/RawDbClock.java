@@ -24,7 +24,7 @@ public class RawDbClock {
     @Column(name = "time_limit")
     private Integer limit;
     @ElementCollection
-    private Map<String, Long> times;
+    private Map<String, Integer> times;
     private Long timer;
 
     public Optional<Clock> decode() {
@@ -33,8 +33,8 @@ public class RawDbClock {
                 .flatMap(whiteTime -> Optional.ofNullable(times.get("black"))
                     .map(blackTime ->
                         timer == 0
-                            ? new PausedClock(trueColor, increment, limit, whiteTime, blackTime)
-                            : new RunningClock(trueColor, increment, limit, whiteTime, blackTime, timer)
+                            ? new PausedClock(limit, increment, trueColor, whiteTime, blackTime)
+                            : new RunningClock(limit, increment, trueColor, whiteTime, blackTime, timer)
                     ))));
     }
 

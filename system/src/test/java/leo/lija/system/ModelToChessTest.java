@@ -122,11 +122,11 @@ K kPP
         @Test
         void clock() {
             assertThat(game.getClock()).contains(new PausedClock(
-                BLACK,
-                5,
                 1200,
-                196250L,
-                304100L
+                5,
+                BLACK,
+                196250,
+                304100
             ));
         }
     }

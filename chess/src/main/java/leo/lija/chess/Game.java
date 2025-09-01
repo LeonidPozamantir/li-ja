@@ -61,15 +61,7 @@ public class Game {
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
         io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
-        return Pair.of(new Game(newGame.board, newGame.player, newPgnMoves, clock, newDeads, turns + 1), move);
-    }
-
-    public Game playMove(Pos from, Pos to) {
-        return playMove(from, to, QUEEN);
-    }
-
-    public Game playMove(Pos from, Pos to, Role promotion) {
-        return apply(from, to, promotion).getFirst();
+        return Pair.of(new Game(newGame.board, newGame.player, newPgnMoves, clock.map(Clock::step), newDeads, turns + 1), move);
     }
 
     public Situation situation() {

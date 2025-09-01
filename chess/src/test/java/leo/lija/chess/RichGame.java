@@ -5,6 +5,8 @@ import leo.lija.chess.utils.Pair;
 
 import java.util.Optional;
 
+import static leo.lija.chess.Role.QUEEN;
+
 public class RichGame extends Game {
 
     public RichGame(Board board, Color player, String pgnMoves, Optional<Clock> clock, List<Pair<Pos, Piece>> deads, int turns) {
@@ -35,13 +37,19 @@ public class RichGame extends Game {
 
     public final RichGame playMoveList(java.util.List<Pair<Pos, Pos>> moves) {
         return moves.stream()
-            .reduce(this, (g, move) -> g.playMove(move.getFirst(), move.getSecond()), (s1, s2) -> s1);
+            .reduce(this, (g, move) -> new RichGame(g.apply(move.getFirst(), move.getSecond()).getFirst()), (s1, s2) -> s1);
     }
 
-    @Override
     public RichGame playMove(Pos from, Pos to) {
-        Game game = super.playMove(from, to);
-        return new RichGame(game.board, game.player, game.pgnMoves, game.clock, game.deads, game.turns);
+        return playMove(from, to, QUEEN);
+    }
+
+    public RichGame playMove(Pos from, Pos to, Role promotion) {
+        return new RichGame(apply(from, to, promotion).getFirst());
+    }
+
+    public RichGame withClock(Clock c) {
+        return new RichGame(board, player, pgnMoves, Optional.of(c), deads, turns);
     }
 
 }

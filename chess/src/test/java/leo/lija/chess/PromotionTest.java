@@ -15,7 +15,7 @@ class PromotionTest extends BaseChess {
     Board board = visual.str2Obj("""
   p
 K      """);
-    Game game = new Game(board, BLACK);
+    RichGame game = new RichGame(board, BLACK);
 
     @Test
     @DisplayName("promote to a queen")

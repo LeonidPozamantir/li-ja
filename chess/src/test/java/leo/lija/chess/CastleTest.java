@@ -91,7 +91,7 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 		@Nested
 		@DisplayName("possible")
 		class Possible {
-			Game game = new Game(goodHist, WHITE);
+			RichGame game = new RichGame(goodHist, WHITE);
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
@@ -147,7 +147,7 @@ R   KB R""");
 		@Nested
 		@DisplayName("possible")
 		class Possible {
-			Game game = new Game(goodHist, WHITE);
+			RichGame game = new RichGame(goodHist, WHITE);
 			@Test
 			@DisplayName("viable moves")
 			void viableMoves() {
@@ -264,7 +264,7 @@ PPPPPPPP
 		@Nested
 		@DisplayName("if kingside rook moves")
 		class KingsideRookMoves {
-			Game g2 = game.playMove(H1, G1).as(WHITE);
+			RichGame g2 = game.playMove(H1, G1).as(WHITE);
 
 			@Test
 			@DisplayName("can only castle queenside")
