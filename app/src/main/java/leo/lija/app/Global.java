@@ -1,0 +1,29 @@
+package leo.lija.app;
+
+import jakarta.servlet.http.HttpServletRequest;
+import leo.lija.system.exceptions.AppException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+@RestControllerAdvice
+public class Global {
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<String> handleNoHandlerFoundException(HttpServletRequest request) {
+        return new ResponseEntity<>("Not found " + request.getRequestURI(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity.badRequest().body("Bad request: " + e.getMessage());
+    }
+
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<String> handleAppException(AppException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}

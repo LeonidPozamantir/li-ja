@@ -20,6 +20,7 @@
 	<modules>
 		<module>chess</module>
 		<module>system</module>
+		<module>app</module>
 		<module>benchmark</module>
 	</modules>
 

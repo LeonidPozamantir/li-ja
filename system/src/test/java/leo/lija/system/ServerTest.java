@@ -3,24 +3,17 @@ package leo.lija.system;
 import leo.lija.chess.Pos;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.format.VisualFormat;
-import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
-import leo.lija.system.entities.EventStack;
-import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.ThreefoldEvent;
 import leo.lija.system.exceptions.AppException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;
