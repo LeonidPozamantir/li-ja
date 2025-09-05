@@ -20,4 +20,12 @@ public class PossibleMovesEvent implements Event {
             .map(e -> Stream.concat(Stream.of(e.getKey()), e.getValue().stream()).map(Pos::getPiotr).map(String::valueOf).collect(Collectors.joining()))
             .collect(Collectors.joining(","));
     }
+
+    @Override
+    public Map<String, Object> export() {
+        return Map.of(
+            "type", "possible_moves",
+            "possible_moves", moves.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::key).collect(Collectors.joining())))
+        );
+    }
 }

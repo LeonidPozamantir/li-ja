@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 public interface Event {
     String encode();
+    Map<String, Object> export();
 
     static List<Event> fromMove(Move move) {
         return Stream.of(

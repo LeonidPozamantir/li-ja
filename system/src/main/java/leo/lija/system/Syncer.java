@@ -16,6 +16,8 @@ public class Syncer {
 
     private final GameRepo repo;
 
+    private final Map<String, Object> reload = Map.of("reload", true);
+
     public Map<String, Object> sync(String id, String colorString, Integer version, String fullId) {
         try {
             return Color.apply(colorString)
@@ -23,14 +25,16 @@ public class Syncer {
                 .map(gameAndPlayer -> {
                     DbGame g = gameAndPlayer.getFirst();
                     DbPlayer p = gameAndPlayer.getSecond();
-                    return Map.of(
-                        "v", p.eventStack().version(),
-                        "p", g.player(),
+                    return p.eventStack().eventsSince(version).map(events ->
+                        Map.of(
+                        "v", p.eventStack().lastVersion(),
+                        "e", events.stream().map(Event::export).toList(),
+                        "p", g.player().getColor().name(),
                         "t", g.getTurns()
-                    );
-                }).orElse(Map.of("reload", true));
+                    )).orElse(reload);
+                }).orElse(reload);
         } catch (Exception e) {
-            return Map.of("reload", true);
+            return reload;
         }
     }
 

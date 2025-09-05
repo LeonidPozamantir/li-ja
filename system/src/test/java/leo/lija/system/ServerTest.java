@@ -154,7 +154,7 @@ B p p
                 @Test
                 @DisplayName("high version number")
                 void highVersionNumber() {
-                    assertThat(found().player(WHITE).eventStack().version()).isGreaterThan(20);
+                    assertThat(found().player(WHITE).eventStack().lastVersion()).matches(v -> v.isPresent() && v.get() > 20);
                 }
 
                 @Test

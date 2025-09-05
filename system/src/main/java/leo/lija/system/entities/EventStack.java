@@ -70,11 +70,6 @@ public class EventStack {
         );
     }
 
-    public Integer version() {
-        if (events.isEmpty()) return 0;
-        return events.getLast().getFirst();
-    }
-
     public Optional<List<Event>> eventsSince(Integer version) {
         return firstVersion()
             .filter(first -> version >= first - 1)
@@ -87,7 +82,7 @@ public class EventStack {
     }
 
     public EventStack withEvents(List<Event> newEvents) {
-        Integer[] v = {version()};
+        Integer[] v = {lastVersion().orElse(0)};
         events.addAll(newEvents.stream().map(e -> {
             v[0]++;
             return Pair.of(v[0], e);

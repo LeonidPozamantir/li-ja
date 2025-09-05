@@ -5,6 +5,8 @@ import leo.lija.chess.Role;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PromotionEvent implements Event {
@@ -14,5 +16,14 @@ public class PromotionEvent implements Event {
     @Override
     public String encode() {
         return "P" + role.fen + pos.getPiotr();
+    }
+
+    @Override
+    public Map<String, Object> export() {
+        return Map.of(
+            "type", "promotion",
+            "key", pos.key(),
+            "pieceClass", role.toString()
+        );
     }
 }
