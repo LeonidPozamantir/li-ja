@@ -13,11 +13,13 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.List;
 import java.util.Optional;
 
 @Entity
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Data
 public class RawDbGame {

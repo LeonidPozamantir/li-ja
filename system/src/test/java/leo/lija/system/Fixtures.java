@@ -1,7 +1,6 @@
 package leo.lija.system;
 
 import leo.lija.chess.Board;
-import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
@@ -14,6 +13,7 @@ import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Status;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 import java.util.Random;
@@ -27,6 +27,7 @@ import static leo.lija.chess.Pos.D4;
 import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
 import static leo.lija.system.entities.DbGame.PLAYER_ID_SIZE;
 
+@ActiveProfiles("test")
 public class Fixtures {
 
     Random random = new Random();
