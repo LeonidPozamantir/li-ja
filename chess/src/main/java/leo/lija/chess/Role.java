@@ -52,7 +52,7 @@ public enum Role {
     }
 
     public static Optional<Role> promotable(String name) {
-        return Optional.ofNullable(allPromotableByName.get(name));
+        return Optional.ofNullable(allPromotableByName.get(name.toUpperCase()));
     }
 
     public static Optional<Role> promotable(Optional<String> name) {

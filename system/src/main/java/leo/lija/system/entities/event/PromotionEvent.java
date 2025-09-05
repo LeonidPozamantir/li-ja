@@ -15,7 +15,7 @@ public class PromotionEvent implements Event {
 
     @Override
     public String encode() {
-        return "P" + role.fen + pos.getPiotr();
+        return "P" + pos.getPiotr() + role.fen;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class PromotionEvent implements Event {
         return Map.of(
             "type", "promotion",
             "key", pos.key(),
-            "pieceClass", role.toString()
+            "pieceClass", role.toString().toLowerCase()
         );
     }
 }
