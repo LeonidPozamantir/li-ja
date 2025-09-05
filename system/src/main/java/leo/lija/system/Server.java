@@ -31,24 +31,24 @@ public class Server {
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString, Optional<String> promString) {
         Pair<String, String> move =  decodeMoveString(moveString).orElseThrow(() -> new AppException("Wrong move"));
-        return play(fullId, move, promString);
+        return play(fullId, move.getFirst(), move.getSecond(), promString);
     }
 
-    public Map<Pos, List<Pos>> play(String fullId, Pair<String, String> moveString) {
-        return play(fullId, moveString, Optional.empty());
+    public Map<Pos, List<Pos>> play(String fullId, String fromString, String toString) {
+        return play(fullId, fromString, toString, Optional.empty());
     }
 
-    public Map<Pos, List<Pos>> play(String fullId, Pair<String, String> moveString, Optional<String> promString) {
+    public Map<Pos, List<Pos>> play(String fullId, String fromString, String toString, Optional<String> promString) {
         DbGame game = repo.playerGame(fullId);
-        doPlay(game, fullId, moveString, promString);
+        doPlay(game, fromString, toString, promString);
         repo.save(game);
         return game.toChess().situation().destinations();
     }
 
-    public void doPlay(DbGame game, String fullId, Pair<String, String> moveString, Optional<String> promString) {
+    public void doPlay(DbGame game, String origString, String destString, Optional<String> promString) {
         if (!game.playable()) throw new AppException("Game is not playable");
-        Pos orig = posAt(moveString.getFirst()).orElseThrow(() -> new AppException("Wrong orig " + moveString));
-        Pos dest = posAt(moveString.getSecond()).orElseThrow(() -> new AppException("Wrong dest " + moveString));
+        Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
+        Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));
         Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
         Game chessGame = game.toChess();
         Pair<Game, Move> newChessGameAndMove = chessGame.apply(orig, dest, promotion);
