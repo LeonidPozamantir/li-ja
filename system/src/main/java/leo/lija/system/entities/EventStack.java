@@ -12,6 +12,7 @@ import org.apache.tomcat.util.digester.ArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +25,24 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class EventStack {
+
     private final List<Pair<Integer, Event>> events;
+    private Optional<List<Pair<Integer, Event>>> cachedSortedEvents = Optional.empty();
+
+    public List<Pair<Integer, Event>> sortedEvents() {
+        if (cachedSortedEvents.isEmpty()) cachedSortedEvents = Optional.of(events.stream().sorted(Comparator.comparingInt(Pair::getFirst)).toList());
+        return cachedSortedEvents.get();
+    }
+
+    public Optional<Integer> firstVersion() {
+        if (events.isEmpty()) return Optional.empty();
+        return Optional.of(sortedEvents().getFirst().getFirst());
+    }
+
+    public Optional<Integer> lastVersion() {
+        if (events.isEmpty()) return Optional.empty();
+        return Optional.of(sortedEvents().getLast().getFirst());
+    }
 
     public String encode() {
         return events.stream()
@@ -55,6 +73,17 @@ public class EventStack {
     public Integer version() {
         if (events.isEmpty()) return 0;
         return events.getLast().getFirst();
+    }
+
+    public Optional<List<Event>> eventsSince(Integer version) {
+        return firstVersion()
+            .filter(first -> version >= first - 1)
+            .flatMap(first -> lastVersion()
+                .filter(last -> version <= last)
+                .map(last -> sortedEvents().stream()
+                    .dropWhile(ve -> ve.getFirst() <= version)
+                    .map(Pair::getSecond)
+                    .toList()));
     }
 
     public EventStack withEvents(List<Event> newEvents) {

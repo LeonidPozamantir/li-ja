@@ -217,4 +217,100 @@ class EventStackTest extends Fixtures {
             ));
         }
     }
+
+    @Nested
+    @DisplayName("get versions")
+    class GetVersions {
+
+        EventStack stack = new EventStack(List.of(
+            Pair.of(21, new ThreefoldEvent()),
+            Pair.of(23, new EndEvent()),
+            Pair.of(22, new ThreefoldEvent()),
+            Pair.of(19, new StartEvent())
+        ));
+
+        @Test
+        @DisplayName("first version")
+        void firstVersion() {
+            assertThat(stack.firstVersion()).contains(19);
+        }
+
+        @Test
+        @DisplayName("last version")
+        void lastVersion() {
+            assertThat(stack.lastVersion()).contains(23);
+        }
+    }
+
+    @Nested
+    @DisplayName("get events")
+    class GetEvents {
+
+        @Nested
+        @DisplayName("since version")
+        class SinceVersion {
+
+            @Test
+            @DisplayName("empty stack")
+            void emptyStack() {
+                assertThat(EventStack.apply().eventsSince(12)).isEmpty();
+            }
+
+            List<Pair<Integer, Event>> threeEvents = List.of(
+                Pair.of(20, new StartEvent()),
+                Pair.of(21, new ThreefoldEvent()),
+                Pair.of(22, new EndEvent())
+            );
+            List<Event> threeEventsValues = threeEvents.stream().map(Pair::getSecond).toList();
+            List<Pair<Integer, Event>> unordered = List.of(
+                Pair.of(21, new ThreefoldEvent()),
+                Pair.of(22, new EndEvent()),
+                Pair.of(20, new StartEvent())
+            );
+
+            @Test
+            @DisplayName("too old version")
+            void tooOldVersion() {
+                assertThat(new EventStack(threeEvents).eventsSince(12)).isEmpty();
+            }
+
+            @Test
+            @DisplayName("too new version")
+            void tooNewVersion() {
+                assertThat(new EventStack(threeEvents).eventsSince(23)).isEmpty();
+            }
+
+            @Test
+            @DisplayName("latest version")
+            void latestVersion() {
+                assertThat(new EventStack(threeEvents).eventsSince(22)).contains(List.of());
+            }
+
+            @Test
+            @DisplayName("first version")
+            void firstVersion() {
+                assertThat(new EventStack(threeEvents).eventsSince(19)).contains(threeEventsValues);
+            }
+
+            @Test
+            @DisplayName("first version, unordered events")
+            void firstVersionUnordered() {
+                assertThat(new EventStack(unordered).eventsSince(19)).contains(threeEventsValues);
+            }
+
+            @Test
+            @DisplayName("latest version, unordered events")
+            void latestVersionUnordered() {
+                assertThat(new EventStack(unordered).eventsSince(19)).contains(threeEventsValues);
+            }
+
+            @Test
+            @DisplayName("middle version, unordered events")
+            void middleVersionUnordered() {
+                assertThat(new EventStack(unordered).eventsSince(21)).contains(List.of(
+                    new EndEvent()
+                ));
+            }
+        }
+    }
 }
