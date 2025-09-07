@@ -10,10 +10,10 @@ public class PromotionEventDecoder implements EventDecoder {
     public Optional<Event> decode(String str) {
         char[] chars = str.toCharArray();
         if (chars.length != 2) return Optional.empty();
-        char r = chars[0];
-        char p = chars[1];
-        return Role.promotable(r)
-            .flatMap(role -> Pos.piotr(p)
-                .map(pos -> new PromotionEvent(role, pos)));
+        char p = chars[0];
+        char r = chars[1];
+        return Pos.piotr(p)
+            .flatMap(pos -> Role.promotable(r)
+                .map(role -> new PromotionEvent(role, pos)));
     }
 }
