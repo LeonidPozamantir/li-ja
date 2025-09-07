@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class VersionCache {
+public class VersionMemo {
 
     private Function<String, Integer> memo = Builder.cache(1800, this::compute);
 

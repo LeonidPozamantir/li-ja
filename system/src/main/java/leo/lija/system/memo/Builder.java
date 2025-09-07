@@ -16,7 +16,7 @@ public class Builder {
     @SneakyThrows
     public static <K, V> Function<K, V> cache(int ttl, Function<K, V> f) {
         LoadingCache<K, V> c = CacheBuilder.newBuilder()
-            .expireAfterAccess(ttl, TimeUnit.SECONDS)
+            .expireAfterWrite(ttl, TimeUnit.SECONDS)
             .build(new CacheLoader<K, V>() {
                 public V load(K key) {
                     return f.apply(key);
