@@ -232,13 +232,13 @@ class EventStackTest extends Fixtures {
         @Test
         @DisplayName("first version")
         void firstVersion() {
-            assertThat(stack.firstVersion()).contains(19);
+            assertThat(stack.firstVersion()).isEqualTo(19);
         }
 
         @Test
         @DisplayName("last version")
         void lastVersion() {
-            assertThat(stack.lastVersion()).contains(23);
+            assertThat(stack.lastVersion()).isEqualTo(23);
         }
     }
 

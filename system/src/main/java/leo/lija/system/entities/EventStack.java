@@ -34,14 +34,14 @@ public class EventStack {
         return cachedSortedEvents.get();
     }
 
-    public Optional<Integer> firstVersion() {
-        if (events.isEmpty()) return Optional.empty();
-        return Optional.of(sortedEvents().getFirst().getFirst());
+    public Integer firstVersion() {
+        if (events.isEmpty()) return 0;
+        return sortedEvents().getFirst().getFirst();
     }
 
-    public Optional<Integer> lastVersion() {
-        if (events.isEmpty()) return Optional.empty();
-        return Optional.of(sortedEvents().getLast().getFirst());
+    public Integer lastVersion() {
+        if (events.isEmpty()) return 0;
+        return sortedEvents().getLast().getFirst();
     }
 
     public String encode() {
@@ -71,18 +71,19 @@ public class EventStack {
     }
 
     public Optional<List<Event>> eventsSince(Integer version) {
-        return firstVersion()
-            .filter(first -> version >= first - 1)
-            .flatMap(first -> lastVersion()
-                .filter(last -> version <= last)
-                .map(last -> sortedEvents().stream()
+        if (version >= firstVersion() - 1 && version <= lastVersion()) {
+            return Optional.of(
+                sortedEvents().stream()
                     .dropWhile(ve -> ve.getFirst() <= version)
                     .map(Pair::getSecond)
-                    .toList()));
+                    .toList()
+            );
+        }
+        return Optional.empty();
     }
 
     public EventStack withEvents(List<Event> newEvents) {
-        Integer[] v = {lastVersion().orElse(0)};
+        Integer[] v = {lastVersion()};
         events.addAll(newEvents.stream().map(e -> {
             v[0]++;
             return Pair.of(v[0], e);
