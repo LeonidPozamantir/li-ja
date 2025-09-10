@@ -10,3 +10,7 @@ spring:
 
 redis:
   host: localhost
+
+sync:
+  duration: 5000
+  sleep: 1000

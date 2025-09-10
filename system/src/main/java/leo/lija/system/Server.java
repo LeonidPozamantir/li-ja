@@ -7,6 +7,7 @@ import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.exceptions.AppException;
+import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class Server {
 
     private final GameRepo repo;
     private final Ai ai;
+    private final VersionMemo versionMemo;
 
     public Map<Pos, List<Pos>> playMove(String fullId, String moveString) {
         return playMove(fullId, moveString, Optional.empty());
@@ -40,12 +42,13 @@ public class Server {
 
     public Map<Pos, List<Pos>> play(String fullId, String fromString, String toString, Optional<String> promString) {
         DbGame game = repo.playerGame(fullId);
-        doPlay(game, fromString, toString, promString);
+        purePlay(game, fromString, toString, promString);
         repo.save(game);
+        versionMemo.put(game);
         return game.toChess().situation().destinations();
     }
 
-    public void doPlay(DbGame game, String origString, String destString, Optional<String> promString) {
+    public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {
         if (!game.playable()) throw new AppException("Game is not playable");
         Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
         Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));

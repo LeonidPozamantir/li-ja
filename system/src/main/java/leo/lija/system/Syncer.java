@@ -4,10 +4,12 @@ import leo.lija.chess.Color;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.event.Event;
+import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,30 +17,49 @@ import java.util.Map;
 public class Syncer {
 
     private final GameRepo repo;
+    private final VersionMemo versionMemo;
 
-    private final Map<String, Object> reload = Map.of("reload", true);
+    @Value("${sync.duration}")
+    int duration;
+    @Value("${sync.sleep}")
+    int sleep;
 
-    public Map<String, Object> sync(String id, String colorString, Integer version, String fullId) {
+    public Map<String, Object> sync(String gameId, String colorString, Integer version, String fullId) {
         try {
             return Color.apply(colorString)
-                .map(color -> repo.player(id, color))
+                .map(color -> {
+                    versionWait(gameId, color, version);
+                    return repo.player(gameId, color);
+                })
                 .map(gameAndPlayer -> {
-                    DbGame g = gameAndPlayer.getFirst();
-                    DbPlayer p = gameAndPlayer.getSecond();
-                    return p.eventStack().eventsSince(version).map(events ->
+                    DbGame game = gameAndPlayer.getFirst();
+                    DbPlayer player = gameAndPlayer.getSecond();
+                    versionMemo.put(game);
+                    return player.eventStack().eventsSince(version).map(events ->
                         Map.of(
-                        "v", p.eventStack().lastVersion(),
+                        "v", player.eventStack().lastVersion(),
                         "e", events.stream().map(Event::export).toList(),
-                        "p", g.player().getColor().name(),
-                        "t", g.getTurns()
-                    )).orElse(reload);
-                }).orElse(reload);
+                        "p", game.player().getColor().name(),
+                        "t", game.getTurns()
+                    )).orElse(failMap);
+                }).orElse(failMap);
         } catch (Exception e) {
-            return reload;
+            return failMap;
         }
     }
 
-    public List<Event> eventsSince(DbPlayer player, Integer version) {
-        return player.eventStack().eventsSince(version).orElse(List.of());
+    private void versionWait(String gameId, Color color, Integer version) {
+        wait(Math.max(1, duration / sleep), gameId, color, version);
     }
+
+    @SneakyThrows
+    private void wait(Integer loop, String gameId, Color color, Integer version) {
+        if (loop == 0 || versionMemo.get(gameId, color) != version) {}
+        else {
+            Thread.sleep(sleep);
+            wait(loop - 1);
+        }
+    }
+
+    private final Map<String, Object> failMap = Map.of("failMap", true);
 }
