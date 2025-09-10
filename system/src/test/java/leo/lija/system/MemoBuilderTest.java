@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import com.google.common.cache.LoadingCache;
 import leo.lija.system.memo.Builder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemoBuilderTest {
 
     Function<String, Integer> f = String::length;
-    Function<String, Integer> cache = Builder.cache(10, f);
+    LoadingCache<String, Integer> cache = Builder.cache(10, f);
 
     @Test
     @DisplayName("f")
@@ -24,14 +25,14 @@ class MemoBuilderTest {
     @Test
     @DisplayName("compute missing value")
     void missingValue() {
-        assertThat(cache.apply("test")).isEqualTo(4);
+        assertThat(cache.getUnchecked("test")).isEqualTo(4);
     }
 
     @Test
     @DisplayName("return stored value")
     void storedValue() {
-        Function<Object, Integer> c = Builder.cache(10, s -> new Random().nextInt());
-        int a = c.apply("test");
-        assertThat(c.apply("test")).isEqualTo(a);
+        LoadingCache<Object, Integer> c = Builder.cache(10, s -> new Random().nextInt());
+        int a = c.getUnchecked("test");
+        assertThat(c.getUnchecked("test")).isEqualTo(a);
     }
 }

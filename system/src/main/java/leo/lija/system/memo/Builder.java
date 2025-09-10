@@ -5,7 +5,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -13,15 +12,13 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Builder {
 
-    @SneakyThrows
-    public static <K, V> Function<K, V> cache(int ttl, Function<K, V> f) {
-        LoadingCache<K, V> c = CacheBuilder.newBuilder()
+    public static <K, V> LoadingCache<K, V> cache(int ttl, Function<K, V> f) {
+        return CacheBuilder.newBuilder()
             .expireAfterWrite(ttl, TimeUnit.SECONDS)
             .build(new CacheLoader<K, V>() {
                 public V load(K key) {
                     return f.apply(key);
                 }
             });
-        return c::getUnchecked;
     }
 }

@@ -1,40 +1,44 @@
 package leo.lija.system.memo;
 
+import com.google.common.cache.LoadingCache;
 import leo.lija.chess.Color;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.GameRepo;
+import leo.lija.system.entities.DbGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.function.Function;
+import static leo.lija.chess.Color.BLACK;
+import static leo.lija.chess.Color.WHITE;
 
 @Service
 @RequiredArgsConstructor
 public class VersionMemo {
 
-    private Function<String, Integer> memo = Builder.cache(1800, this::compute);
+    private final GameRepo repo;
 
+    private LoadingCache<Pair<String, Boolean>, Integer> cache = Builder.cache(1800, this::compute);
 
-    private String toKey(String gameId, Color color) {
-        return gameId + ":" + color.getLetter() + ":v";
+    public Integer get(String gameId, Color color) {
+        return cache.getUnchecked(Pair.of(gameId, color == WHITE));
     }
 
-    private Optional<Pair<String, Color>> fromKey(String key) {
-        String[] list = key.split(":");
-        if (list.length != 3 || !list[2].equals("v")) return Optional.empty();
-        String gameId = list[0];
-        String cName = list[1];
-        return Color.apply(cName).map(c -> Pair.of(gameId, c));
+    public void put(String gameId, Color color, Integer version) {
+        cache.put(Pair.of(gameId, color == WHITE), version);
     }
 
-    private int compute(String key) {
-        return fromKey(key)
-            .map(pair -> compute(pair.getFirst(), pair.getSecond()))
-            .orElse(0);
+    public void put(DbGame game) {
+        put(game.getId(), WHITE, game.player(WHITE).eventStack().lastVersion());
+        put(game.getId(), BLACK, game.player(BLACK).eventStack().lastVersion());
     }
 
-    private int compute(String gameId, Color color) {
-        return 33;
+    private Integer compute(Pair<String, Boolean> pair) {
+        String gameId = pair.getFirst();
+        boolean isWhite = pair.getSecond();
+        try {
+            return repo.playerOnly(gameId, Color.apply(isWhite)).eventStack().lastVersion();
+        } catch (Exception e) {
+            return 0;
+        }
     }
-
 }

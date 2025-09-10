@@ -29,12 +29,7 @@
 
         <dependency>
             <groupId>leo</groupId>
-            <artifactId>chess</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>leo</groupId>
-            <artifactId>system</artifactId>
+            <artifactId>app</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

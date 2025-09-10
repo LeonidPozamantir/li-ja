@@ -5,7 +5,7 @@ import leo.lija.chess.Game;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.GameRepo;
-import leo.lija.system.LijaApplication;
+import leo.lija.app.AppApplication;
 import leo.lija.system.Server;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -80,7 +80,7 @@ public class GameBenchmark {
 
     @Setup(Level.Trial)
     public static void setContext() {
-        context = SpringApplication.run(LijaApplication.class);
+        context = SpringApplication.run(AppApplication.class);
         repo = context.getBean(GameRepo.class);
         server = context.getBean(Server.class);
     }

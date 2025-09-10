@@ -36,6 +36,11 @@ public class GameRepo {
         return Pair.of(validGame, validGame.player(color));
     }
 
+    public DbPlayer playerOnly(String gameId, Color color) {
+        DbGame validGame = game(gameId);
+        return validGame.player(color);
+    }
+
     public Pair<DbGame, DbPlayer> player(String fullId) {
         DbGame validGame = game(fullId.substring(0, GAME_ID_SIZE));
         String playerId = fullId.substring(GAME_ID_SIZE);
