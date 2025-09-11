@@ -1,6 +1,7 @@
 package leo.lija.app;
 
 import jakarta.servlet.http.HttpServletRequest;
+import leo.lija.chess.exceptions.ChessException;
 import leo.lija.system.exceptions.AppException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class Global {
         return ResponseEntity.badRequest().body("Bad request: " + e.getMessage());
     }
 
-    @ExceptionHandler(AppException.class)
+    @ExceptionHandler({AppException.class, ChessException.class})
     public ResponseEntity<String> handleAppException(AppException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }

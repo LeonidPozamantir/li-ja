@@ -6,7 +6,6 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
@@ -28,35 +27,24 @@ public class Server {
     private final Ai ai;
     private final VersionMemo versionMemo;
 
-    public Map<Pos, List<Pos>> playMove(String fullId, String moveString) {
-        return playMove(fullId, moveString, Optional.empty());
+    public void playMove(String fullId, String moveString) {
+        playMove(fullId, moveString, Optional.empty());
     }
 
-    public Map<Pos, List<Pos>> playMove(String fullId, String moveString, Optional<String> promString) {
+    public void playMove(String fullId, String moveString, Optional<String> promString) {
         Pair<String, String> move =  decodeMoveString(moveString).orElseThrow(() -> new AppException("Wrong move"));
-        return play(fullId, move.getFirst(), move.getSecond(), promString);
+        play(fullId, move.getFirst(), move.getSecond(), promString);
     }
 
-    public Map<Pos, List<Pos>> play(String fullId, String fromString, String toString) {
-        return play(fullId, fromString, toString, Optional.empty());
+    public void play(String fullId, String fromString, String toString) {
+        play(fullId, fromString, toString, Optional.empty());
     }
 
-    public Map<Pos, List<Pos>> play(String fullId, String fromString, String toString, Optional<String> promString) {
-        DbGame game = repo.playerGame(fullId);
-        purePlay(game, fromString, toString, promString);
-        repo.save(game);
-        versionMemo.put(game);
-        return game.toChess().situation().destinations();
-    }
-
-    public void updateVersion(String gameId) {
-        versionMemo.put(repo.game(gameId));
-    }
-
-    public void endGame(String gameId) {
-        DbGame g1 = repo.game(gameId);
-        g1.withEvents(List.of(new EndEvent()));
+    public void play(String fullId, String fromString, String toString, Optional<String> promString) {
+        DbGame g1 = repo.playerGame(fullId);
+        purePlay(g1, fromString, toString, promString);
         repo.save(g1);
+        versionMemo.put(g1);
     }
 
     public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {

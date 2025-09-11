@@ -1,7 +1,7 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
-import leo.lija.app.MoveForm;
+import leo.lija.app.forms.MoveForm;
 import leo.lija.system.Server;
 import leo.lija.system.Syncer;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +39,4 @@ public class Application {
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/update-version/{gameId}")
-    public void updateVersion(@PathVariable String gameId) {
-        server.updateVersion(gameId);
-    }
-
-    @PostMapping("/end-game/{gameId}")
-    public void endGame(@PathVariable String gameId) {
-        server.endGame(gameId);
-    }
 }

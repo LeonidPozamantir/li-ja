@@ -39,11 +39,11 @@ class ServerTest extends Fixtures {
         return dbGame;
     }
 
-    Map<Pos, List<Pos>> move(DbGame game, String m) {
-        return server.playMove(game.fullIdOf(WHITE), m);
+    void move(DbGame game, String m) {
+        server.playMove(game.fullIdOf(WHITE), m);
     }
-    Map<Pos, List<Pos>> move(DbGame game) {
-        return move(game, "d2 d4");
+    void move(DbGame game) {
+        move(game, "d2 d4");
     }
 
     DbGame updated() {
