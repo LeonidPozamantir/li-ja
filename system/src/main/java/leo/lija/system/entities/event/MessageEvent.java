@@ -2,11 +2,13 @@ package leo.lija.system.entities.event;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
+@Getter
 @EqualsAndHashCode
 public class MessageEvent implements Event {
     private String author;
@@ -19,9 +21,6 @@ public class MessageEvent implements Event {
 
     @Override
     public Map<String, Object> export() {
-        return Map.of(
-            "type", "message",
-            "message", List.of(author, message)
-        );
+        return Map.of();
     }
 }

@@ -26,4 +26,9 @@ public class Global {
     public ResponseEntity<String> handleAppException(AppException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleInternalErrorException(Exception e) {
+        return ResponseEntity.internalServerError().body(e.getMessage());
+    }
 }

@@ -91,8 +91,12 @@ public class DbGame {
         };
     }
 
-    public Optional<DbPlayer> player(String id) {
-        return players().stream().filter(p -> p.getId().equals(id)).findFirst();
+    public Optional<DbPlayer> player(String playerId) {
+        return players().stream().filter(p -> p.getId().equals(playerId)).findFirst();
+    }
+
+    public boolean isPlayerFullId(DbPlayer player, String fullId) {
+        return fullId.length() == DbGame.FULL_ID_SIZE && player.getId().equals(fullId.substring(8));
     }
 
     public DbPlayer player() {
@@ -204,6 +208,11 @@ public class DbGame {
         String newEvts = player.newEvts(newEvents);
 
         return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
+    }
+
+    public void withEvents(List<Event> events) {
+        whitePlayer.withEvents(events);
+        blackPlayer.withEvents(events);
     }
 
     public boolean playable() {

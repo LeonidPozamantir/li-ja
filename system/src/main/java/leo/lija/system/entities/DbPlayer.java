@@ -44,6 +44,10 @@ public class DbPlayer {
         return eventStack().withEvents(events).optimize().encode();
     }
 
+    public void withEvents(List<Event> events) {
+        evts = newEvts(events);
+    }
+
     public String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
         return Stream.concat(
             pieces.entrySet().stream()

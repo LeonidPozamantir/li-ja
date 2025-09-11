@@ -7,6 +7,7 @@ import leo.lija.system.Syncer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,11 @@ public class Application {
     private final Server server;
     private final Syncer syncer;
 
+    @GetMapping({"/sync/{id}/{color}/{version}/{fullId}", "/sync/{id}/{color}/{version}"})
+    public Map<String, Object> sync(@PathVariable String id, @PathVariable String color, @PathVariable Integer version, @PathVariable Optional<String> fullId) {
+        return syncer.sync(id, color, version, fullId);
+    }
+
     @PostMapping("/move/{fullId}")
     public ResponseEntity<String> move(@PathVariable String fullId, @Valid @RequestBody MoveForm move, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -33,8 +39,13 @@ public class Application {
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/sync/{id}/{color}/{version}/{fullId}")
-    public Map<String, Object> sync(@PathVariable String id, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
-        return syncer.sync(id, color, version, fullId);
+    @PostMapping("/update-version/{gameId}")
+    public void updateVersion(@PathVariable String gameId) {
+        server.updateVersion(gameId);
+    }
+
+    @PostMapping("/end-game/{gameId}")
+    public void endGame(@PathVariable String gameId) {
+        server.endGame(gameId);
     }
 }
