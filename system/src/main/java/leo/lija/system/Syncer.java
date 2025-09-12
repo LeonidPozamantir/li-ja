@@ -56,9 +56,9 @@ public class Syncer {
     private List<Map<String, Object>> renderEvents(List<Event> events, boolean isPrivate) {
         if (isPrivate) {
             return events.stream().map(e -> {
-                if (e instanceof MessageEvent) {
-                    String author = ((MessageEvent) e).getAuthor();
-                    String message = ((MessageEvent) e).getMessage();
+                if (e instanceof MessageEvent messageEvent) {
+                    String author = messageEvent.getAuthor();
+                    String message = messageEvent.getMessage();
                     return renderMessage(author, message);
                 } else return e.export();
             }).toList();
@@ -89,7 +89,7 @@ public class Syncer {
         }
         else {
             Thread.sleep(sleep);
-            this.wait(loop - 1);
+            wait(loop - 1, gameId, color, version);
         }
     }
 

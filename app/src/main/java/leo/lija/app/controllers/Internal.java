@@ -1,10 +1,9 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
+import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.InternalApi;
-import leo.lija.system.Server;
-import leo.lija.system.Syncer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -36,5 +35,14 @@ public class Internal {
     @PostMapping("/internal/end-game/{gameId}")
     public void endGame(@PathVariable String gameId) {
         api.endGame(gameId);
+    }
+
+    @PostMapping("/internal/join/{fullId}")
+    public ResponseEntity<String> join(@PathVariable String fullId, @Valid @RequestBody JoinForm join, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Invalid join");
+        }
+        api.join(fullId, join.redirect(), join.messages());
+        return ResponseEntity.ok().body("ok");
     }
 }

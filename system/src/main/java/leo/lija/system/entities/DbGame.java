@@ -99,6 +99,10 @@ public class DbGame {
         return fullId.length() == DbGame.FULL_ID_SIZE && player.getId().equals(fullId.substring(8));
     }
 
+    public DbPlayer opponent(DbPlayer p) {
+        return player(p.getColor().getOpposite());
+    }
+
     public DbPlayer player() {
         return player(0 == turns % 2 ? WHITE : BLACK);
     }
@@ -213,6 +217,13 @@ public class DbGame {
     public void withEvents(List<Event> events) {
         whitePlayer.withEvents(events);
         blackPlayer.withEvents(events);
+    }
+
+    public void withEvents(Color color, List<Event> events) {
+        switch (color) {
+            case WHITE -> whitePlayer.withEvents(events);
+            case BLACK -> blackPlayer.withEvents(events);
+        }
     }
 
     public boolean playable() {
