@@ -220,8 +220,13 @@ public class DbGame {
     }
 
     public void withEvents(Color color, List<Event> events) {
-        if (color == WHITE) whitePlayer.withEvents(events);
-        else if (color == BLACK) blackPlayer.withEvents(events);
+        if (color == WHITE) withEvents(events, List.of());
+        else if (color == BLACK) withEvents(List.of(), events);
+    }
+
+    public void withEvents(List<Event> whiteEvents, List<Event> blackEvents) {
+        whitePlayer.withEvents(whiteEvents);
+        blackPlayer.withEvents(blackEvents);
     }
 
     public boolean playable() {

@@ -7,6 +7,7 @@ import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
+import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,15 +29,13 @@ public class InternalApi {
         DbPlayer player = gameAndPlayer.getSecond();
         g1.withEvents(decodeMessages(messages));
         g1.withEvents(g1.opponent(player).getColor(), List.of(new RedirectEvent(url)));
-        repo.save(g1);
-        versionMemo.put(g1);
+        save(g1);
     }
 
     public void talk(String gameId, String author, String message) {
         DbGame g1 = repo.game(gameId);
         g1.withEvents(List.of(new MessageEvent(author, message)));
-        repo.save(g1);
-        versionMemo.put(g1);
+        save(g1);
     }
 
     public void end(String gameId, String messages) {
@@ -44,12 +43,31 @@ public class InternalApi {
         ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
         newEvents.addAll(decodeMessages(messages));
         g1.withEvents(newEvents);
-        repo.save(g1);
-        versionMemo.put(g1);
+        save(g1);
+    }
+
+    public void acceptRematch(String gameId, String whiteRedirect, String blackRedirect) {
+        DbGame g1 = repo.game(gameId);
+        g1.withEvents(
+            List.of(new RedirectEvent(whiteRedirect)),
+            List.of(new RedirectEvent(blackRedirect))
+        );
+        save(g1);
     }
 
     public void updateVersion(String gameId) {
         versionMemo.put(repo.game(gameId));
+    }
+
+    public void reloadTable(String gameId) {
+        DbGame g1 = repo.game(gameId);
+        g1.withEvents(List.of(new ReloadTableEvent()));
+        save(g1);
+    }
+
+    private void save(DbGame g1) {
+        repo.save(g1);
+        versionMemo.put(g1);
     }
 
     private List<Event> decodeMessages(String messages) {
