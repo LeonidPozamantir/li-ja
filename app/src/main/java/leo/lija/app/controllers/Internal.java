@@ -35,6 +35,11 @@ public class Internal {
         api.reloadTable(gameId);
     }
 
+    @PostMapping("/internal/alive/{gameId}/{color}")
+    public void alive(@PathVariable String gameId, @PathVariable String color) {
+        api.alive(gameId, color);
+    }
+
     @PostMapping("/internal/end/{gameId}")
     public void end(@PathVariable String gameId, @Valid @RequestBody EndForm msgs) {
         api.end(gameId, msgs.messages());
@@ -46,8 +51,8 @@ public class Internal {
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/internal/accept-rematch/{gameId}")
-    public void acceptRematch(@PathVariable String gameId, @Valid @RequestBody RematchForm rematch) {
-        api.acceptRematch(gameId, rematch.whiteRedirect(), rematch.blackRedirect());
+    @PostMapping("/internal/accept-rematch/{gameId}/{newGameId}/{color}")
+    public void acceptRematch(@PathVariable String gameId, @PathVariable String newGameId, @PathVariable String color, @Valid @RequestBody RematchForm rematch) {
+        api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
     }
 }

@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import leo.lija.chess.Color;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -8,6 +9,8 @@ import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
+import leo.lija.system.exceptions.AppException;
+import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class InternalApi {
 
     private final GameRepo repo;
     private final VersionMemo versionMemo;
+    private final AliveMemo aliveMemo;
 
     public void join(String fullId, String url, String messages) {
         Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId);
@@ -46,17 +50,29 @@ public class InternalApi {
         save(g1);
     }
 
-    public void acceptRematch(String gameId, String whiteRedirect, String blackRedirect) {
+    public void acceptRematch(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect) {
+        Color color = ioColor(colorName);
         DbGame g1 = repo.game(gameId);
         g1.withEvents(
             List.of(new RedirectEvent(whiteRedirect)),
             List.of(new RedirectEvent(blackRedirect))
         );
         save(g1);
+        aliveMemo.put(newGameId, color.getOpposite());
+        aliveMemo.transfer(gameId, color.getOpposite(), newGameId, color);
     }
 
     public void updateVersion(String gameId) {
         versionMemo.put(repo.game(gameId));
+    }
+
+    public void alive(String gameId, String colorName) {
+        Color color = ioColor(colorName);
+        aliveMemo.put(gameId, color);
+    }
+
+    private Color ioColor(String colorName) {
+        return Color.apply(colorName).orElseThrow(() -> new AppException("Invalid color"));
     }
 
     public void reloadTable(String gameId) {

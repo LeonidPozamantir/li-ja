@@ -6,13 +6,13 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.exceptions.AppException;
+import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 
@@ -26,6 +26,7 @@ public class Server {
     private final GameRepo repo;
     private final Ai ai;
     private final VersionMemo versionMemo;
+    private final AliveMemo aliveMemo;
 
     public void playMove(String fullId, String moveString) {
         playMove(fullId, moveString, Optional.empty());
@@ -41,10 +42,13 @@ public class Server {
     }
 
     public void play(String fullId, String fromString, String toString, Optional<String> promString) {
-        DbGame g1 = repo.playerGame(fullId);
+        Pair<DbGame, DbPlayer> gp = repo.player(fullId);
+        DbGame g1 = gp.getFirst();
+        DbPlayer player = gp.getSecond();
         purePlay(g1, fromString, toString, promString);
         repo.save(g1);
         versionMemo.put(g1);
+        aliveMemo.put(g1.getId(), player.getColor());
     }
 
     public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {

@@ -1,5 +1,6 @@
 package leo.lija.system.memo;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -20,5 +21,11 @@ public class Builder {
                     return f.apply(key);
                 }
             });
+    }
+
+    public static <K, V> Cache<K, V> expiry(int ttl) {
+        return CacheBuilder.newBuilder()
+            .expireAfterWrite(ttl, TimeUnit.SECONDS)
+            .build();
     }
 }
