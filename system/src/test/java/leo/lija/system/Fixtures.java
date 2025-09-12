@@ -9,10 +9,12 @@ import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.config.MemoConfig;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Status;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
@@ -28,6 +30,7 @@ import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
 import static leo.lija.system.entities.DbGame.PLAYER_ID_SIZE;
 
 @ActiveProfiles("test")
+@EnableConfigurationProperties(MemoConfig.class)
 public class Fixtures {
 
     Random random = new Random();

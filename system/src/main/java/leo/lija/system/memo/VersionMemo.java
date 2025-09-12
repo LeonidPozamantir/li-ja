@@ -1,8 +1,10 @@
 package leo.lija.system.memo;
 
 import com.google.common.cache.LoadingCache;
+import jakarta.annotation.PostConstruct;
 import leo.lija.chess.Color;
 import leo.lija.system.GameRepo;
+import leo.lija.system.config.MemoConfig;
 import leo.lija.system.entities.DbGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +19,14 @@ public class VersionMemo {
 
     private final GameRepo repo;
 
-    @Value("${memo.version.timeout}")
-    private int timeout;
+    private final MemoConfig config;
 
-    private LoadingCache<String, Integer> cache = Builder.cache(timeout, this::compute);
+    private LoadingCache<String, Integer> cache;
+
+    @PostConstruct
+    void init() {
+        cache = Builder.cache(config.version().timeout(), this::compute);
+    }
 
     public Integer get(String gameId, Color color) {
         return cache.getUnchecked(toKey(gameId, color));

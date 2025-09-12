@@ -1,25 +1,29 @@
 package leo.lija.system.memo;
 
 import com.google.common.cache.Cache;
+import jakarta.annotation.PostConstruct;
 import leo.lija.chess.Color;
+import leo.lija.system.config.MemoConfig;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AliveMemo {
 
-    @Value("${memo.alive.hard-timeout}")
-    int hardTimeout;
-    @Value("${memo.alive.soft-timeout}")
-    int softTimeout;
+    private final MemoConfig config;
 
-    private Cache<String, Long> cache = Builder.expiry(hardTimeout);
+    private Cache<String, Long> cache;
 
-    private static int BIG_LATENCY = 9999;
+    private static final int BIG_LATENCY = 9999;
+
+    @PostConstruct
+    void init() {
+        cache = Builder.expiry(config.alive().hardTimeout());
+    }
 
     public Optional<Long> get(String gameId, Color color) {
         return Optional.ofNullable(cache.getIfPresent(toKey(gameId, color)));
@@ -27,10 +31,6 @@ public class AliveMemo {
 
     public void put(String gameId, Color color) {
         put(gameId, color, now());
-    }
-
-    public void put(String gameId, Color color, Long time) {
-        cache.put(toKey(gameId, color), time);
     }
 
     public void transfer(String g1, Color c1, String g2, Color c2) {
@@ -41,18 +41,22 @@ public class AliveMemo {
         return get(gameId, color).map(time -> (int)(now() - time)).orElse(BIG_LATENCY);
     }
 
-    public int activity(DbGame game, DbPlayer player) {
-        if (player.isAi()) return 2;
+    public int activity(DbGame game, Color color) {
+        if (game.player(color).isAi()) return 2;
         else {
-            int l = latency(game.getId(), player.getColor());
-            if (l <= softTimeout) return 2;
-            if (l <= hardTimeout) return 1;
+            int l = latency(game.getId(), color);
+            if (l <= config.alive().softTimeout()) return 2;
+            if (l <= config.alive().hardTimeout()) return 1;
             return 0;
         }
     }
 
     public long count() {
         return cache.size();
+    }
+
+    private void put(String gameId, Color color, Long time) {
+        cache.put(toKey(gameId, color), time);
     }
 
     private String toKey(String gameId, Color color) {
