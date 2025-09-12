@@ -1,20 +1,24 @@
 package leo.lija.system;
 
 import leo.lija.chess.Color;
+import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
+import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class Syncer {
 
     private final GameRepo repo;
     private final VersionMemo versionMemo;
+    private final AliveMemo aliveMemo;
 
     @Value("${sync.duration}")
     int duration;
@@ -31,22 +36,27 @@ public class Syncer {
     public Map<String, Object> sync(String gameId, String colorString, Integer version, Optional<String> fullId) {
         try {
             return Color.apply(colorString)
-                .map(color -> {
+                .flatMap(color -> {
                     versionWait(gameId, color, version);
-                    return repo.player(gameId, color);
-                })
-                .map(gameAndPlayer -> {
+                    Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(gameId, color);
                     DbGame game = gameAndPlayer.getFirst();
                     DbPlayer player = gameAndPlayer.getSecond();
                     boolean isPrivate = fullId.map(fid -> game.isPlayerFullId(player, fid)).orElse(false);
                     versionMemo.put(game);
-                    return player.eventStack().eventsSince(version).map(events ->
-                        Map.of(
-                        "v", player.eventStack().lastVersion(),
-                        "e", renderEvents(events, isPrivate),
-                        "p", game.player().getColor().name(),
-                        "t", game.getTurns()
-                    )).orElse(failMap);
+                    return player.eventStack().eventsSince(version).map(events -> {
+                            Map<String, Object> res = new HashMap<>();
+                            res.putAll(Map.of(
+                                "v", player.eventStack().lastVersion(),
+                                "e", renderEvents(events, isPrivate),
+                                "p", game.player().getColor().name(),
+                                "t", game.getTurns(),
+                                "oa", aliveMemo.activity(game, color.getOpposite())
+                            ));
+                            res.put("c", game.getClock().map(clock -> clock.remainingTimes().entrySet().stream()
+                                .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
+                            return res;
+                        }
+                    );
                 }).orElse(failMap);
         } catch (Exception e) {
             return failMap;
