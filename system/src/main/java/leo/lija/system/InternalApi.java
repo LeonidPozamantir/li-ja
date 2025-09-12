@@ -11,6 +11,8 @@ import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -24,8 +26,7 @@ public class InternalApi {
         Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId);
         DbGame g1 = gameAndPlayer.getFirst();
         DbPlayer player = gameAndPlayer.getSecond();
-        List<String> messageList = List.of(messages.split("\\$"));
-        g1.withEvents(messageList.stream().map(m -> (Event) new MessageEvent("system", m)).toList());
+        g1.withEvents(decodeMessages(messages));
         g1.withEvents(g1.opponent(player).getColor(), List.of(new RedirectEvent(url)));
         repo.save(g1);
         versionMemo.put(g1);
@@ -38,9 +39,11 @@ public class InternalApi {
         versionMemo.put(g1);
     }
 
-    public void endGame(String gameId) {
+    public void end(String gameId, String messages) {
         DbGame g1 = repo.game(gameId);
-        g1.withEvents(List.of(new EndEvent()));
+        ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
+        newEvents.addAll(decodeMessages(messages));
+        g1.withEvents(newEvents);
         repo.save(g1);
         versionMemo.put(g1);
     }
@@ -49,5 +52,7 @@ public class InternalApi {
         versionMemo.put(repo.game(gameId));
     }
 
-
+    private List<Event> decodeMessages(String messages) {
+        return Arrays.stream(messages.split("\\$")).map(m -> (Event) new MessageEvent("system", m)).toList();
+    }
 }
