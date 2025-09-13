@@ -29,8 +29,16 @@ public class AliveMemo {
         return Optional.ofNullable(cache.getIfPresent(toKey(gameId, color)));
     }
 
+    public void put(String key) {
+        cache.put(key, now());
+    }
+
     public void put(String gameId, Color color) {
-        put(gameId, color, now());
+        cache.put(toKey(gameId, color), now());
+    }
+
+    public void put(String gameId, Color color, Long time) {
+        cache.put(toKey(gameId, color), time);
     }
 
     public void transfer(String g1, Color c1, String g2, Color c2) {
@@ -43,23 +51,21 @@ public class AliveMemo {
 
     public int activity(DbGame game, Color color) {
         if (game.player(color).isAi()) return 2;
-        else {
-            int l = latency(game.getId(), color);
-            if (l <= config.alive().softTimeout()) return 2;
-            if (l <= config.alive().hardTimeout()) return 1;
-            return 0;
-        }
+        return activity(game.getId(), color);
+    }
+
+    public int activity(String gameId, Color color) {
+        int l = latency(gameId, color);
+        if (l <= config.alive().softTimeout()) return 2;
+        if (l <= config.alive().hardTimeout()) return 1;
+        return 0;
     }
 
     public long count() {
         return cache.size();
     }
 
-    private void put(String gameId, Color color, Long time) {
-        cache.put(toKey(gameId, color), time);
-    }
-
-    private String toKey(String gameId, Color color) {
+    public String toKey(String gameId, Color color) {
         return gameId + "." + color.getLetter();
     }
 

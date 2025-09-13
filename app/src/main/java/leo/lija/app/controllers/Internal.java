@@ -8,6 +8,7 @@ import leo.lija.app.forms.TalkForm;
 import leo.lija.system.InternalApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +50,11 @@ public class Internal {
     public ResponseEntity<String> join(@PathVariable String fullId, @Valid @RequestBody JoinForm join) {
         api.join(fullId, join.redirect(), join.messages());
         return ResponseEntity.ok().body("ok");
+    }
+
+    @GetMapping("/internal/activity/{gameId}/{color}")
+    public String activity(@PathVariable String gameId, @PathVariable String color) {
+        return String.valueOf(api.activity(gameId, color));
     }
 
     @PostMapping("/internal/accept-rematch/{gameId}/{newGameId}/{color}")

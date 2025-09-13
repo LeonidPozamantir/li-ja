@@ -12,7 +12,7 @@ redis:
   host: localhost
 
 sync:
-  duration: 10000
+  duration: 7000
   sleep: 200
 
 memo:
@@ -21,3 +21,11 @@ memo:
   alive:
     hard-timeout: 100
     soft-timeout: 6
+  watcher:
+    timeout: 6
+  username:
+    timeout: 10
+
+crafty:
+  exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
+  book-path:

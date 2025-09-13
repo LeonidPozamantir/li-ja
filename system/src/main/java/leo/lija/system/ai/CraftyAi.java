@@ -7,11 +7,13 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.format.Fen;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.Ai;
+import leo.lija.system.config.CraftyConfig;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Variant;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,12 +26,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class CraftyAi implements Ai {
 
-    private final String execPath;
-    private final Optional<String> bookPath;
-
-    public CraftyAi() {
-        this("C:\\Leo\\Arena\\Engines\\stockfish_14.1_win_x64_avx2\\stockfish_14.1_win_x64_avx2.exe", Optional.empty());
-    }
+    private final CraftyConfig config;
 
     @Override
     public Pair<Game, Move> apply(DbGame dbGame) {
@@ -64,7 +61,7 @@ public class CraftyAi implements Ai {
     }
 
     private String command() {
-        return execPath;
+        return config.execPath();
     }
 
     private List<String> input(String fen, int level) {

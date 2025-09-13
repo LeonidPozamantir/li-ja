@@ -71,6 +71,10 @@ public class InternalApi {
         aliveMemo.put(gameId, color);
     }
 
+    public int activity(String gameId, String colorName) {
+        return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
+    }
+
     private Color ioColor(String colorName) {
         return Color.apply(colorName).orElseThrow(() -> new AppException("Invalid color"));
     }

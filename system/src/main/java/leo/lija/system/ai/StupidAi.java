@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public class StupidAi implements Ai {
     @Override
     public Pair<Game, Move> apply(DbGame dbGame) {
