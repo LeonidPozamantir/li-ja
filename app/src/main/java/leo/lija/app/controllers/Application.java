@@ -26,9 +26,14 @@ public class Application {
     private final Syncer syncer;
     private final Pinger pinger;
 
-    @GetMapping({"/sync/{gameId}/{color}/{version}/{fullId}", "/sync/{gameId}/{color}/{version}"})
-    public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable Optional<String> fullId) {
-        return syncer.sync(gameId, color, version, fullId);
+    @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
+    public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
+        return syncer.sync(gameId, color, version, Optional.of(fullId));
+    }
+
+    @GetMapping("/sync/{gameId}/{color}/{version}")
+    public Map<String, Object> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
+        return syncer.sync(gameId, color, version, Optional.empty());
     }
 
     @PostMapping("/move/{fullId}")

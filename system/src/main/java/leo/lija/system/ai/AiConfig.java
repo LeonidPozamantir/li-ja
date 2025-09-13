@@ -9,9 +9,6 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class AiConfig {
 
-    @Autowired
-    private CraftyConfig craftyConfig;
-
     @Bean
     @Primary
     public StupidAi stupidAi() {
@@ -19,7 +16,7 @@ public class AiConfig {
     }
 
     @Bean
-    public CraftyAi craftyAi(@Autowired CraftyConfig config2) {
-        return new CraftyAi(craftyConfig);
+    public CraftyAi craftyAi(@Autowired CraftyConfig config) {
+        return new CraftyAi(config);
     }
 }
