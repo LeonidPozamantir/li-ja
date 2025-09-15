@@ -18,7 +18,7 @@ public class AliveMemo {
 
     private Cache<String, Long> cache;
 
-    private static final int BIG_LATENCY = 9999;
+    private static final int BIG_LATENCY = 9999 * 1000;
 
     @PostConstruct
     void init() {
