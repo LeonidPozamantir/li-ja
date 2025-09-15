@@ -1,12 +1,12 @@
 package leo.lija.system.memo;
 
-import leo.lija.system.config.MemoConfig;
+import leo.lija.system.config.MemoConfigProperties;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WatcherMemo extends BooleanExpiryMemo {
 
-    public WatcherMemo(MemoConfig config) {
+    public WatcherMemo(MemoConfigProperties config) {
         super(config);
         cache = Builder.expiry(config.watcher().timeout());
     }

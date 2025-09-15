@@ -4,7 +4,7 @@ import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
-import leo.lija.system.GameRepo;
+import leo.lija.system.db.GameRepo;
 import leo.lija.app.AppApplication;
 import leo.lija.system.Server;
 import leo.lija.system.entities.DbGame;

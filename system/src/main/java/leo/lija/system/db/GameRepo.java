@@ -1,4 +1,4 @@
-package leo.lija.system;
+package leo.lija.system.db;
 
 import leo.lija.chess.Color;
 import leo.lija.chess.utils.Pair;

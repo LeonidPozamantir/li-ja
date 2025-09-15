@@ -1,4 +1,4 @@
-package leo.lija.system;
+package leo.lija.system.db;
 
 import leo.lija.system.entities.RawDbGame;
 import org.springframework.data.jpa.repository.JpaRepository;

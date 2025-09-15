@@ -1,7 +1,7 @@
 package leo.lija.system.memo;
 
 import com.google.common.cache.Cache;
-import leo.lija.system.config.MemoConfig;
+import leo.lija.system.config.MemoConfigProperties;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -10,7 +10,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public abstract class BooleanExpiryMemo {
 
-    private final MemoConfig config;
+    private final MemoConfigProperties config;
 
     protected Cache<String, Boolean> cache;
 

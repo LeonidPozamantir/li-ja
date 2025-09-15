@@ -1,8 +1,8 @@
 package leo.lija.system;
 
-import leo.lija.chess.Pos;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.format.VisualFormat;
+import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.event.ThreefoldEvent;
 import leo.lija.system.exceptions.AppException;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.Map;
 
 import static leo.lija.chess.Color.WHITE;
 import static org.assertj.core.api.Assertions.assertThat;

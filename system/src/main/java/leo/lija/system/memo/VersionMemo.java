@@ -3,29 +3,26 @@ package leo.lija.system.memo;
 import com.google.common.cache.LoadingCache;
 import jakarta.annotation.PostConstruct;
 import leo.lija.chess.Color;
-import leo.lija.system.GameRepo;
-import leo.lija.system.config.MemoConfig;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.DbPlayer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+
+import java.util.function.BiFunction;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
-@Service
 @RequiredArgsConstructor
 public class VersionMemo {
 
-    private final GameRepo repo;
-
-    private final MemoConfig config;
+    private final BiFunction<String, Color, DbPlayer> getPlayer;
+    private final int timeout;
 
     private LoadingCache<String, Integer> cache;
 
     @PostConstruct
     void init() {
-        cache = Builder.cache(config.version().timeout(), this::compute);
+        cache = Builder.cache(timeout, this::compute);
     }
 
     public Integer get(String gameId, Color color) {
@@ -55,7 +52,7 @@ public class VersionMemo {
         return Color.apply(letter.substring(0, 1))
             .map(color -> {
                 try {
-                    return repo.playerOnly(gameId, color).eventStack().lastVersion();
+                    return getPlayer.apply(gameId, color).eventStack().lastVersion();
                 } catch (Exception e) {
                     return 0;
                 }

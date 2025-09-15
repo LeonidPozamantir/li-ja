@@ -1,6 +1,6 @@
 package leo.lija.system.ai;
 
-import leo.lija.system.config.CraftyConfig;
+import leo.lija.system.config.CraftyConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ public class AiConfig {
     }
 
     @Bean
-    public CraftyAi craftyAi(@Autowired CraftyConfig config) {
+    public CraftyAi craftyAi(@Autowired CraftyConfigProperties config) {
         return new CraftyAi(config);
     }
 }

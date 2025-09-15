@@ -5,6 +5,7 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.exceptions.AppException;

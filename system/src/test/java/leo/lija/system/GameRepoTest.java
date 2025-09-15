@@ -1,5 +1,7 @@
 package leo.lija.system;
 
+import leo.lija.system.db.GameRepo;
+import leo.lija.system.db.GameRepoJpa;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.RawDbGame;

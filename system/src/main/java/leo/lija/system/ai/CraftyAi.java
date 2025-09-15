@@ -7,26 +7,24 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.format.Fen;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.Ai;
-import leo.lija.system.config.CraftyConfig;
+import leo.lija.system.config.CraftyConfigProperties;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Variant;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class CraftyAi implements Ai {
 
-    private final CraftyConfig config;
+    private final CraftyConfigProperties config;
 
     @Override
     public Pair<Game, Move> apply(DbGame dbGame) {

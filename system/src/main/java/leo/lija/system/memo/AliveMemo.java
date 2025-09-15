@@ -3,7 +3,7 @@ package leo.lija.system.memo;
 import com.google.common.cache.Cache;
 import jakarta.annotation.PostConstruct;
 import leo.lija.chess.Color;
-import leo.lija.system.config.MemoConfig;
+import leo.lija.system.config.MemoConfigProperties;
 import leo.lija.system.entities.DbGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AliveMemo {
 
-    private final MemoConfig config;
+    private final MemoConfigProperties config;
 
     private Cache<String, Long> cache;
 

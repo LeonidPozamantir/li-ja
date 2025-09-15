@@ -2,6 +2,7 @@ package leo.lija.system;
 
 import leo.lija.chess.Color;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.event.EndEvent;
