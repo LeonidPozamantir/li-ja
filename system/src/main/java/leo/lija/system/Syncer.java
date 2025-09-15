@@ -104,5 +104,5 @@ public class Syncer {
         }
     }
 
-    private final Map<String, Object> failMap = Map.of("failMap", true);
+    private final Map<String, Object> failMap = Map.of("reload", true);
 }
