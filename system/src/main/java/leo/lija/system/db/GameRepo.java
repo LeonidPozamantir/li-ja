@@ -8,13 +8,13 @@ import leo.lija.system.entities.RawDbGame;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
 
-@Service
+@Repository
 @RequiredArgsConstructor
 public class GameRepo {
 

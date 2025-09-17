@@ -1,10 +1,19 @@
 package leo.lija.system.db;
 
-import leo.lija.system.entities.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
+import java.util.Collection;
+import java.util.List;
 
-public interface UserRepo extends JpaRepository<User, UUID> {
+@Repository
+@RequiredArgsConstructor
+public class UserRepo {
 
+    private final UserRepoJpa repo;
+
+    public void updateOnlineUserNames(Collection<String> usernames) {
+        repo.updateOnlineUsernamesFalse(usernames);
+        repo.updateOnlineUsernamesTrue(usernames);
+    }
 }

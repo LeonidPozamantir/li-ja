@@ -1,0 +1,24 @@
+package leo.lija.system.db;
+
+import leo.lija.system.entities.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+public interface UserRepoJpa extends JpaRepository<User, UUID> {
+
+    @Modifying
+    @Query("update User set isOnline = true where username in :usernames and isOnline = false")
+    @Transactional
+    public void updateOnlineUsernamesTrue(Collection<String> usernames);
+
+    @Modifying
+    @Query("update User set isOnline = false where username not in :usernames and isOnline = true")
+    @Transactional
+    public void updateOnlineUsernamesFalse(Collection<String> usernames);
+}
