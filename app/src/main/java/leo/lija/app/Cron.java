@@ -13,9 +13,8 @@ public class Cron {
     private final UserRepo userRepo;
     private final UsernameMemo usernameMemo;
 
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRateString = "${cron.online-username.frequency}")
     void onlineUsername() {
-        System.out.println("sholom");
         userRepo.updateOnlineUserNames(usernameMemo.keys());
     }
 }
