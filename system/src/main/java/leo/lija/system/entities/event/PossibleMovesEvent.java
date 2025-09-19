@@ -23,6 +23,7 @@ public class PossibleMovesEvent implements Event {
 
     @Override
     public Map<String, Object> export() {
+        if (moves.isEmpty()) return Map.of("type", "possible_moves");
         return Map.of(
             "type", "possible_moves",
             "possible_moves", moves.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::key).collect(Collectors.joining())))
