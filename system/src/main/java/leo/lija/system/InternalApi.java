@@ -72,6 +72,23 @@ public class InternalApi {
         aliveMemo.put(gameId, color);
     }
 
+    public void draw(String gameId, String colorName, String messages) {
+        Color color = ioColor(colorName);
+        DbGame g1 = repo.game(gameId);
+        g1.withEvents(decodeMessages(messages));
+        g1.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+        save(g1);
+    }
+
+    public void drawAccept(String gameId, String colorName, String messages) {
+        Color color = ioColor(colorName);
+        DbGame g1 = repo.game(gameId);
+        ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
+        newEvents.addAll(decodeMessages(messages));
+        g1.withEvents(newEvents);
+        save(g1);
+    }
+
     public int activity(String gameId, String colorName) {
         return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
     }

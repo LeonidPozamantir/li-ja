@@ -1,7 +1,7 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
-import leo.lija.app.forms.EndForm;
+import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
@@ -45,8 +45,18 @@ public class Internal {
         api.alive(gameId, color);
     }
 
+    @PostMapping("/draw/{gameId}/{color}")
+    public void draw(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody MessagesForm msgs) {
+        api.draw(gameId, color, msgs.messages());
+    }
+
+    @PostMapping("/draw-accept/{gameId}/{color}")
+    public void drawAccept(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody MessagesForm msgs) {
+        api.drawAccept(gameId, color, msgs.messages());
+    }
+
     @PostMapping("/end/{gameId}")
-    public void end(@PathVariable String gameId, @Valid @RequestBody EndForm msgs) {
+    public void end(@PathVariable String gameId, @Valid @RequestBody MessagesForm msgs) {
         api.end(gameId, msgs.messages());
     }
 
@@ -61,8 +71,8 @@ public class Internal {
         return String.valueOf(api.activity(gameId, color));
     }
 
-    @PostMapping("/accept-rematch/{gameId}/{newGameId}/{color}")
-    public void acceptRematch(@PathVariable String gameId, @PathVariable String newGameId, @PathVariable String color, @Valid @RequestBody RematchForm rematch) {
+    @PostMapping("/accept-rematch/{gameId}/{color}/{newGameId}")
+    public void acceptRematch(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm rematch) {
         api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
     }
 
