@@ -211,7 +211,7 @@ public class DbGame {
         newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
         String newEvts = player.newEvts(newEvents);
 
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo());
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo(), player.getLastDrawOffer());
     }
 
     public void withEvents(List<Event> events) {

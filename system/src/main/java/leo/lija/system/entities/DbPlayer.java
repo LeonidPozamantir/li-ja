@@ -31,9 +31,10 @@ public class DbPlayer {
     private Boolean isWinner;
     private String evts;
     private Integer elo;
+    private Integer lastDrawOffer;
 
     public DbPlayer copy() {
-        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo);
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, lastDrawOffer);
     }
 
     public EventStack eventStack() {

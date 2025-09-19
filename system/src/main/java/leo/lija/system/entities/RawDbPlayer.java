@@ -33,14 +33,15 @@ public class RawDbPlayer {
     private Boolean isWinner;
     private String evts;
     private Integer elo;
+    private Integer lastDrawOffer;
 
     public RawDbPlayer copy() {
-        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, evts, elo);
+        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, lastDrawOffer);
     }
 
     public Optional<DbPlayer> decode() {
         return Color.apply(color).map(trueColor -> new DbPlayer(
-            id, trueColor, ps, aiLevel, isWinner, evts, elo
+            id, trueColor, ps, aiLevel, isWinner, evts, elo, lastDrawOffer
         ));
     }
 
@@ -52,6 +53,8 @@ public class RawDbPlayer {
             dbPlayer.getAiLevel(),
             dbPlayer.getIsWinner(),
             dbPlayer.getEvts(),
-            dbPlayer.getElo());
+            dbPlayer.getElo(),
+            dbPlayer.getLastDrawOffer()
+        );
     }
 }

@@ -60,7 +60,7 @@ class MemoBuilderTest {
         @Order(1)
         @DisplayName("be empty")
         void empty() {
-            assertThat(makeCache.size()).isEqualTo(0);
+            assertThat(makeCache.size()).isZero();
         }
 
         @Test
