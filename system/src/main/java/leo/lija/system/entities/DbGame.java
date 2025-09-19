@@ -14,6 +14,7 @@ import leo.lija.chess.Side;
 import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.event.Event;
+import leo.lija.system.entities.event.ReloadTableEvent;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -182,6 +183,10 @@ public class DbGame {
     }
 
     public void update(Game game, Move move) {
+        boolean abortableBefore = abortable();
+        boolean whiteCanOfferDrawBefore = playerCanOfferDraw(WHITE);
+        boolean blackCanOfferDrawBefore = playerCanOfferDraw(BLACK);
+
         History history = game.getBoard().getHistory();
         Situation situation = game.situation();
         List<Event> events = new ArrayList<>(Event.fromMove(move));
@@ -202,6 +207,10 @@ public class DbGame {
         else if (situation.stalemate()) status = Status.STALEMATE;
         else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
+
+        if (abortableBefore != abortable() || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE) || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK)) {
+            withEvents(List.of(new ReloadTableEvent()));
+        }
     }
 
     private DbPlayer updatePlayer(Game game, DbPlayer player, List<Event> events) {
@@ -211,7 +220,7 @@ public class DbGame {
         newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
         String newEvts = player.newEvts(newEvents);
 
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo(), player.getLastDrawOffer());
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer());
     }
 
     public void withEvents(List<Event> events) {
@@ -242,6 +251,22 @@ public class DbGame {
         whitePlayer = f.apply(whitePlayer);
         blackPlayer = f.apply(blackPlayer);
         return this;
+    }
+
+    public boolean playerCanOfferDraw(Color color) {
+        return status.id() >= Status.STARTED.id()
+            && status.id() < Status.ABORTED.id()
+            && turns >= 2
+            && !player(color).getIsOfferingDraw()
+            && !playerHasOfferedDraw(color);
+    }
+
+    public boolean playerHasOfferedDraw(Color color) {
+        return player(color).getLastDrawOffer() != null && player(color).getLastDrawOffer() >= turns - 1;
+    }
+
+    public boolean abortable() {
+        return status == Status.STARTED && turns < 2;
     }
 
     public static final int GAME_ID_SIZE = 8;
