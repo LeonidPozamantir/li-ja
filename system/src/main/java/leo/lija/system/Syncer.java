@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class Syncer {
 
-    private final GameRepo repo;
+    private final GameRepo gameRepo;
     private final VersionMemo versionMemo;
     private final AliveMemo aliveMemo;
 
@@ -39,7 +39,7 @@ public class Syncer {
             return Color.apply(colorString)
                 .flatMap(color -> {
                     versionWait(gameId, color, version);
-                    Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(gameId, color);
+                    Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(gameId, color);
                     DbGame game = gameAndPlayer.getFirst();
                     DbPlayer player = gameAndPlayer.getSecond();
                     boolean isPrivate = fullId.map(fid -> game.isPlayerFullId(player, fid)).orElse(false);

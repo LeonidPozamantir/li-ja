@@ -5,7 +5,7 @@ import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
-import leo.lija.system.InternalApi;
+import leo.lija.system.AppApi;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("internal")
 @RequiredArgsConstructor
-public class Internal {
+public class AppApiC {
 
-    private final InternalApi api;
-    private final AliveMemo aliveMemo;
+    private final AppApi api;
 
     @PostMapping("/talk/{gameId}")
     public ResponseEntity<String> talk(@PathVariable String gameId, @Valid @RequestBody TalkForm talk) {
@@ -71,13 +70,13 @@ public class Internal {
         return String.valueOf(api.activity(gameId, color));
     }
 
+    public void lobbyJoin(String gameId, String color) {
+        api.lobbyJoin(gameId, color);
+    }
+
     @PostMapping("/accept-rematch/{gameId}/{color}/{newGameId}")
     public void acceptRematch(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm rematch) {
         api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
     }
 
-    @GetMapping("/nb-players")
-    public String nbPlayers() {
-        return String.valueOf(aliveMemo.count());
-    }
 }

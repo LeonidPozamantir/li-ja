@@ -3,7 +3,7 @@ package leo.lija.app.controllers;
 import jakarta.validation.Valid;
 import leo.lija.app.forms.MoveForm;
 import leo.lija.system.Pinger;
-import leo.lija.system.Server;
+import leo.lija.system.AppXhr;
 import leo.lija.system.Syncer;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +21,9 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-public class Application {
+public class AppXhrC {
 
-    private final Server server;
+    private final AppXhr xhr;
     private final Syncer syncer;
     private final Pinger pinger;
     private final AliveMemo aliveMemo;
@@ -44,7 +44,7 @@ public class Application {
             return ResponseEntity.badRequest().body("Invalid move");
         }
 
-        server.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
+        xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
 
         return ResponseEntity.ok().body("ok");
     }
@@ -59,7 +59,7 @@ public class Application {
         return pinger.ping(username, playerKey, watcher, getNbWatchers);
     }
 
-    @GetMapping("/how-many-players-now")
+    @GetMapping({"/how-many-players-now", "/internal/nb-players"})
     public String nbPlayers() {
         return String.valueOf(aliveMemo.count());
     }

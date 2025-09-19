@@ -6,7 +6,7 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.app.AppApplication;
-import leo.lija.system.Server;
+import leo.lija.system.AppXhr;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Status;
@@ -75,14 +75,14 @@ import static leo.lija.chess.Pos.H3;
 public class GameBenchmark {
 
     private static GameRepo repo;
-    private static Server server;
+    private static AppXhr appXhr;
     private static ConfigurableApplicationContext context;
 
     @Setup(Level.Trial)
     public static void setContext() {
         context = SpringApplication.run(AppApplication.class);
         repo = context.getBean(GameRepo.class);
-        server = context.getBean(Server.class);
+        appXhr = context.getBean(AppXhr.class);
     }
 
     @TearDown(Level.Trial)
@@ -137,7 +137,7 @@ public class GameBenchmark {
     }
 
     private Map<Pos, List<Pos>> move(DbGame game, String m) {
-        return server.playMove(game.fullIdOf(WHITE), m);
+        return appXhr.playMove(game.fullIdOf(WHITE), m);
     }
 
     List<String> moves = List.of("e2 e4", "d7 d5", "e4 d5", "d8 d5", "b1 c3", "d5 a5", "d2 d4", "c7 c6", "g1 f3", "c8 g4", "c1 f4", "e7 e6", "h2 h3", "g4 f3", "d1 f3", "f8 b4", "f1 e2", "b8 d7", "a2 a3", "e8 c8", "a3 b4", "a5 a1", "e1 d2", "a1 h1", "f3 c6", "b7 c6", "e2 a6");

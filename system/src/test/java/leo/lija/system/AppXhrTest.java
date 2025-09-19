@@ -21,12 +21,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @DisplayName("the server should")
-class ServerTest extends Fixtures {
+class AppXhrTest extends Fixtures {
 
     @Autowired
     private GameRepo repo;
     @Autowired
-    private Server server;
+    private AppXhr appXhr;
 
     private VisualFormat visualFormat = new VisualFormat();
 
@@ -39,7 +39,7 @@ class ServerTest extends Fixtures {
     }
 
     void move(DbGame game, String m) {
-        server.playMove(game.fullIdOf(WHITE), m);
+        appXhr.playMove(game.fullIdOf(WHITE), m);
     }
     void move(DbGame game) {
         move(game, "d2 d4");

@@ -22,9 +22,9 @@ import static leo.lija.system.Utils.MOVE_STRING;
 
 @Service
 @RequiredArgsConstructor
-public class Server {
+public class AppXhr {
 
-    private final GameRepo repo;
+    private final GameRepo gameRepo;
     private final Ai ai;
     private final VersionMemo versionMemo;
     private final AliveMemo aliveMemo;
@@ -43,11 +43,11 @@ public class Server {
     }
 
     public void play(String fullId, String fromString, String toString, Optional<String> promString) {
-        Pair<DbGame, DbPlayer> gp = repo.player(fullId);
+        Pair<DbGame, DbPlayer> gp = gameRepo.player(fullId);
         DbGame g1 = gp.getFirst();
         DbPlayer player = gp.getSecond();
         purePlay(g1, fromString, toString, promString);
-        repo.save(g1);
+        gameRepo.save(g1);
         versionMemo.put(g1);
         aliveMemo.put(g1.getId(), player.getColor());
     }

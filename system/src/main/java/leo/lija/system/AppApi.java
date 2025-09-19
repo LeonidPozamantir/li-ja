@@ -10,10 +10,8 @@ import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
-import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,15 +19,24 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class InternalApi {
+public class AppApi extends IOTools {
 
-    private final GameRepo repo;
-    private final VersionMemo versionMemo;
+    AppApi(GameRepo gameRepo, VersionMemo versionMemo, AliveMemo aliveMemo) {
+        super(gameRepo, versionMemo);
+        this.aliveMemo = aliveMemo;
+    }
+
     private final AliveMemo aliveMemo;
 
+    public void lobbyJoin(String gameId, String colorName) {
+        Color color = ioColor(colorName);
+        DbGame g1 = gameRepo.game(gameId);
+        aliveMemo.put(gameId, color);
+        aliveMemo.put(gameId, color.getOpposite());
+    }
+
     public void join(String fullId, String url, String messages) {
-        Pair<DbGame, DbPlayer> gameAndPlayer = repo.player(fullId);
+        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
         DbGame g1 = gameAndPlayer.getFirst();
         DbPlayer player = gameAndPlayer.getSecond();
         g1.withEvents(decodeMessages(messages));
@@ -38,13 +45,13 @@ public class InternalApi {
     }
 
     public void talk(String gameId, String author, String message) {
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(List.of(new MessageEvent(author, message)));
         save(g1);
     }
 
     public void end(String gameId, String messages) {
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
         newEvents.addAll(decodeMessages(messages));
         g1.withEvents(newEvents);
@@ -53,7 +60,7 @@ public class InternalApi {
 
     public void acceptRematch(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect) {
         Color color = ioColor(colorName);
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(
             List.of(new RedirectEvent(whiteRedirect)),
             List.of(new RedirectEvent(blackRedirect))
@@ -64,7 +71,7 @@ public class InternalApi {
     }
 
     public void updateVersion(String gameId) {
-        versionMemo.put(repo.game(gameId));
+        versionMemo.put(gameRepo.game(gameId));
     }
 
     public void alive(String gameId, String colorName) {
@@ -74,7 +81,7 @@ public class InternalApi {
 
     public void draw(String gameId, String colorName, String messages) {
         Color color = ioColor(colorName);
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(decodeMessages(messages));
         g1.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
         save(g1);
@@ -82,7 +89,7 @@ public class InternalApi {
 
     public void drawAccept(String gameId, String colorName, String messages) {
         Color color = ioColor(colorName);
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
         newEvents.addAll(decodeMessages(messages));
         g1.withEvents(newEvents);
@@ -93,19 +100,11 @@ public class InternalApi {
         return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
     }
 
-    private Color ioColor(String colorName) {
-        return Color.apply(colorName).orElseThrow(() -> new AppException("Invalid color"));
-    }
 
     public void reloadTable(String gameId) {
-        DbGame g1 = repo.game(gameId);
+        DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(List.of(new ReloadTableEvent()));
         save(g1);
-    }
-
-    private void save(DbGame g1) {
-        repo.save(g1);
-        versionMemo.put(g1);
     }
 
     private List<Event> decodeMessages(String messages) {
