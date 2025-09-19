@@ -5,6 +5,7 @@ import leo.lija.app.forms.MoveForm;
 import leo.lija.system.Pinger;
 import leo.lija.system.Server;
 import leo.lija.system.Syncer;
+import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ public class Application {
     private final Server server;
     private final Syncer syncer;
     private final Pinger pinger;
+    private final AliveMemo aliveMemo;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
@@ -55,6 +57,11 @@ public class Application {
         @RequestParam("get_nb_watchers") Optional<String> getNbWatchers
     ) {
         return pinger.ping(username, playerKey, watcher, getNbWatchers);
+    }
+
+    @GetMapping("/how-many-players-now")
+    public String nbPlayers() {
+        return String.valueOf(aliveMemo.count());
     }
 
 }

@@ -6,6 +6,7 @@ import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.InternalApi;
+import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,51 +15,57 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController("/internal")
 @RequiredArgsConstructor
 public class Internal {
 
     private final InternalApi api;
+    private final AliveMemo aliveMemo;
 
-    @PostMapping("/internal/talk/{gameId}")
+    @PostMapping("/talk/{gameId}")
     public ResponseEntity<String> talk(@PathVariable String gameId, @Valid @RequestBody TalkForm talk) {
         api.talk(gameId, talk.author(), talk.message());
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/internal/update-version/{gameId}")
+    @PostMapping("/update-version/{gameId}")
     public void updateVersion(@PathVariable String gameId) {
         api.updateVersion(gameId);
     }
 
-    @PostMapping("/internal/reload-table/{gameId}")
+    @PostMapping("/reload-table/{gameId}")
     public void reloadTable(@PathVariable String gameId) {
         api.reloadTable(gameId);
     }
 
-    @PostMapping("/internal/alive/{gameId}/{color}")
+    @PostMapping("/alive/{gameId}/{color}")
     public void alive(@PathVariable String gameId, @PathVariable String color) {
         api.alive(gameId, color);
     }
 
-    @PostMapping("/internal/end/{gameId}")
+    @PostMapping("/end/{gameId}")
     public void end(@PathVariable String gameId, @Valid @RequestBody EndForm msgs) {
         api.end(gameId, msgs.messages());
     }
 
-    @PostMapping("/internal/join/{fullId}")
+    @PostMapping("/join/{fullId}")
     public ResponseEntity<String> join(@PathVariable String fullId, @Valid @RequestBody JoinForm join) {
         api.join(fullId, join.redirect(), join.messages());
         return ResponseEntity.ok().body("ok");
     }
 
-    @GetMapping("/internal/activity/{gameId}/{color}")
+    @GetMapping("/activity/{gameId}/{color}")
     public String activity(@PathVariable String gameId, @PathVariable String color) {
         return String.valueOf(api.activity(gameId, color));
     }
 
-    @PostMapping("/internal/accept-rematch/{gameId}/{newGameId}/{color}")
+    @PostMapping("/accept-rematch/{gameId}/{newGameId}/{color}")
     public void acceptRematch(@PathVariable String gameId, @PathVariable String newGameId, @PathVariable String color, @Valid @RequestBody RematchForm rematch) {
         api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
+    }
+
+    @GetMapping("/nb-players")
+    public String nbPlayers() {
+        return String.valueOf(aliveMemo.count());
     }
 }
