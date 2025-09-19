@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class CraftyAiTest extends AiTest {
 
-    CraftyAiTest(@Autowired CraftyConfigProperties config) {
-        this.ai = new CraftyAi(config);
+    CraftyAiTest(@Autowired CraftyAi craftyAi) {
+        this.ai = craftyAi;
         this.name = "crafty";
         this.nbMoves = 5;
     }
