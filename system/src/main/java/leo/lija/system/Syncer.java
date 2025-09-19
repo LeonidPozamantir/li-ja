@@ -55,6 +55,7 @@ public class Syncer {
                             ));
                             res.put("c", game.getClock().map(clock -> clock.remainingTimes().entrySet().stream()
                                 .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
+                            res.entrySet().removeIf(e -> e.getValue() == null);
                             return res;
                         }
                     );
