@@ -1,12 +1,11 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
-import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.JoinForm;
+import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppApi;
-import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("internal")
+@RequestMapping("api")
 @RequiredArgsConstructor
 public class AppApiC {
 

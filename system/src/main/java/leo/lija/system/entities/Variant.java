@@ -6,10 +6,15 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record Variant(int id) {
+public record Variant(int id, String string) {
 
-    public static final Variant STANDARD = new Variant(1);
-    public static final Variant CHESS960 = new Variant(2);
+    @Override
+    public String toString() {
+        return string;
+    }
+
+    public static final Variant STANDARD = new Variant(1, "Standard");
+    public static final Variant CHESS960 = new Variant(2, "Chess960");
 
     public static final List<Variant> all = List.of(STANDARD, CHESS960);
 

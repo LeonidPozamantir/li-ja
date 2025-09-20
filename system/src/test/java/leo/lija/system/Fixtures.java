@@ -10,6 +10,7 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.config.CraftyConfigProperties;
+import leo.lija.system.config.LobbyConfigProperties;
 import leo.lija.system.config.MemoConfigProperties;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -31,7 +32,7 @@ import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
 import static leo.lija.system.entities.DbGame.PLAYER_ID_SIZE;
 
 @ActiveProfiles("test")
-@EnableConfigurationProperties({MemoConfigProperties.class, CraftyConfigProperties.class})
+@EnableConfigurationProperties({MemoConfigProperties.class, CraftyConfigProperties.class, LobbyConfigProperties.class})
 public class Fixtures {
 
     Random random = new Random();

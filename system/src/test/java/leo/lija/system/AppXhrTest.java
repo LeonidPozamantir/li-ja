@@ -26,7 +26,7 @@ class AppXhrTest extends Fixtures {
     @Autowired
     private GameRepo repo;
     @Autowired
-    private AppXhr appXhr;
+    private AppXhr xhr;
 
     private VisualFormat visualFormat = new VisualFormat();
 
@@ -39,7 +39,7 @@ class AppXhrTest extends Fixtures {
     }
 
     void move(DbGame game, String m) {
-        appXhr.playMove(game.fullIdOf(WHITE), m);
+        xhr.playMove(game.fullIdOf(WHITE), m);
     }
     void move(DbGame game) {
         move(game, "d2 d4");

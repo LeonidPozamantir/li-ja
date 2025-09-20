@@ -15,6 +15,11 @@ sync:
   duration: 7000
   sleep: 200
 
+lobby:
+  poll:
+    duration: 10000
+    sleep: 300
+
 memo:
   version:
     timeout: 1800
