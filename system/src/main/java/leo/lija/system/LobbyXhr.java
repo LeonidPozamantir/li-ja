@@ -27,7 +27,9 @@ public class LobbyXhr {
             "state", newVersion,
             "pool", !hooks.isEmpty()
                 ? Map.of("hooks", renderHooks(hooks, Optional.empty()))
-                : Map.of("message", "No game available right now, create one!")
+                : Map.of("message", "No game available right now, create one!"),
+            "chat", "",
+            "timeline", ""
         );
     }
 
@@ -44,17 +46,17 @@ public class LobbyXhr {
     }
 
     private int versionWait(int version) {
-        return _wait(Math.max(1, config.poll().duration() / config.poll().sleep()), version);
+        return waitLoop(Math.max(1, config.poll().duration() / config.poll().sleep()), version);
     }
 
     @SneakyThrows
-    private int _wait(Integer loop, Integer version) {
-        if (loop == 0 || !(lobbyMemo.version() == version)) {
+    private int waitLoop(Integer loop, Integer version) {
+        if (loop == 0 || lobbyMemo.version() != version) {
             return lobbyMemo.version();
         }
         else {
             Thread.sleep(config.poll().sleep());
-            return _wait(loop - 1, version);
+            return waitLoop(loop - 1, version);
         }
     }
 

@@ -19,7 +19,7 @@ public class LobbyXhrC {
     private final LobbyXhr xhr;
 
     @GetMapping({"/sync/{hookId}", "/sync"})
-    private Map<String, Object> sync(
+    public Map<String, Object> sync(
         @PathVariable Optional<String> hookId,
         @RequestParam Optional<Integer> auth,
         @RequestParam Optional<String> l,

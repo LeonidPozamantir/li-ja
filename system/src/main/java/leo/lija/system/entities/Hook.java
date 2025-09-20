@@ -30,9 +30,6 @@ public class Hook {
     @Column(nullable = false)
     private int variant;
 
-    @Column(nullable = false)
-    private boolean hasClock;
-
     private Integer time;
     private Integer increment;
 
@@ -84,11 +81,15 @@ public class Hook {
             "variant", realVariant().toString(),
             "mode", realMode().toString(),
             "color", color,
-            "clock", hasClock ? time + " + " + increment : "Unlimited",
+            "clock", time != null && increment != null ? renderClock(time, increment) : "Unlimited",
             "emin", eloMin(),
             "emax", eloMax()
         ));
         if (engine) res.put("engine", true);
         return res;
+    }
+
+    private String renderClock(int time, int inc) {
+        return "%d + %d".formatted(time, inc);
     }
 }
