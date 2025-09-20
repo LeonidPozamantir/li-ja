@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 public class LobbyMemo {
 
     public int version() {
-        return 0;
+        return 1;
     }
 }

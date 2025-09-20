@@ -18,7 +18,7 @@ public class LobbyXhrC {
 
     private final LobbyXhr xhr;
 
-    @GetMapping({"/sync/{hookId}", "/sync"})
+    @GetMapping({"/sync/{hookId}", "/sync", "/api/lobby/preload/{hookId}", "/api/lobby/preload"})
     public Map<String, Object> sync(
         @PathVariable Optional<String> hookId,
         @RequestParam Optional<Integer> auth,
@@ -27,7 +27,6 @@ public class LobbyXhrC {
     ) {
         return xhr.sync(
             auth.orElse(0) == 1,
-            l.orElse("en"),
             state.orElse(0)
         );
     }

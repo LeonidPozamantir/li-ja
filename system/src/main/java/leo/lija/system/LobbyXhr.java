@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class LobbyXhr {
     private final LobbyMemo lobbyMemo;
     private final LobbyConfigProperties config;
 
-    public Map<String, Object> sync(boolean auth, String lang, int version) {
+    public Map<String, Object> sync(boolean auth, int version) {
         int newVersion = versionWait(version);
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();
         return Map.of(
@@ -33,8 +34,8 @@ public class LobbyXhr {
         );
     }
 
-    private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
-        return hooks.stream().map(hook -> {
+    private Map<String, Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
+        return hooks.stream().collect(Collectors.toMap(Hook::getId, hook -> {
             Map<String, Object> res = hook.render();
             if (myHookId.isPresent() && myHookId.get().equals(hook.getOwnerId())) {
                 res.putAll(Map.of("action", "cancel", "id", myHookId.get()));
@@ -42,7 +43,7 @@ public class LobbyXhr {
                 res.putAll(Map.of("action", "join", "id", hook.getId()));
             }
             return res;
-        }).toList();
+        }));
     }
 
     private int versionWait(int version) {
