@@ -27,8 +27,8 @@ public class LobbyApiC {
         api.inc();
     }
 
-    @PostMapping("/create")
-    public void create(@Valid @RequestBody Hook hook) {
-        api.create(hook);
+    @PostMapping("/create/{hookOwnerId}")
+    public void create(@PathVariable String hookOwnerId) {
+        api.create(hookOwnerId);
     }
 }

@@ -39,9 +39,8 @@ public class LobbyApi extends IOTools {
         lobbyMemo.increase();
     }
 
-    public void create(Hook hook) {
-        hookRepo.save(hook);
+    public void create(String hookOwnerId) {
         lobbyMemo.increase();
-        hookMemo.put(hook.getOwnerId());
+        hookMemo.put(hookOwnerId);
     }
 }
