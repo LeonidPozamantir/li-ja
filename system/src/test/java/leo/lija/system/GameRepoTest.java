@@ -38,19 +38,24 @@ class GameRepoTest extends Fixtures {
     }
 
     @Nested
-    @DisplayName("find by ID")
-    class findById {
+    @DisplayName("find a game")
+    class FindGame {
 
-        @Test
-        @DisplayName("non-existing")
-        void nonExisting() {
-            assertThatThrownBy(() -> repo.game("haha")).isInstanceOf(AppException.class);
-        }
+        @Nested
+        @DisplayName("by ID")
+        class ById {
 
-        @Test
-        void existing() {
-            DbGame g = repo.game(anyGame.getId());
-            assertThat(g.getId()).isEqualTo(anyGame.getId());
+            @Test
+            @DisplayName("non-existing")
+            void nonExisting() {
+                assertThatThrownBy(() -> repo.game("haha")).isInstanceOf(AppException.class);
+            }
+
+            @Test
+            void existing() {
+                DbGame g = repo.game(anyGame.getId());
+                assertThat(g.getId()).isEqualTo(anyGame.getId());
+            }
         }
     }
 

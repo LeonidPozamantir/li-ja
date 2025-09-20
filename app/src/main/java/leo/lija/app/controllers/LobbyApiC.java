@@ -1,12 +1,9 @@
 package leo.lija.app.controllers;
 
-import jakarta.validation.Valid;
 import leo.lija.system.LobbyApi;
-import leo.lija.system.entities.Hook;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +27,10 @@ public class LobbyApiC {
     @PostMapping("/create/{hookOwnerId}")
     public void create(@PathVariable String hookOwnerId) {
         api.create(hookOwnerId);
+    }
+
+    @PostMapping("/remove/{hookId}")
+    public void remove(@PathVariable String hookId) {
+        api.remove(hookId);
     }
 }

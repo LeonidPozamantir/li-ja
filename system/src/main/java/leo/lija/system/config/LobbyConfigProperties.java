@@ -3,7 +3,7 @@ package leo.lija.system.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "lobby")
-public record LobbyConfigProperties(Poll poll) {
+public record LobbyConfigProperties(Sync sync) {
 
-    public static record Poll(int duration, int sleep) {}
+    public static record Sync(int duration, int sleep) {}
 }

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class Syncer {
+public class AppSyncer {
 
     private final GameRepo gameRepo;
     private final VersionMemo versionMemo;
@@ -61,6 +61,7 @@ public class Syncer {
                     );
                 }).orElse(failMap);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return failMap;
         }
     }

@@ -16,7 +16,7 @@ sync:
   sleep: 200
 
 lobby:
-  poll:
+  sync:
     duration: 10000
     sleep: 300
 

@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import leo.lija.app.forms.MoveForm;
 import leo.lija.system.Pinger;
 import leo.lija.system.AppXhr;
-import leo.lija.system.Syncer;
+import leo.lija.system.AppSyncer;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class AppXhrC {
 
     private final AppXhr xhr;
-    private final Syncer syncer;
+    private final AppSyncer syncer;
     private final Pinger pinger;
     private final AliveMemo aliveMemo;
 

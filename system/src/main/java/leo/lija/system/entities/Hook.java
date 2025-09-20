@@ -59,6 +59,8 @@ public class Hook {
     @Column(nullable = false)
     private Boolean engine;
 
+    private String game;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

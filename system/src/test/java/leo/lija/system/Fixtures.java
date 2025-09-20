@@ -54,7 +54,8 @@ public class Fixtures {
         Status.CREATED,
         0,
         Optional.empty(),
-        Optional.empty()
+        Optional.empty(),
+        WHITE
     );
 
     public DbGame newDbGameWithBoard(Board b) {
@@ -104,7 +105,8 @@ public class Fixtures {
         Status.RESIGN,
         24,
         Optional.empty(),
-        Optional.empty()
+        Optional.empty(),
+        WHITE
     );
 
     DbGame dbGame2 = new DbGame(
@@ -121,7 +123,8 @@ public class Fixtures {
             196250,
             304100
         )),
-        Optional.of("a7 c7")
+        Optional.of("a7 c7"),
+        WHITE
     );
 
     DbGame dbGame3 = new DbGame(
@@ -132,7 +135,8 @@ public class Fixtures {
         Status.MATE,
         81,
         Optional.empty(),
-        Optional.of("a3 a8")
+        Optional.of("a3 a8"),
+        WHITE
     );
 
     DbGame dbGame4 = new DbGame(
@@ -143,7 +147,8 @@ public class Fixtures {
         Status.RESIGN,
         24,
         Optional.empty(),
-        Optional.empty()
+        Optional.empty(),
+        WHITE
     );
 
     DbGame dbGame5 = new DbGame(
@@ -160,7 +165,8 @@ public class Fixtures {
             27610,
             60240
         )),
-        Optional.of("d8 d2")
+        Optional.of("d8 d2"),
+        WHITE
     );
 
     public Move newMove(Piece piece, Pos orig, Pos dest) {

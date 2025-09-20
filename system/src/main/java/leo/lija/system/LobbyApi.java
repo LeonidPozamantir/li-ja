@@ -43,4 +43,9 @@ public class LobbyApi extends IOTools {
         lobbyMemo.increase();
         hookMemo.put(hookOwnerId);
     }
+
+    public void remove(String hookId) {
+        hookRepo.deleteById(hookId);
+        lobbyMemo.increase();
+    }
 }

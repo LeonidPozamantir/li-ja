@@ -49,16 +49,17 @@ public class DbGame {
     @Setter
     private Optional<Clock> clock;
     private Optional<String> lastMove;
+    private Color creatorColor;
     private String positionHashes;
     private String castles;
     private boolean isRated;
     private Variant variant;
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, "", "KQkq", false, Variant.STANDARD);
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor) {
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, creatorColor, "", "KQkq", false, Variant.STANDARD);
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, String positionHashes, String castles, boolean isRated, Variant variant) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -67,6 +68,7 @@ public class DbGame {
         this.turns = turns;
         this.clock = clock;
         this.lastMove = lastMove;
+        this.creatorColor = creatorColor;
         this.positionHashes = positionHashes;
         this.castles = castles;
         this.isRated = isRated;
@@ -74,7 +76,7 @@ public class DbGame {
     }
 
     public DbGame copy() {
-        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, positionHashes, castles, isRated, variant);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, creatorColor, positionHashes, castles, isRated, variant);
     }
 
     public List<DbPlayer> players() {

@@ -1,6 +1,7 @@
 package leo.lija.system;
 
 import leo.lija.chess.Clock;
+import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
@@ -13,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove) {
-        super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove);
+    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor) {
+        super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, creatorColor);
     }
 
     public RichDbGame(DbGame game) {
-        this(game.getId(), game.getWhitePlayer(), game.getBlackPlayer(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove());
+        this(game.getId(), game.getWhitePlayer(), game.getBlackPlayer(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove(), game.getCreatorColor());
     }
 
     @Override
