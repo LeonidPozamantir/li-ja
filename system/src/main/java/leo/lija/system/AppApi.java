@@ -28,13 +28,6 @@ public class AppApi extends IOTools {
 
     private final AliveMemo aliveMemo;
 
-    public void lobbyJoin(String gameId, String colorName) {
-        Color color = ioColor(colorName);
-        DbGame g1 = gameRepo.game(gameId);
-        aliveMemo.put(gameId, color);
-        aliveMemo.put(gameId, color.getOpposite());
-    }
-
     public void join(String fullId, String url, String messages) {
         Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
         DbGame g1 = gameAndPlayer.getFirst();

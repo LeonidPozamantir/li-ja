@@ -20,6 +20,7 @@ import java.util.Optional;
 @Getter
 public class Hook {
 
+    @NotNull
     @Id
     private String id;
 
@@ -27,14 +28,16 @@ public class Hook {
     @Column(nullable = false)
     private String ownerId;
 
+    @NotNull
     @Column(nullable = false)
-    private int variant;
+    private Integer variant;
 
     private Integer time;
     private Integer increment;
 
+    @NotNull
     @Column(nullable = false)
-    private int mode;
+    private Integer mode;
 
     @NotNull
     @Column(nullable = false)
@@ -46,13 +49,15 @@ public class Hook {
 
     private Integer elo;
 
+    @NotNull
     @Column(nullable = false)
-    private boolean match;
+    private Boolean match;
 
     private String eloRange;
 
+    @NotNull
     @Column(nullable = false)
-    private boolean engine;
+    private Boolean engine;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

@@ -22,10 +22,10 @@ public class LobbyXhrC {
     public Map<String, Object> sync(
         @PathVariable Optional<String> hookId,
         @RequestParam Optional<Integer> auth,
-        @RequestParam Optional<String> l,
         @RequestParam Optional<Integer> state
     ) {
         return xhr.sync(
+            hookId,
             auth.orElse(0) == 1,
             state.orElse(0)
         );

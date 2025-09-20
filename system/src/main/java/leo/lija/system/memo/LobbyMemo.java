@@ -5,7 +5,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class LobbyMemo {
 
+    private int privateVersion = 1;
+
     public int version() {
-        return 1;
+        return privateVersion;
+    }
+
+    public void increase() {
+        privateVersion++;
     }
 }

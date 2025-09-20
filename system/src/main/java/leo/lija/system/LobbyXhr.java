@@ -21,13 +21,13 @@ public class LobbyXhr {
     private final LobbyMemo lobbyMemo;
     private final LobbyConfigProperties config;
 
-    public Map<String, Object> sync(boolean auth, int version) {
+    public Map<String, Object> sync(Optional<String> myHookId, boolean auth, int version) {
         int newVersion = versionWait(version);
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();
         return Map.of(
             "state", newVersion,
             "pool", !hooks.isEmpty()
-                ? Map.of("hooks", renderHooks(hooks, Optional.empty()))
+                ? Map.of("hooks", renderHooks(hooks, myHookId))
                 : Map.of("message", "No game available right now, create one!"),
             "chat", "",
             "timeline", ""

@@ -69,10 +69,6 @@ public class AppApiC {
         return String.valueOf(api.activity(gameId, color));
     }
 
-    public void lobbyJoin(String gameId, String color) {
-        api.lobbyJoin(gameId, color);
-    }
-
     @PostMapping("/accept-rematch/{gameId}/{color}/{newGameId}")
     public void acceptRematch(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm rematch) {
         api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
