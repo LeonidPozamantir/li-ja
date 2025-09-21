@@ -24,12 +24,14 @@ public class LobbyXhrC {
     public Map<String, Object> sync(
         @PathVariable Optional<String> hookId,
         @RequestParam Optional<Integer> auth,
-        @RequestParam Optional<Integer> state
+        @RequestParam Optional<Integer> state,
+        @RequestParam Optional<Integer> entryId
     ) {
         return syncer.sync(
             hookId,
             auth.orElse(0) == 1,
-            state.orElse(0)
+            state.orElse(0),
+            entryId.orElse(0)
         );
     }
 }

@@ -5,5 +5,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "lobby")
 public record LobbyConfigProperties(Sync sync) {
 
-    public static record Sync(int duration, int sleep) {}
+    public static record Sync(int duration, int sleep, int maxEntries) {}
 }

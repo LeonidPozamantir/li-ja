@@ -18,7 +18,8 @@ sync:
 lobby:
   sync:
     duration: 10000
-    sleep: 300
+    sleep: 250
+    max-entries: 12
 
 memo:
   version:
@@ -40,3 +41,7 @@ crafty:
 cron:
   online-username:
     frequency: 2000
+  hook-cleanup-dead:
+    frequency: 2000
+  hook-cleanup-old:
+    frequency: 21000

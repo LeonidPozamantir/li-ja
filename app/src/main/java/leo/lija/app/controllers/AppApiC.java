@@ -6,6 +6,7 @@ import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppApi;
+import leo.lija.system.entities.entry.EntryGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,9 +59,14 @@ public class AppApiC {
         api.end(gameId, msgs.messages());
     }
 
+    @PostMapping("/start")
+    public void start(@Valid @RequestBody EntryGame entryGame) {
+        api.start(entryGame);
+    }
+
     @PostMapping("/join/{fullId}")
     public ResponseEntity<String> join(@PathVariable String fullId, @Valid @RequestBody JoinForm join) {
-        api.join(fullId, join.redirect(), join.messages());
+        api.join(fullId, join.redirect(), join.messages(), join.entry());
         return ResponseEntity.ok().body("ok");
     }
 
@@ -69,9 +75,9 @@ public class AppApiC {
         return String.valueOf(api.activity(gameId, color));
     }
 
-    @PostMapping("/accept-rematch/{gameId}/{color}/{newGameId}")
-    public void acceptRematch(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm rematch) {
-        api.acceptRematch(gameId, newGameId, color, rematch.whiteRedirect(), rematch.blackRedirect());
+    @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")
+    public void rematchAccept(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm r) {
+        api.acceptRematch(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry());
     }
 
 }

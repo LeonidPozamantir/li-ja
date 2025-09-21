@@ -5,7 +5,8 @@ sync:
 lobby:
   sync:
     duration: 10000
-    sleep: 300
+    sleep: 250
+    maxEntries: 12
 
 memo:
   version:

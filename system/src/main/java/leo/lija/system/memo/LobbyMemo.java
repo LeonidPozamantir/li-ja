@@ -11,7 +11,8 @@ public class LobbyMemo {
         return privateVersion;
     }
 
-    public void increase() {
+    public int increase() {
         privateVersion++;
+        return privateVersion;
     }
 }

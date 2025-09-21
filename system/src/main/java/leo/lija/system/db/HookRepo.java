@@ -1,25 +1,51 @@
 package leo.lija.system.db;
 
+import com.google.common.cache.Cache;
 import leo.lija.system.entities.Hook;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface HookRepo extends JpaRepository<Hook, String> {
 
-    public Optional<Hook> findById(String id);
+    Optional<Hook> findById(String id);
 
-    public Optional<Hook> findByOwnerId(String ownerId);
+    Optional<Hook> findByOwnerId(String ownerId);
 
     @Query("select h from Hook h where h.match = false order by h.createdAt")
-    public List<Hook> allOpen();
+    List<Hook> allOpen();
 
     @Query("select h from Hook h where h.match = false and h.mode = 0 order by h.createdAt")
-    public List<Hook> allOpenCasual();
+    List<Hook> allOpenCasual();
 
     @Transactional
-    public void deleteById(String id);
+    void deleteById(String id);
+
+    default boolean keepOnlyIds(Collection<String> ids) {
+        List<String> removableIds = getOtherIds(ids);
+        if (!removableIds.isEmpty()) {
+            deleteAllById(removableIds);
+            return true;
+        }
+        return false;
+    }
+
+    @Query("select h.id from Hook h where h.id not in :ids and h.match = false ")
+    List<String> getOtherIds(Collection<String> ids);
+
+    default void cleanupOld() {
+        cleanupByTime(LocalDateTime.now().minusHours(1));
+    }
+
+    @Modifying
+    @Query("delete from Hook h where h.createdAt < :time")
+    @Transactional
+    void cleanupByTime(LocalDateTime time);
+
 }
