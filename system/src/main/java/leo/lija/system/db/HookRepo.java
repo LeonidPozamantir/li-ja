@@ -1,6 +1,5 @@
 package leo.lija.system.db;
 
-import com.google.common.cache.Cache;
 import leo.lija.system.entities.Hook;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,6 +26,7 @@ public interface HookRepo extends JpaRepository<Hook, String> {
     @Transactional
     void deleteById(String id);
 
+    @Transactional
     default boolean keepOnlyIds(Collection<String> ids) {
         List<String> removableIds = getOtherIds(ids);
         if (!removableIds.isEmpty()) {
@@ -39,6 +39,7 @@ public interface HookRepo extends JpaRepository<Hook, String> {
     @Query("select h.id from Hook h where h.id not in :ids and h.match = false ")
     List<String> getOtherIds(Collection<String> ids);
 
+    @Transactional
     default void cleanupOld() {
         cleanupByTime(LocalDateTime.now().minusHours(1));
     }

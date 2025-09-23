@@ -50,6 +50,10 @@ public abstract class Clock {
         return limitInSeconds() / 60;
     }
 
+    public int incrementInSeconds() {
+        return increment / 1000;
+    }
+
     abstract RunningClock step();
 
     public int estimateTotalTime() {

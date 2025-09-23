@@ -11,6 +11,7 @@ import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.EntryMemo;
 import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;
+import leo.lija.system.memo.MessageMemo;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
@@ -20,27 +21,29 @@ public class LobbyApi extends IOTools {
     private final HookRepo hookRepo;
     private final EntryRepo entryRepo;
     private final LobbyMemo lobbyMemo;
+    private final MessageMemo messageMemo;
     private final EntryMemo entryMemo;
     private final AliveMemo aliveMemo;
     private final HookMemo hookMemo;
 
-    LobbyApi(HookRepo hookRepo, EntryRepo entryRepo, LobbyMemo lobbyMemo, EntryMemo entryMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
+    LobbyApi(HookRepo hookRepo, EntryRepo entryRepo, LobbyMemo lobbyMemo, MessageMemo messageMemo, EntryMemo entryMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
         super(gameRepo, versionMemo);
         this.hookRepo = hookRepo;
         this.entryRepo = entryRepo;
         this.lobbyMemo = lobbyMemo;
+        this.messageMemo = messageMemo;
         this.entryMemo = entryMemo;
         this.aliveMemo = aliveMemo;
         this.hookMemo = hookMemo;
     }
 
-    public void join(String gameId, String colorName, EntryGame entryGame) {
+    public void join(String gameId, String colorName, String entryData) {
         Color color = ioColor(colorName);
-        DbGame g1 = gameRepo.game(gameId);
+        DbGame game = gameRepo.game(gameId);
         aliveMemo.put(gameId, color);
         aliveMemo.put(gameId, color.getOpposite());
         versionInc();
-        addEntry(entryGame);
+        addEntry(game, entryData);
     }
 
     public void create(String hookOwnerId) {
@@ -57,12 +60,18 @@ public class LobbyApi extends IOTools {
         hookMemo.put(hookOwnerId);
     }
 
+    public void messageRefresh() {
+        messageMemo.refresh();
+    }
+
     private int versionInc() {
         return lobbyMemo.increase();
     }
 
-    public void addEntry(EntryGame entryGame) {
-        int nextId = entryMemo.increase();
-        entryRepo.save(new Entry(nextId, entryGame));
+    public void addEntry(DbGame game, String data) {
+        Entry.build(game, data).ifPresent(f -> {
+            int id = entryMemo.increase();
+            entryRepo.save(f.apply(id));
+        });
     }
 }

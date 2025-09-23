@@ -4,12 +4,15 @@ import leo.lija.system.config.LobbyConfigProperties;
 import leo.lija.system.db.EntryRepo;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
+import leo.lija.system.db.MessageRepo;
 import leo.lija.system.dto.EntryDto;
 import leo.lija.system.entities.Hook;
+import leo.lija.system.entities.Message;
 import leo.lija.system.entities.entry.Entry;
 import leo.lija.system.memo.EntryMemo;
 import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;
+import leo.lija.system.memo.MessageMemo;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
@@ -26,17 +29,19 @@ public class LobbySyncer {
 
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;
+    private final MessageRepo messageRepo;
     private final EntryRepo entryRepo;
     private final LobbyMemo lobbyMemo;
     private final HookMemo hookMemo;
+    private final MessageMemo messageMemo;
     private final EntryMemo entryMemo;
     private final LobbyConfigProperties config;
 
-    public Map<String, Object> sync(Optional<String> myHookId, boolean auth, int version, int entryId) {
+    public Map<String, Object> sync(Optional<String> myHookId, boolean auth, int version, int messageId, int entryId) {
         myHookId.ifPresent(hookMemo::put);
-        int newVersion = wait2(version, entryId);
+        int newVersion = wait2(version, messageId, entryId);
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();
-        Supplier<Map<String, Object>> response = () -> stdResponse(newVersion, hooks, myHookId, entryId);
+        Supplier<Map<String, Object>> response = () -> stdResponse(newVersion, hooks, myHookId, messageId, entryId);
         return myHookId
             .map(hookId -> hookResponse(hookId, response))
             .orElse(response.get());
@@ -52,21 +57,35 @@ public class LobbySyncer {
             .orElse(Map.of("redirect", ""));
     }
 
-    public Map<String, Object> stdResponse(Integer version, List<Hook> hooks, Optional<String> myHookId, int entryId) {
+    public Map<String, Object> stdResponse(Integer version, List<Hook> hooks, Optional<String> myHookId, int messageId, int entryId) {
+        List<Message> messages = messageId == 0
+            ? messageRepo.recent(config.sync().message().max())
+            : messageRepo.since(Math.max(messageMemo.id() - config.sync().message().max(), messageId));
         List<Entry> entries = entryId == 0
-            ? entryRepo.recent(config.sync().maxEntries())
-            : entryRepo.since(Math.max(entryMemo.id() - config.sync().maxEntries(), entryId));
+            ? entryRepo.recent(config.sync().entry().max())
+            : entryRepo.since(Math.max(entryMemo.id() - config.sync().entry().max(), entryId));
         return Map.of(
             "state", version,
             "pool", !hooks.isEmpty()
                 ? Map.of("hooks", renderHooks(hooks, myHookId))
                 : Map.of("message", "No game available right now, create one!"),
-            "chat", "",
-            "timeline", !entries.isEmpty() ? renderTimeline(entries) : Map.of("id", entryId, "entries", List.of())
+            "chat", !messages.isEmpty() ? renderMessages(messages) : Map.of("id", messageId, "messages", List.of()),
+            "timeline", !entries.isEmpty() ? renderEntries(entries) : Map.of("id", entryId, "entries", List.of())
         );
     }
 
-    private Map<String, Object> renderTimeline(List<Entry> entries) {
+    private Map<String, Object> renderMessages(List<Message> messages) {
+        return Map.of(
+            "id", messages.getFirst().getId(),
+            "messages", messages.reversed().stream().map(message -> Map.of(
+                "id", message.getId(),
+                "u", message.getUsername(),
+                "m", message.getMessage()
+            ))
+        );
+    }
+
+    private Map<String, Object> renderEntries(List<Entry> entries) {
         return Map.of(
             "id", entries.get(0).getId(),
             "entries", entries.reversed().stream().map(entry -> new EntryDto(
@@ -91,20 +110,21 @@ public class LobbySyncer {
         }));
     }
 
-    private int wait2(int version, int entryId) {
-        return waitLoop(Math.max(1, config.sync().duration() / config.sync().sleep()), version, entryId);
+    private int wait2(int version, int messageId, int entryId) {
+        return waitLoop(Math.max(1, config.sync().duration() / config.sync().sleep()), version, messageId, entryId);
     }
 
     @SneakyThrows
-    private int waitLoop(int loop, int version, int entryId) {
+    private int waitLoop(int loop, int version, int messageId, int entryId) {
         if (loop == 0
             || lobbyMemo.version() != version
+            || messageMemo.id() != messageId
             || entryMemo.id() != entryId) {
             return lobbyMemo.version();
         }
         else {
             Thread.sleep(config.sync().sleep());
-            return waitLoop(loop - 1, version, entryId);
+            return waitLoop(loop - 1, version, messageId, entryId);
         }
     }
 

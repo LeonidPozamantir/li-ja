@@ -1,12 +1,12 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
+import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppApi;
-import leo.lija.system.entities.entry.EntryGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +59,9 @@ public class AppApiC {
         api.end(gameId, msgs.messages());
     }
 
-    @PostMapping("/start")
-    public void start(@Valid @RequestBody EntryGame entryGame) {
-        api.start(entryGame);
+    @PostMapping("/start/{gameId}")
+    public void start(@PathVariable String gameId, @Valid @RequestBody EntryForm entryData) {
+        api.start(gameId, entryData.entry());
     }
 
     @PostMapping("/join/{fullId}")

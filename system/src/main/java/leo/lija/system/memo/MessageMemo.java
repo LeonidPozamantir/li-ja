@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class EntryMemo {
+public class MessageMemo {
 
     private final Supplier<Optional<Integer>> getId;
 
@@ -24,7 +24,7 @@ public class EntryMemo {
     }
 
     public int refresh() {
-        privateId = getId.get().orElseThrow(() -> new AppException("No last entry found"));
+        privateId = getId.get().orElseThrow(() -> new AppException("No last message found"));
         return privateId;
     }
 

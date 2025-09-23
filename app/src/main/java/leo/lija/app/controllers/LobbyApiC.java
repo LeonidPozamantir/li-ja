@@ -1,8 +1,8 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
+import leo.lija.app.forms.EntryForm;
 import leo.lija.system.LobbyApi;
-import leo.lija.system.entities.entry.EntryGame;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +18,8 @@ public class LobbyApiC {
     private final LobbyApi api;
 
     @PostMapping("/join/{gameId}/{color}")
-    public void join(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody EntryGame ec) {
-        api.join(gameId, color, ec);
+    public void join(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody EntryForm entry) {
+        api.join(gameId, color, entry.entry());
     }
 
     @PostMapping("/create/{hookOwnerId}")
@@ -35,5 +35,10 @@ public class LobbyApiC {
     @PostMapping("/alive/{hookOwnerId}")
     public void alive(@PathVariable String hookOwnerId) {
         api.alive(hookOwnerId);
+    }
+
+    @PostMapping("/message")
+    public void message() {
+        api.messageRefresh();
     }
 }

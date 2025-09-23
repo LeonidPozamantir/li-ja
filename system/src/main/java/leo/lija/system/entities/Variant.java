@@ -13,6 +13,10 @@ public record Variant(int id, String string) {
         return string;
     }
 
+    public String name() {
+        return string.toLowerCase();
+    }
+
     public static final Variant STANDARD = new Variant(1, "Standard");
     public static final Variant CHESS960 = new Variant(2, "Chess960");
 

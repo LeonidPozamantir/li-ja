@@ -44,9 +44,7 @@ public class DbGame {
     private DbPlayer blackPlayer;
     private String pgn;
     private Status status;
-    @Setter
     private int turns;
-    @Setter
     private Optional<Clock> clock;
     private Optional<String> lastMove;
     private Color creatorColor;

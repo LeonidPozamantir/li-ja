@@ -5,7 +5,6 @@ import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
-import leo.lija.system.entities.entry.EntryGame;
 import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 @Service
 public class AppApi extends IOTools {
@@ -25,20 +25,20 @@ public class AppApi extends IOTools {
     AppApi(GameRepo gameRepo, VersionMemo versionMemo, AliveMemo aliveMemo, LobbyApi lobbyApi) {
         super(gameRepo, versionMemo);
         this.aliveMemo = aliveMemo;
-        this.lobbyApi = lobbyApi;
+        this.addEntry = lobbyApi::addEntry;
     }
 
     private final AliveMemo aliveMemo;
-    private final LobbyApi lobbyApi;
+    private final BiConsumer<DbGame, String> addEntry;
 
-    public void join(String fullId, String url, String messages, EntryGame entryGame) {
+    public void join(String fullId, String url, String messages, String entryData) {
         Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
         DbGame g1 = gameAndPlayer.getFirst();
         DbPlayer player = gameAndPlayer.getSecond();
         g1.withEvents(decodeMessages(messages));
         g1.withEvents(g1.opponent(player).getColor(), List.of(new RedirectEvent(url)));
         save(g1);
-        lobbyApi.addEntry(entryGame);
+        addEntry.accept(g1, entryData);
     }
 
     public void talk(String gameId, String author, String message) {
@@ -55,12 +55,13 @@ public class AppApi extends IOTools {
         save(g1);
     }
 
-    public void start(EntryGame entryGame) {
-        lobbyApi.addEntry(entryGame);
+    public void start(String gameId, String entryData) {
+        DbGame game = gameRepo.game(gameId);
+        addEntry.accept(game, entryData);
     }
 
 
-    public void acceptRematch(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect, EntryGame entryGame) {
+    public void acceptRematch(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect, String entryData) {
         Color color = ioColor(colorName);
         DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(
@@ -70,7 +71,7 @@ public class AppApi extends IOTools {
         save(g1);
         aliveMemo.put(newGameId, color.getOpposite());
         aliveMemo.transfer(gameId, color.getOpposite(), newGameId, color);
-        lobbyApi.addEntry(entryGame);
+        addEntry.accept(g1, entryData);
     }
 
     public void updateVersion(String gameId) {

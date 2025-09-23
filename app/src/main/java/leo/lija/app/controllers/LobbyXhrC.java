@@ -25,12 +25,14 @@ public class LobbyXhrC {
         @PathVariable Optional<String> hookId,
         @RequestParam Optional<Integer> auth,
         @RequestParam Optional<Integer> state,
+        @RequestParam Optional<Integer> messageId,
         @RequestParam Optional<Integer> entryId
     ) {
         return syncer.sync(
             hookId,
             auth.orElse(0) == 1,
             state.orElse(0),
+            messageId.orElse(0),
             entryId.orElse(0)
         );
     }

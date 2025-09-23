@@ -54,9 +54,10 @@ public class AppXhrC {
         @RequestParam Optional<String> username,
         @RequestParam("player_key") Optional<String> playerKey,
         @RequestParam Optional<String> watcher,
-        @RequestParam("get_nb_watchers") Optional<String> getNbWatchers
+        @RequestParam("get_nb_watchers") Optional<String> getNbWatchers,
+        @RequestParam("hook_id") Optional<String> hookId
     ) {
-        return pinger.ping(username, playerKey, watcher, getNbWatchers);
+        return pinger.ping(username, playerKey, watcher, getNbWatchers, hookId);
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})

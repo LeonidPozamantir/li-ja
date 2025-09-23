@@ -2,7 +2,6 @@ package leo.lija.system.entities.entry;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
