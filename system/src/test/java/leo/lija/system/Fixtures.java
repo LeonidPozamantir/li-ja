@@ -55,6 +55,7 @@ public class Fixtures {
         0,
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         WHITE
     );
 
@@ -106,6 +107,7 @@ public class Fixtures {
         24,
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         WHITE
     );
 
@@ -124,6 +126,7 @@ public class Fixtures {
             304100
         )),
         Optional.of("a7 c7"),
+        Optional.empty(),
         WHITE
     );
 
@@ -136,6 +139,7 @@ public class Fixtures {
         81,
         Optional.empty(),
         Optional.of("a3 a8"),
+        Optional.empty(),
         WHITE
     );
 
@@ -146,6 +150,7 @@ public class Fixtures {
         "e4 Nc6 Nf3 Nf6 e5 Ne4 d3 Nc5 Be3 d6 d4 Ne4 Bd3 Bf5 Nc3 Nxc3 bxc3 Qd7 Bxf5 Qxf5 Nh4 Qe4 g3 Qxh1+",
         Status.RESIGN,
         24,
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         WHITE
@@ -166,6 +171,7 @@ public class Fixtures {
             60240
         )),
         Optional.of("d8 d2"),
+        Optional.empty(),
         WHITE
     );
 

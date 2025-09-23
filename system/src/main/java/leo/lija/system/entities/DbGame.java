@@ -47,17 +47,18 @@ public class DbGame {
     private int turns;
     private Optional<Clock> clock;
     private Optional<String> lastMove;
+    private Optional<Pos> check;
     private Color creatorColor;
     private String positionHashes;
     private String castles;
     private boolean isRated;
     private Variant variant;
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, creatorColor, "", "KQkq", false, Variant.STANDARD);
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor) {
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD);
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -66,6 +67,7 @@ public class DbGame {
         this.turns = turns;
         this.clock = clock;
         this.lastMove = lastMove;
+        this.check = check;
         this.creatorColor = creatorColor;
         this.positionHashes = positionHashes;
         this.castles = castles;
@@ -74,7 +76,7 @@ public class DbGame {
     }
 
     public DbGame copy() {
-        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, creatorColor, positionHashes, castles, isRated, variant);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant);
     }
 
     public List<DbPlayer> players() {
@@ -207,6 +209,7 @@ public class DbGame {
         else if (situation.stalemate()) status = Status.STALEMATE;
         else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
+        check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
 
         if (abortableBefore != abortable() || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE) || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK)) {
             withEvents(List.of(new ReloadTableEvent()));

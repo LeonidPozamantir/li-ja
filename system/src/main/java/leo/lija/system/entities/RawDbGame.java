@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
+import leo.lija.chess.Pos;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,19 +36,19 @@ public class RawDbGame {
     @Column(nullable = false)
     private String pgn;
     private int status;
-    @Setter
     private int turns;
     @Embedded
-    @Setter
     private RawDbClock clock;
     private String lastMove;
+    @Column(name = "pos_check")
+    private String check;
     private String creatorColor;
     private String positionHashes;
     private String castles;
     private boolean isRated;
     private int variant;
 
-    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String creatorColor, String positionHashes, String castles, boolean isRated, int variant) {
+    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String check, String creatorColor, String positionHashes, String castles, boolean isRated, int variant) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -55,6 +56,7 @@ public class RawDbGame {
         this.turns = turns;
         this.clock = clock;
         this.lastMove = lastMove;
+        this.check = check;
         this.creatorColor = creatorColor;
         this.positionHashes = positionHashes;
         this.castles = castles;
@@ -71,7 +73,21 @@ public class RawDbGame {
                         .flatMap(trueCreatorColor -> Variant.apply(variant)
                             .map(trueVariant -> {
                                 Optional<Clock> validClock = Optional.ofNullable(clock).flatMap(RawDbClock::decode);
-                                return new DbGame(id, whitePlayer, blackPlayer, pgn, trueStatus, turns, validClock, Optional.ofNullable(lastMove), trueCreatorColor, positionHashes, castles, isRated, trueVariant);
+                                return new DbGame(
+                                    id,
+                                    whitePlayer,
+                                    blackPlayer,
+                                    pgn, trueStatus,
+                                    turns,
+                                    validClock,
+                                    Optional.ofNullable(lastMove),
+                                    Optional.ofNullable(check).flatMap(Pos::posAt),
+                                    trueCreatorColor,
+                                    positionHashes,
+                                    castles,
+                                    isRated,
+                                    trueVariant
+                                );
                 })))));
     }
 
@@ -84,6 +100,7 @@ public class RawDbGame {
             dbGame.getTurns(),
             dbGame.getClock().map(RawDbClock::encode).orElse(null),
             dbGame.getLastMove().orElse(null),
+            dbGame.getCheck().map(Pos::key).orElse(null),
             dbGame.getCreatorColor().getName(),
             dbGame.getPositionHashes(),
             dbGame.getCastles(),

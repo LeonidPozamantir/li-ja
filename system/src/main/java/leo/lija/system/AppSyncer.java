@@ -8,6 +8,7 @@ import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
+import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
@@ -35,34 +36,28 @@ public class AppSyncer {
     int sleep;
 
     public Map<String, Object> sync(String gameId, String colorString, Integer version, Optional<String> fullId) {
-        try {
-            return Color.apply(colorString)
-                .flatMap(color -> {
-                    versionWait(gameId, color, version);
-                    Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(gameId, color);
-                    DbGame game = gameAndPlayer.getFirst();
-                    DbPlayer player = gameAndPlayer.getSecond();
-                    boolean isPrivate = fullId.map(fid -> game.isPlayerFullId(player, fid)).orElse(false);
-                    versionMemo.put(game);
-                    return player.eventStack().eventsSince(version).map(events -> {
-                            Map<String, Object> res = new HashMap<>();
-                            res.putAll(Map.of(
-                                "v", player.eventStack().lastVersion(),
-                                "e", renderEvents(events, isPrivate),
-                                "p", game.player().getColor().name(),
-                                "t", game.getTurns(),
-                                "oa", aliveMemo.activity(game, color.getOpposite())
-                            ));
-                            res.put("c", game.getClock().map(clock -> clock.remainingTimes().entrySet().stream()
-                                .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
-                            res.entrySet().removeIf(e -> e.getValue() == null);
-                            return res;
-                        }
-                    );
-                }).orElse(failMap);
-        } catch (Exception e) {
-            return failMap;
-        }
+        Color color = Color.apply(colorString).orElseThrow(() -> new AppException("Invalid color"));
+        versionWait(gameId, color, version);
+        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(gameId, color);
+        DbGame game = gameAndPlayer.getFirst();
+        DbPlayer player = gameAndPlayer.getSecond();
+        boolean isPrivate = fullId.map(fid -> game.isPlayerFullId(player, fid)).orElse(false);
+        versionMemo.put(game);
+        return player.eventStack().eventsSince(version).map(events -> {
+                Map<String, Object> res = new HashMap<>();
+                res.putAll(Map.of(
+                    "v", player.eventStack().lastVersion(),
+                    "e", renderEvents(events, isPrivate),
+                    "p", game.player().getColor().name(),
+                    "t", game.getTurns(),
+                    "oa", aliveMemo.activity(game, color.getOpposite())
+                ));
+                res.put("c", game.getClock().map(clock -> clock.remainingTimes().entrySet().stream()
+                    .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
+                res.entrySet().removeIf(e -> e.getValue() == null);
+                return res;
+            }
+        ).orElse(Map.of("reload", true));
     }
 
     private List<Map<String, Object>> renderEvents(List<Event> events, boolean isPrivate) {

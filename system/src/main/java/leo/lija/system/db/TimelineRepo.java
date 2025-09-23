@@ -1,6 +1,5 @@
 package leo.lija.system.db;
 
-import leo.lija.system.entities.entry.Entry;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

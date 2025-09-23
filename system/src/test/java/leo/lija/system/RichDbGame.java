@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class RichDbGame extends DbGame {
-    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Color creatorColor) {
-        super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, creatorColor);
+    public RichDbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor) {
+        super(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor);
     }
 
     public RichDbGame(DbGame game) {
-        this(game.getId(), game.getWhitePlayer(), game.getBlackPlayer(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove(), game.getCreatorColor());
+        this(game.getId(), game.getWhitePlayer(), game.getBlackPlayer(), game.getPgn(), game.getStatus(), game.getTurns(), game.getClock(), game.getLastMove(), game.getCheck(), game.getCreatorColor());
     }
 
     @Override
