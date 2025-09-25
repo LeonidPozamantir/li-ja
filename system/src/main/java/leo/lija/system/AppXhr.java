@@ -47,6 +47,17 @@ public class AppXhr {
         DbGame g1 = gp.getFirst();
         DbPlayer player = gp.getSecond();
         purePlay(g1, fromString, toString, promString);
+        if (g1.player().isAi()) {
+            Pair<Game, Move> aiResult;
+            try {
+                aiResult = ai.apply(g1);
+            } catch (Exception e) {
+                throw new AppException("AI failure");
+            }
+            Game newChessGame = aiResult.getFirst();
+            Move move = aiResult.getSecond();
+            g1.update(newChessGame, move);
+        }
         gameRepo.save(g1);
         versionMemo.put(g1);
         aliveMemo.put(g1.getId(), player.getColor());
@@ -62,17 +73,7 @@ public class AppXhr {
         Game newChessGame = newChessGameAndMove.getFirst();
         Move move = newChessGameAndMove.getSecond();
         game.update(newChessGame, move);
-        if (game.player().isAi()) aiResponse(game);
     }
-
-    private void aiResponse(DbGame dbGame) {
-        Pair<Game, Move> newChessGameAndMove = ai.apply(dbGame);
-        Game newChessGame = newChessGameAndMove.getFirst();
-        Move move = newChessGameAndMove.getSecond();
-        dbGame.update(newChessGame, move);
-    }
-
-
 
     private Optional<Pair<String, String>> decodeMoveString(String moveString) {
         Matcher matcher = MOVE_STRING.matcher(moveString);

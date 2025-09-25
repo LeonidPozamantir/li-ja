@@ -31,7 +31,7 @@ public abstract class Clock {
     }
 
     public long remainingTime(Color c) {
-        return Math.max(limit, elapsedTime(c));
+        return Math.max(0, limit - elapsedTime(c));
     }
 
     public Map<Color, Long> remainingTimes() {
@@ -60,9 +60,8 @@ public abstract class Clock {
         return limit + 30 * increment;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%d minutes/side + %d seconds/move", limitInMinutes(), increment);
+    protected long now() {
+        return System.currentTimeMillis();
     }
 
     protected static final int HTTP_DELAY = 500;

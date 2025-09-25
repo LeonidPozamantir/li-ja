@@ -8,11 +8,8 @@ spring:
     throw-exception-if-no-handler-found: true
     static-path-pattern: /assets/**
 
-redis:
-  host: localhost
-
 sync:
-  duration: 7000
+  duration: 2000
   sleep: 200
 
 lobby:

@@ -81,7 +81,7 @@ public class AppApi extends IOTools {
     }
 
 
-    public void acceptRematch(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect, String entryData) {
+    public void rematchAccept(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect, String entryData) {
         Color color = ioColor(colorName);
         DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(

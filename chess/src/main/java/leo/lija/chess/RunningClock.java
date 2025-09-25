@@ -18,8 +18,9 @@ public class RunningClock extends Clock {
 
     @Override
     public RunningClock step() {
-        RunningClock addedTime = addTime(color, Math.max(0, (int) (now() - timer) - HTTP_DELAY - increment));
-        return new RunningClock(limit, increment, color.getOpposite(), addedTime.whiteTime, addedTime.blackTime, now());
+        long t = now();
+        RunningClock addedTime = addTime(color, Math.max(0, (int) (t - timer) - HTTP_DELAY - increment));
+        return new RunningClock(limit, increment, color.getOpposite(), addedTime.whiteTime, addedTime.blackTime, t);
     }
 
     public RunningClock addTime(Color c, int t) {
@@ -33,7 +34,4 @@ public class RunningClock extends Clock {
         return addTime(c, -t);
     }
 
-    private long now() {
-        return System.currentTimeMillis();
-    }
 }

@@ -23,31 +23,27 @@ public class RawDbClock {
     private Integer increment;
     @Column(name = "time_limit")
     private Integer limit;
-    @ElementCollection
-    private Map<String, Integer> times;
-    private Long timer;
+    private float white;
+    private float black;
+    private Double timer;
 
     public Optional<Clock> decode() {
         return Optional.ofNullable(color).flatMap(c -> Color.apply(color)
-            .flatMap(trueColor -> Optional.ofNullable(times.get("white"))
-                .flatMap(whiteTime -> Optional.ofNullable(times.get("black"))
-                    .map(blackTime ->
+            .map(trueColor ->
                         timer == 0
-                            ? new PausedClock(limit, increment, trueColor, whiteTime, blackTime)
-                            : new RunningClock(limit, increment, trueColor, whiteTime, blackTime, timer)
-                    ))));
+                            ? new PausedClock(limit * 1000, increment * 1000, trueColor, Math.round(white * 1000), Math.round(black * 1000))
+                            : new RunningClock(limit * 1000, increment * 1000, trueColor, Math.round(white * 1000), Math.round(black * 1000), (long) (timer * 1000))
+                    ));
     }
 
     public static RawDbClock encode(Clock clock) {
         return new RawDbClock(
             clock.getColor().getName(),
-            clock.getIncrement(),
-            clock.getLimit(),
-            Map.of(
-                "white", clock.getWhiteTime(),
-                "black", clock.getBlackTime()
-            ),
-            clock.getTimer()
+            clock.getIncrement() / 1000,
+            clock.getLimit() / 1000,
+            clock.getWhiteTime() / 1000f,
+            clock.getBlackTime() / 1000f,
+            clock.getTimer() / 1000d
         );
     }
 }

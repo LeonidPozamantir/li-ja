@@ -84,7 +84,7 @@ public class AppApiC {
 
     @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")
     public void rematchAccept(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm r) {
-        api.acceptRematch(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry());
+        api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry());
     }
 
 }
