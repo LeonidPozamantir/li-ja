@@ -9,7 +9,7 @@ spring:
     static-path-pattern: /assets/**
 
 sync:
-  duration: 2000
+  duration: 7000
   sleep: 200
 
 lobby:

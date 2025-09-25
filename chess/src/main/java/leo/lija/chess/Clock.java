@@ -18,11 +18,11 @@ public abstract class Clock {
     protected final int limit;
     protected final int increment;
     protected final Color color;
-    protected final int whiteTime;
-    protected final int blackTime;
-    protected final long timer;
+    protected final float whiteTime;
+    protected final float blackTime;
+    protected final double timer;
 
-    public int time(Color c) {
+    public float time(Color c) {
         return c == WHITE ? whiteTime : blackTime;
     }
 
@@ -30,15 +30,15 @@ public abstract class Clock {
         return remainingTime(c) == 0;
     }
 
-    public long remainingTime(Color c) {
+    public float remainingTime(Color c) {
         return Math.max(0, limit - elapsedTime(c));
     }
 
-    public Map<Color, Long> remainingTimes() {
+    public Map<Color, Float> remainingTimes() {
         return Color.all.stream().collect(Collectors.toMap(Function.identity(), this::remainingTime));
     }
 
-    public int elapsedTime(Color c) {
+    public float elapsedTime(Color c) {
         return time(c);
     }
 
@@ -60,9 +60,9 @@ public abstract class Clock {
         return limit + 30 * increment;
     }
 
-    protected long now() {
-        return System.currentTimeMillis();
+    protected double now() {
+        return System.currentTimeMillis() / 1000d;
     }
 
-    protected static final int HTTP_DELAY = 500;
+    protected static final float HTTP_DELAY = 0.5f;
 }

@@ -2,35 +2,35 @@ package leo.lija.chess;
 
 public class RunningClock extends Clock {
 
-    public RunningClock(int limit, int increment, Color color, int whiteTime, int blackTime) {
+    public RunningClock(int limit, int increment, Color color, float whiteTime, float blackTime) {
         this(limit, increment, color, whiteTime, blackTime, 0L);
     }
 
-    public RunningClock(int limit, int increment, Color color, int whiteTime, int blackTime, long timer) {
+    public RunningClock(int limit, int increment, Color color, float whiteTime, float blackTime, double timer) {
         super(limit, increment, color, whiteTime, blackTime, timer);
     }
 
     @Override
-    public int elapsedTime(Color c) {
+    public float elapsedTime(Color c) {
         return time(c)
-            + (c == color ? (int) (now() - timer) : 0);
+            + (c == color ? (float) (now() - timer) : 0);
     }
 
     @Override
     public RunningClock step() {
-        long t = now();
-        RunningClock addedTime = addTime(color, Math.max(0, (int) (t - timer) - HTTP_DELAY - increment));
+        double t = now();
+        RunningClock addedTime = addTime(color, Math.max(0, (float) (t - timer) - HTTP_DELAY - increment));
         return new RunningClock(limit, increment, color.getOpposite(), addedTime.whiteTime, addedTime.blackTime, t);
     }
 
-    public RunningClock addTime(Color c, int t) {
+    public RunningClock addTime(Color c, float t) {
         return switch (c) {
             case WHITE -> new RunningClock(limit, increment, color, whiteTime + t, blackTime, timer);
             case BLACK -> new RunningClock(limit, increment, color, whiteTime, blackTime + t, timer);
         };
     }
 
-    public RunningClock giveTime(Color c, int t) {
+    public RunningClock giveTime(Color c, float t) {
         return addTime(c, -t);
     }
 

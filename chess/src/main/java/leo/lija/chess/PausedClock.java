@@ -8,7 +8,7 @@ public class PausedClock extends Clock {
         this(limit, increment, WHITE, 0, 0);
     }
 
-    public PausedClock(int limit, int increment, Color color, int whiteTime, int blackTime) {
+    public PausedClock(int limit, int increment, Color color, float whiteTime, float blackTime) {
         super(limit, increment, color, whiteTime, blackTime, 0);
     }
 
