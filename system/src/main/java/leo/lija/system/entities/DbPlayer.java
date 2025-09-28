@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,15 +28,16 @@ public class DbPlayer {
     private String id;
     private Color color;
     private String ps;
-    private Integer aiLevel;
-    private Boolean isWinner;
+    private Optional<Integer> aiLevel;
+    private Optional<Boolean> isWinner;
     private String evts;
-    private Integer elo;
+    private Optional<Integer> elo;
     private Boolean isOfferingDraw;
-    private Integer lastDrawOffer;
+    private Optional<Integer> lastDrawOffer;
+    private Optional<String> userId;
 
     public DbPlayer copy() {
-        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer);
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer, userId);
     }
 
     public EventStack eventStack() {
@@ -62,7 +64,17 @@ public class DbPlayer {
     }
 
     public boolean isAi() {
-        return aiLevel != null;
+        return aiLevel.isPresent();
+    }
+
+    public boolean wins() {
+        return isWinner.orElse(false);
+    }
+
+    public DbPlayer finish(boolean winner) {
+        DbPlayer res = copy();
+        res.isWinner = winner ? Optional.of(true) : Optional.empty();
+        return res;
     }
 
 }

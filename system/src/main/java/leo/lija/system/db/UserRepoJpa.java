@@ -20,4 +20,19 @@ public interface UserRepoJpa extends JpaRepository<User, UUID> {
     @Query("update User set isOnline = false where username not in :usernames and isOnline = true")
     @Transactional
     public void updateOnlineUsernamesFalse(Collection<String> usernames);
+
+    @Modifying
+    @Query("update User set elo = :elo where id = :id")
+    @Transactional
+    public void setElo(UUID id, int elo);
+
+    @Modifying
+    @Query("update User set nbGames = nbGames + 1, nbRatedGames = nbRatedGames + 1 where id = :id")
+    @Transactional
+    public void incRated(UUID id);
+
+    @Modifying
+    @Query("update User set nbGames = nbGames + 1 where id = :id")
+    @Transactional
+    public void incNonRated(UUID id);
 }

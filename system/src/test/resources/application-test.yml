@@ -23,6 +23,8 @@ memo:
     timeout: 10
   hook:
     timeout: 6
+  finisher-lock:
+    timeout: 30
 
 crafty:
   exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe

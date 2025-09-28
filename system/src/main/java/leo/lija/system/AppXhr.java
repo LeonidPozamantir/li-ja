@@ -26,6 +26,7 @@ public class AppXhr {
 
     private final GameRepo gameRepo;
     private final Ai ai;
+    private final Finisher finisher;
     private final VersionMemo versionMemo;
     private final AliveMemo aliveMemo;
 
@@ -61,6 +62,23 @@ public class AppXhr {
         gameRepo.save(g1);
         versionMemo.put(g1);
         aliveMemo.put(g1.getId(), player.getColor());
+    }
+
+    public void abort(String fullId) {
+        DbGame game = gameRepo.playerGame(fullId);
+        finisher.abort(game);
+    }
+
+    public void resign(String fullId) {
+        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
+        DbGame game = gameAndPlayer.getFirst();
+        DbPlayer player = gameAndPlayer.getSecond();
+        finisher.resign(game, player.getColor());
+    }
+
+    public void outoftime(String fullId) {
+        DbGame game = gameRepo.playerGame(fullId);
+        finisher.outoftime(game);
     }
 
     public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {

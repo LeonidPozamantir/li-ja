@@ -89,12 +89,13 @@ public class Fixtures {
             color.getName().substring(0, 4),
             color,
             ps,
-            null,
-            null,
+            Optional.empty(),
+            Optional.empty(),
             evts,
-            1280,
+            Optional.of(1280),
             false,
-            null
+            Optional.empty(),
+            Optional.empty()
         );
     }
 

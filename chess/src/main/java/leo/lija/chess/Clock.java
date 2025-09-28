@@ -26,7 +26,7 @@ public abstract class Clock {
         return c == WHITE ? whiteTime : blackTime;
     }
 
-    public boolean isOutOfTime(Color c) {
+    public boolean outoftime(Color c) {
         return remainingTime(c) == 0;
     }
 

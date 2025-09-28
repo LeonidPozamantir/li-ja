@@ -56,11 +56,6 @@ public class AppApiC {
         api.drawAccept(gameId, color, msgs.messages());
     }
 
-    @PostMapping("/end/{gameId}")
-    public void end(@PathVariable String gameId, @Valid @RequestBody MessagesForm msgs) {
-        api.end(gameId, msgs.messages());
-    }
-
     @PostMapping("/start/{gameId}")
     public void start(@PathVariable String gameId, @Valid @RequestBody EntryForm entryData) {
         api.start(gameId, entryData.entry());

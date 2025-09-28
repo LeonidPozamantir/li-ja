@@ -55,14 +55,6 @@ public class AppApi extends IOTools {
         save(g1);
     }
 
-    public void end(String gameId, String messages) {
-        DbGame g1 = gameRepo.game(gameId);
-        ArrayList<Event> newEvents = new ArrayList<>(List.of(new EndEvent()));
-        newEvents.addAll(decodeMessages(messages));
-        g1.withEvents(newEvents);
-        save(g1);
-    }
-
     public void start(String gameId, String entryData) {
         DbGame game = gameRepo.game(gameId);
         addEntry.accept(game, entryData);

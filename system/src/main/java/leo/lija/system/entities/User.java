@@ -5,11 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@Getter
 public class User {
 
     @Id
@@ -18,5 +20,8 @@ public class User {
 
     private String username;
     private boolean isOnline;
+    private int elo;
+    private int nbGames;
+    private int nbRatedGames;
 
 }

@@ -35,14 +35,24 @@ public class RawDbPlayer {
     private Integer elo;
     private Boolean isOfferingDraw;
     private Integer lastDrawOffer;
+    private String userId;
 
     public RawDbPlayer copy() {
-        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer);
+        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer, userId);
     }
 
     public Optional<DbPlayer> decode() {
         return Color.apply(color).map(trueColor -> new DbPlayer(
-            id, trueColor, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer
+            id,
+            trueColor,
+            ps,
+            Optional.ofNullable(aiLevel),
+            Optional.ofNullable(isWinner),
+            evts,
+            Optional.ofNullable(elo),
+            isOfferingDraw,
+            Optional.ofNullable(lastDrawOffer),
+            Optional.ofNullable(userId)
         ));
     }
 
@@ -51,12 +61,13 @@ public class RawDbPlayer {
             dbPlayer.getId(),
             dbPlayer.getColor().getName(),
             dbPlayer.getPs(),
-            dbPlayer.getAiLevel(),
-            dbPlayer.getIsWinner(),
+            dbPlayer.getAiLevel().orElse(null),
+            dbPlayer.getIsWinner().orElse(null),
             dbPlayer.getEvts(),
-            dbPlayer.getElo(),
+            dbPlayer.getElo().orElse(null),
             dbPlayer.getIsOfferingDraw(),
-            dbPlayer.getLastDrawOffer()
+            dbPlayer.getLastDrawOffer().orElse(null),
+            dbPlayer.getUserId().orElse(null)
         );
     }
 }

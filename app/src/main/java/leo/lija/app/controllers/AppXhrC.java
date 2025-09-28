@@ -7,6 +7,7 @@ import leo.lija.system.AppXhr;
 import leo.lija.system.AppSyncer;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,6 +49,30 @@ public class AppXhrC {
         xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
 
         return ResponseEntity.ok().body("ok");
+    }
+
+    @GetMapping("/abort/{fullId}")
+    public ResponseEntity<Void> abort(@PathVariable String fullId) {
+        xhr.abort(fullId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create("/" + fullId))
+            .build();
+    }
+
+    @PostMapping("/outoftime/{fullId}")
+    public ResponseEntity<Void> outoftime(@PathVariable String fullId) {
+        xhr.outoftime(fullId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create("/" + fullId))
+            .build();
+    }
+
+    @GetMapping("/resign/{fullId}")
+    public ResponseEntity<Void> resign(@PathVariable String fullId) {
+        xhr.resign(fullId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create("/" + fullId))
+            .build();
     }
 
     @GetMapping("/ping")

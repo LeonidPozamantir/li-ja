@@ -47,8 +47,9 @@ public class RawDbGame {
     private String castles;
     private boolean isRated;
     private int variant;
+    private String winnerId;
 
-    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String check, String creatorColor, String positionHashes, String castles, boolean isRated, int variant) {
+    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String check, String creatorColor, String positionHashes, String castles, boolean isRated, int variant, String winnerId) {
         this.id = id;
         this.players = players;
         this.pgn = pgn;
@@ -62,6 +63,7 @@ public class RawDbGame {
         this.castles = castles;
         this.isRated = isRated;
         this.variant = variant;
+        this.winnerId = winnerId;
     }
 
     public Optional<DbGame> decode() {
@@ -86,7 +88,8 @@ public class RawDbGame {
                                     positionHashes,
                                     castles,
                                     isRated,
-                                    trueVariant
+                                    trueVariant,
+                                    Optional.ofNullable(winnerId)
                                 );
                 })))));
     }
@@ -105,7 +108,8 @@ public class RawDbGame {
             dbGame.getPositionHashes(),
             dbGame.getCastles(),
             dbGame.isRated(),
-            dbGame.getVariant().id()
+            dbGame.getVariant().id(),
+            dbGame.getWinnerId().orElse(null)
         );
     }
 }
