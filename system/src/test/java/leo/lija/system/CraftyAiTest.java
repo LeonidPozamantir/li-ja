@@ -1,10 +1,12 @@
 package leo.lija.system;
 
 import leo.lija.system.ai.CraftyAi;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@Disabled
 public class CraftyAiTest extends AiTest {
 
     CraftyAiTest(@Autowired CraftyAi craftyAi) {

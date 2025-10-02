@@ -38,28 +38,41 @@ public class AppXhr {
     }
 
     public void playMove(String fullId, String moveString, Optional<String> promString) {
-        Pair<String, String> move =  decodeMoveString(moveString).orElseThrow(() -> new AppException("Wrong move"));
-        play(fullId, move.getFirst(), move.getSecond(), promString);
+        Matcher matcher = MOVE_STRING.matcher(moveString);
+        if (matcher.find()) {
+            String orig = matcher.group(1);
+            String dest = matcher.group(2);
+            play(fullId, orig, dest, promString);
+        } else throw new AppException("Wrong move");
     }
 
     public void play(String fullId, String fromString, String toString) {
         play(fullId, fromString, toString, Optional.empty());
     }
 
-    public void play(String fullId, String fromString, String toString, Optional<String> promString) {
+    public void play(String fullId, String origString, String destString, Optional<String> promString) {
         attempt(fullId, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
-            purePlay(g1, fromString, toString, promString);
-            if (g1.player(color).isAi()) {
+
+            if (!g1.playable()) throw new AppException("Game is not playable");
+            Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
+            Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));
+            Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
+            Pair<Game, Move> newChessGameAndMove = g1.toChess().apply(orig, dest, promotion);
+            Game newChessGame = newChessGameAndMove.getFirst();
+            Move move = newChessGameAndMove.getSecond();
+            g1.update(newChessGame, move);
+
+            if (g1.player().isAi()) {
                 Pair<Game, Move> aiResult;
                 try {
                     aiResult = ai.apply(g1);
                 } catch (Exception e) {
                     throw new AppException("AI failure");
                 }
-                Game newChessGame = aiResult.getFirst();
-                Move move = aiResult.getSecond();
+                newChessGame = aiResult.getFirst();
+                move = aiResult.getSecond();
                 g1.update(newChessGame, move);
             }
             gameRepo.save(g1);
@@ -98,23 +111,4 @@ public class AppXhr {
         return op.apply(pov);
     }
 
-    public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {
-        if (!game.playable()) throw new AppException("Game is not playable");
-        Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
-        Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));
-        Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
-        Game chessGame = game.toChess();
-        Pair<Game, Move> newChessGameAndMove = chessGame.apply(orig, dest, promotion);
-        Game newChessGame = newChessGameAndMove.getFirst();
-        Move move = newChessGameAndMove.getSecond();
-        game.update(newChessGame, move);
-    }
-
-    private Optional<Pair<String, String>> decodeMoveString(String moveString) {
-        Matcher matcher = MOVE_STRING.matcher(moveString);
-        if (matcher.find()) {
-            return Optional.of(Pair.of(matcher.group(1), matcher.group(2)));
-        }
-        return Optional.empty();
-    }
 }

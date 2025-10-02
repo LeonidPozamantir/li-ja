@@ -20,7 +20,6 @@ import leo.lija.system.entities.event.ReloadTableEvent;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -282,6 +281,7 @@ public class DbGame {
 
     public DbGame finish(Status status, Optional<Color> winner, Optional<String> msg) {
         DbGame res = copy();
+        res.status = status;
         res.winnerId = winner.flatMap(c -> player(c).getUserId());
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);

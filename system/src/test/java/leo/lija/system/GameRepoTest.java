@@ -69,13 +69,13 @@ class GameRepoTest extends Fixtures {
             @Test
             @DisplayName("non-existing")
             void nonExisting() {
-                assertThatThrownBy(() -> repo.player("huhuhuhu")).isInstanceOf(AppException.class);
+                assertThatThrownBy(() -> repo.pov("huhuhuhu")).isInstanceOf(AppException.class);
             }
 
             @Test
             void existing() {
                 DbPlayer player = anyGame.players().getFirst();
-                assertThat(repo.player(anyGame.fullIdOf(player).get()).getSecond().getId()).isEqualTo(player.getId());
+                assertThat(repo.pov(anyGame.fullIdOf(player).get()).color()).isEqualTo(player.getColor());
             }
         }
 
@@ -85,13 +85,13 @@ class GameRepoTest extends Fixtures {
             @Test
             @DisplayName("non-existing")
             void nonExisting() {
-                assertThatThrownBy(() -> repo.player("hahahaha",WHITE)).isInstanceOf(AppException.class);
+                assertThatThrownBy(() -> repo.pov("hahahaha",WHITE)).isInstanceOf(AppException.class);
             }
 
             @Test
             void existing() {
                 DbPlayer player = anyGame.players().getFirst();
-                assertThat(repo.player(anyGame.getId(), player.getColor()).getSecond().getId()).isEqualTo(player.getId());
+                assertThat(repo.player(anyGame.getId(), player.getColor()).getId()).isEqualTo(player.getId());
             }
         }
 
