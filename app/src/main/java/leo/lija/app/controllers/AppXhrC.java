@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-public class AppXhrC {
+public class AppXhrC extends BaseController {
 
     private final AppXhr xhr;
     private final AppSyncer syncer;
@@ -53,42 +53,27 @@ public class AppXhrC {
 
     @GetMapping("/abort/{fullId}")
     public ResponseEntity<Void> abort(@PathVariable String fullId) {
-        xhr.abort(fullId);
-        return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create("/" + fullId))
-            .build();
+        return validRedir(() -> xhr.abort(fullId), fullId);
     }
 
     @PostMapping("/outoftime/{fullId}")
     public ResponseEntity<Void> outoftime(@PathVariable String fullId) {
-        xhr.outoftime(fullId);
-        return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create("/" + fullId))
-            .build();
+        return validRedir(() -> xhr.outoftime(fullId), fullId);
     }
 
     @GetMapping("/resign/{fullId}")
     public ResponseEntity<Void> resign(@PathVariable String fullId) {
-        xhr.resign(fullId);
-        return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create("/" + fullId))
-            .build();
+        return validRedir(() -> xhr.resign(fullId), fullId);
     }
 
     @GetMapping("/force-resign/{fullId}")
     public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
-        xhr.forceResign(fullId);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/" + fullId))
-                .build();
+        return validRedir(() -> xhr.forceResign(fullId), fullId);
     }
 
     @GetMapping("/claim-draw/{fullId}")
     public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
-        xhr.claimDraw(fullId);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("/" + fullId))
-                .build();
+        return validRedir(() -> xhr.claimDraw(fullId), fullId);
     }
 
     @GetMapping("/ping")

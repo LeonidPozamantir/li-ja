@@ -32,7 +32,7 @@ public class LobbyXhrC {
             hookId,
             auth.orElse(0) == 1,
             state.orElse(0),
-            messageId.orElse(0),
+            messageId.orElse(-1),
             entryId.orElse(0)
         );
     }

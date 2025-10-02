@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,20 +59,25 @@ public class LobbySyncer {
     }
 
     public Map<String, Object> stdResponse(Integer version, List<Hook> hooks, Optional<String> myHookId, int messageId, int entryId) {
-        List<Message> messages = messageId == 0
-            ? messageRepo.recent(config.sync().message().max())
-            : messageRepo.since(Math.max(messageMemo.id() - config.sync().message().max(), messageId));
+        List<Message> messages = switch(messageId) {
+            case -1 -> List.of();
+            case 0 -> messageRepo.recent(config.sync().message().max());
+            default -> messageRepo.since(Math.max(messageMemo.id() - config.sync().message().max(), messageId));
+        };
+
         List<Entry> entries = entryId == 0
             ? entryRepo.recent(config.sync().entry().max())
             : entryRepo.since(Math.max(entryMemo.id() - config.sync().entry().max(), entryId));
-        return Map.of(
-            "state", version,
-            "pool", !hooks.isEmpty()
-                ? Map.of("hooks", renderHooks(hooks, myHookId))
-                : Map.of("message", "No game available right now, create one!"),
-            "chat", !messages.isEmpty() ? renderMessages(messages) : Map.of("id", messageId, "messages", List.of()),
-            "timeline", !entries.isEmpty() ? renderEntries(entries) : Map.of("id", entryId, "entries", List.of())
+        Map<String, Object> res = new HashMap<>(Map.of(
+                "state", version,
+                "pool", !hooks.isEmpty()
+                        ? Map.of("hooks", renderHooks(hooks, myHookId))
+                        : Map.of("message", "No game available right now, create one!"),
+                "timeline", !entries.isEmpty() ? renderEntries(entries) : Map.of("id", entryId, "entries", List.of()))
         );
+        if (messageId != 1) res.put("chat", !messages.isEmpty() ? renderMessages(messages) : Map.of("id", messageId, "messages", List.of()));
+        return res;
+
     }
 
     private Map<String, Object> renderMessages(List<Message> messages) {
@@ -118,7 +124,7 @@ public class LobbySyncer {
     private int waitLoop(int loop, int version, int messageId, int entryId) {
         if (loop == 0
             || lobbyMemo.version() != version
-            || messageMemo.id() != messageId
+            || (messageId != -1 && messageMemo.id() != messageId)
             || entryMemo.id() != entryId) {
             return lobbyMemo.version();
         }
