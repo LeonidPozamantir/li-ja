@@ -61,6 +61,10 @@ public class AliveMemo {
         return 0;
     }
 
+    public boolean inactive(String gameId, Color color) {
+        return activity(gameId, color) == 0;
+    }
+
     public long count() {
         return cache.size();
     }

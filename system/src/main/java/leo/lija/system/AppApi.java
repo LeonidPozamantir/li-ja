@@ -7,7 +7,7 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
@@ -40,13 +40,11 @@ public class AppApi extends IOTools {
     private final BiConsumer<DbGame, String> addEntry;
 
     public void join(String fullId, String url, String messages, String entryData) {
-        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
-        DbGame g1 = gameAndPlayer.getFirst();
-        DbPlayer player = gameAndPlayer.getSecond();
-        g1.withEvents(decodeMessages(messages));
-        g1.withEvents(g1.opponent(player).getColor(), List.of(new RedirectEvent(url)));
-        save(g1);
-        addEntry.accept(g1, entryData);
+        Pov pov = gameRepo.pov(fullId);
+        pov.game().withEvents(decodeMessages(messages));
+        pov.game().withEvents(pov.color().getOpposite(), List.of(new RedirectEvent(url)));
+        save(pov.game());
+        addEntry.accept(pov.game(), entryData);
     }
 
     public void talk(String gameId, String author, String message) {

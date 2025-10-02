@@ -164,7 +164,7 @@ public class DbGame {
                 .map(role -> Pair.of(pos, new Piece(color, role))));
     }
 
-    private History toChessHistory() {
+    public History toChessHistory() {
         Optional<Pair<Pos, Pos>> historyLastMove = lastMove.flatMap(lm -> {
             Matcher matcher = MOVE_STRING.matcher(lm);
             if (matcher.find()) {

@@ -1,9 +1,9 @@
 package leo.lija.system.db;
 
 import leo.lija.chess.Color;
-import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.RawDbGame;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
@@ -31,26 +31,21 @@ public class GameRepo {
         return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
     }
 
-    public Pair<DbGame, DbPlayer> player(String gameId, Color color) {
-        DbGame validGame = game(gameId);
-        return Pair.of(validGame, validGame.player(color));
+    public Pov pov(String gameId, Color color) {
+        DbGame g = game(gameId);
+        return Pov.apply(g, g.player(color));
     }
 
-    public DbPlayer playerOnly(String gameId, Color color) {
+    public DbPlayer player(String gameId, Color color) {
         DbGame validGame = game(gameId);
         return validGame.player(color);
     }
 
-    public Pair<DbGame, DbPlayer> player(String fullId) {
-        DbGame validGame = game(fullId.substring(0, GAME_ID_SIZE));
+    public Pov pov(String fullId) {
+        DbGame g = game(fullId.substring(0, GAME_ID_SIZE));
         String playerId = fullId.substring(GAME_ID_SIZE);
-        DbPlayer player = validGame.player(playerId).orElseThrow(() -> new AppException("No player found for id " + fullId));
-        return Pair.of(validGame, player);
-    }
-
-    public DbGame playerGame(String fullId) {
-        Pair<DbGame, DbPlayer> gameAndPlayer = player(fullId);
-        return gameAndPlayer.getFirst();
+        DbPlayer player = g.player(playerId).orElseThrow(() -> new AppException("No player found for id " + fullId));
+        return Pov.apply(g, player);
     }
 
     public void save(DbGame game) {

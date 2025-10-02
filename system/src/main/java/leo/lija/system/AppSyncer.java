@@ -1,10 +1,8 @@
 package leo.lija.system;
 
 import leo.lija.chess.Color;
-import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
-import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
@@ -38,21 +36,19 @@ public class AppSyncer {
     public Map<String, Object> sync(String gameId, String colorString, Integer version, Optional<String> fullId) {
         Color color = Color.apply(colorString).orElseThrow(() -> new AppException("Invalid color"));
         versionWait(gameId, color, version);
-        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(gameId, color);
-        DbGame game = gameAndPlayer.getFirst();
-        DbPlayer player = gameAndPlayer.getSecond();
-        boolean isPrivate = fullId.map(fid -> game.isPlayerFullId(player, fid)).orElse(false);
-        versionMemo.put(game);
-        return player.eventStack().eventsSince(version).map(events -> {
+        Pov pov = gameRepo.pov(gameId, color);
+        boolean isPrivate = pov.isPlayerFullId(fullId);
+        versionMemo.put(pov.game());
+        return pov.player().eventStack().eventsSince(version).map(events -> {
                 Map<String, Object> res = new HashMap<>();
                 res.putAll(Map.of(
-                    "v", player.eventStack().lastVersion(),
+                    "v", pov.player().eventStack().lastVersion(),
                     "e", renderEvents(events, isPrivate),
-                    "p", game.player().getColor().name(),
-                    "t", game.getTurns(),
-                    "oa", aliveMemo.activity(game, color.getOpposite())
+                    "p", pov.color().name(),
+                    "t", pov.game().getTurns(),
+                    "oa", aliveMemo.activity(pov.game(), color.getOpposite())
                 ));
-                res.put("c", game.getClock().map(clock -> clock.remainingTimes().entrySet().stream()
+                res.put("c", pov.game().getClock().map(clock -> clock.remainingTimes().entrySet().stream()
                     .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
                 res.entrySet().removeIf(e -> e.getValue() == null);
                 return res;

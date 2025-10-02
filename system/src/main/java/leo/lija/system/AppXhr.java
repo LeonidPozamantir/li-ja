@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
@@ -7,7 +8,7 @@ import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Pov;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 
 import static leo.lija.chess.Pos.posAt;
@@ -44,41 +47,55 @@ public class AppXhr {
     }
 
     public void play(String fullId, String fromString, String toString, Optional<String> promString) {
-        Pair<DbGame, DbPlayer> gp = gameRepo.player(fullId);
-        DbGame g1 = gp.getFirst();
-        DbPlayer player = gp.getSecond();
-        purePlay(g1, fromString, toString, promString);
-        if (g1.player().isAi()) {
-            Pair<Game, Move> aiResult;
-            try {
-                aiResult = ai.apply(g1);
-            } catch (Exception e) {
-                throw new AppException("AI failure");
+        attempt(fullId, pov -> {
+            DbGame g1 = pov.game();
+            Color color = pov.color();
+            purePlay(g1, fromString, toString, promString);
+            if (g1.player(color).isAi()) {
+                Pair<Game, Move> aiResult;
+                try {
+                    aiResult = ai.apply(g1);
+                } catch (Exception e) {
+                    throw new AppException("AI failure");
+                }
+                Game newChessGame = aiResult.getFirst();
+                Move move = aiResult.getSecond();
+                g1.update(newChessGame, move);
             }
-            Game newChessGame = aiResult.getFirst();
-            Move move = aiResult.getSecond();
-            g1.update(newChessGame, move);
-        }
-        gameRepo.save(g1);
-        versionMemo.put(g1);
-        aliveMemo.put(g1.getId(), player.getColor());
+            gameRepo.save(g1);
+            versionMemo.put(g1);
+            aliveMemo.put(g1.getId(), color);
+        });
     }
 
     public void abort(String fullId) {
-        DbGame game = gameRepo.playerGame(fullId);
-        finisher.abort(game);
+        attempt(fullId, finisher::abort);
     }
 
     public void resign(String fullId) {
-        Pair<DbGame, DbPlayer> gameAndPlayer = gameRepo.player(fullId);
-        DbGame game = gameAndPlayer.getFirst();
-        DbPlayer player = gameAndPlayer.getSecond();
-        finisher.resign(game, player.getColor());
+        attempt(fullId, finisher::resign);
+    }
+
+    public void forceResign(String fullId) {
+        attempt(fullId, finisher::forceResign);
+    }
+
+    public void claimDraw(String fullId) {
+        attempt(fullId, finisher::claimDraw);
     }
 
     public void outoftime(String fullId) {
-        DbGame game = gameRepo.playerGame(fullId);
-        finisher.outoftime(game);
+        attempt(fullId, finisher::outoftime);
+    }
+
+    private void attempt(String fullId, Consumer<Pov> action) {
+        Pov pov = gameRepo.pov(fullId);
+        action.accept(pov);
+    }
+
+    private <A> A fromPov(String fullId, Function<Pov, A> op) {
+        Pov pov = gameRepo.pov(fullId);
+        return op.apply(pov);
     }
 
     public void purePlay(DbGame game, String origString, String destString, Optional<String> promString) {

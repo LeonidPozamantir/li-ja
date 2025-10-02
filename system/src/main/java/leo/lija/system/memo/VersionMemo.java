@@ -4,7 +4,7 @@ import com.google.common.cache.LoadingCache;
 import jakarta.annotation.PostConstruct;
 import leo.lija.chess.Color;
 import leo.lija.system.entities.DbGame;
-import leo.lija.system.entities.DbPlayer;
+import leo.lija.system.entities.Pov;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.BiFunction;
@@ -15,7 +15,7 @@ import static leo.lija.chess.Color.WHITE;
 @RequiredArgsConstructor
 public class VersionMemo {
 
-    private final BiFunction<String, Color, DbPlayer> getPlayer;
+    private final BiFunction<String, Color, Pov> getPov;
     private final int timeout;
 
     private LoadingCache<String, Integer> cache;
@@ -52,7 +52,7 @@ public class VersionMemo {
         return Color.apply(letter.substring(0, 1))
             .map(color -> {
                 try {
-                    return getPlayer.apply(gameId, color).eventStack().lastVersion();
+                    return getPov.apply(gameId, color).player().eventStack().lastVersion();
                 } catch (Exception e) {
                     return 0;
                 }

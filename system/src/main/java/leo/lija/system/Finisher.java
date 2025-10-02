@@ -7,9 +7,11 @@ import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HistoryRepo;
 import leo.lija.system.db.UserRepo;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Status;
 import leo.lija.system.entities.User;
 import leo.lija.system.exceptions.AppException;
+import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.FinisherLock;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
@@ -27,24 +29,39 @@ public class Finisher {
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
+    private final AliveMemo aliveMemo;
     private final VersionMemo versionMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public void abort(DbGame game) {
-        if (game.abortable()) finish(game, Status.ABORTED);
+    public void abort(Pov pov) {
+        if (pov.game().abortable()) finish(pov.game(), Status.ABORTED);
         else throw new AppException("game is not abortable");
     }
 
-    public void resign(DbGame game, Color color) {
-        if (game.resignable()) finish(game, Status.RESIGN, Optional.of(color.getOpposite()));
+    public void resign(Pov pov) {
+        if (pov.game().resignable()) finish(pov.game(), Status.RESIGN, Optional.of(pov.color().getOpposite()));
         else throw new AppException("game is not resignable");
     }
 
-    public void outoftime(DbGame game) {
-        game.outoftimePlayer().map(player -> {
-            finish(game, Status.OUTOFTIME,
-                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)));
+    public void forceResign(Pov pov) {
+        if (pov.game().playable() && aliveMemo.inactive(pov.game().getId(), pov.color().getOpposite())) {
+            finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
+        } else throw new AppException("game is not force-resignable");
+    }
+
+    public void claimDraw(Pov pov) {
+        DbGame game = pov.game();
+        Color color = pov.color();
+        if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition()) {
+            finish(game, Status.DRAW, Optional.of(color));
+        } else throw new AppException("game is not threefold repetition");
+    }
+
+    public void outoftime(Pov pov) {
+        pov.game().outoftimePlayer().map(player -> {
+            finish(pov.game(), Status.OUTOFTIME,
+                Optional.of(player.getColor().getOpposite()).filter((c) -> pov.game().toChess().getBoard().hasEnoughMaterialToMate(c)));
             return null;
         }).orElseThrow(() -> new AppException("no outoftime applicable"));
     }

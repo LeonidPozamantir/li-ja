@@ -75,6 +75,22 @@ public class AppXhrC {
             .build();
     }
 
+    @GetMapping("/force-resign/{fullId}")
+    public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
+        xhr.forceResign(fullId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/" + fullId))
+                .build();
+    }
+
+    @GetMapping("/claim-draw/{fullId}")
+    public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
+        xhr.claimDraw(fullId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/" + fullId))
+                .build();
+    }
+
     @GetMapping("/ping")
     public Map<String, Object> ping(
         @RequestParam Optional<String> username,

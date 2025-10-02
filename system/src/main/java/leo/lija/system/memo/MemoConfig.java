@@ -12,7 +12,7 @@ public class MemoConfig {
 
     @Bean
     public VersionMemo versionMemo(GameRepo repo, MemoConfigProperties config) {
-        return new VersionMemo(repo::playerOnly, config.version().timeout());
+        return new VersionMemo(repo::pov, config.version().timeout());
     }
 
     @Bean
