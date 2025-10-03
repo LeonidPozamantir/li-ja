@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: lija
+  datasource:
+    generate-unique-name: false
+    name: lija
+  mvc:
+    throw-exception-if-no-handler-found: true
+    static-path-pattern: /assets/**
+
+sync:
+  duration: 7000
+  sleep: 200
+
+lobby:
+  sync:
+    duration: 10000
+    sleep: 250
+  message:
+    max: 30
+  entry:
+    max: 12
+
+memo:
+  version:
+    timeout: 1800
+  alive:
+    hard-timeout: 100
+    soft-timeout: 6
+  watcher:
+    timeout: 6
+  username:
+    timeout: 10
+  hook:
+    timeout: 6
+  finisher-lock:
+    timeout: 30
+
+crafty:
+  exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
+  book-path:
+
+moretime:
+  seconds: 15
+
+cron:
+  online-username:
+    frequency: 2000
+  hook-cleanup-dead:
+    frequency: 2000
+  hook-cleanup-old:
+    frequency: 21000

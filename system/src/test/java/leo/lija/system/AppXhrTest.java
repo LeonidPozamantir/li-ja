@@ -6,6 +6,7 @@ import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.event.ThreefoldEvent;
 import leo.lija.system.exceptions.AppException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class AppXhrTest extends Fixtures {
     }
 
     void move(DbGame game, String m) {
-        xhr.playMove(game.fullIdOf(WHITE), m);
+        xhr.play(game.fullIdOf(WHITE), m.substring(0, m.indexOf(' ')), m.substring(m.indexOf(' ') + 1));
     }
     void move(DbGame game) {
         move(game, "d2 d4");
