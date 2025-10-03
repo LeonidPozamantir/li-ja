@@ -45,7 +45,7 @@ public class AppSyncer {
                 res.putAll(Map.of(
                     "v", pov.player().eventStack().lastVersion(),
                     "e", renderEvents(events, isPrivate),
-                    "p", pov.color().name(),
+                    "p", pov.game().player().getColor().name(),
                     "t", pov.game().getTurns(),
                     "oa", aliveMemo.activity(pov.game(), color.getOpposite())
                 ));
@@ -77,7 +77,7 @@ public class AppSyncer {
     private Map<String, Object> renderMessage(String author, String message) {
         return Map.of(
             "type", "message",
-            "message", new Room.Message(author, message)
+            "message", new Room.RoomMessage(author, message)
         );
     }
 

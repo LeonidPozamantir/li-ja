@@ -75,7 +75,7 @@ public class AppXhrC extends BaseController {
         return validRedir(() -> xhr.claimDraw(fullId), fullId);
     }
 
-    @PostMapping("/draw-accept/{fullId}")
+    @GetMapping("/draw-accept/{fullId}")
     public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
         return validRedir(() -> xhr.drawAccept(fullId), fullId);
     }
@@ -83,6 +83,12 @@ public class AppXhrC extends BaseController {
     @PostMapping("/talk/{fullId}")
     public void talk(@PathVariable String fullId, @Valid @RequestBody TalkForm talkForm) {
         xhr.talk(fullId, talkForm.message());
+    }
+
+    @PostMapping("/moretime/{fullId}")
+    public String moretime(@PathVariable String fullId) {
+        float time = xhr.moretime(fullId);
+        return String.valueOf(time);
     }
 
     @GetMapping("/ping")

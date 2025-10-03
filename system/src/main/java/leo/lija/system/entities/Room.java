@@ -20,9 +20,9 @@ public class Room {
     private String id;
 
     @ElementCollection
-    private List<Message> messages;
+    private List<RoomMessage> messages;
 
-    public List<Message> render() {
+    public List<RoomMessage> render() {
         return messages;
     }
 
@@ -30,7 +30,7 @@ public class Room {
     @AllArgsConstructor
     @Getter
     @Embeddable
-    public static class Message {
+    public static class RoomMessage {
         private String author;
         private String message;
     }

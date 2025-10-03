@@ -56,6 +56,10 @@ public abstract class Clock {
 
     abstract RunningClock step();
 
+    public abstract <T extends Clock> T addTime(Color c, float t);
+
+    public abstract <T extends Clock> T giveTime(Color c, float t);
+
     public int estimateTotalTime() {
         return limit + 30 * increment;
     }

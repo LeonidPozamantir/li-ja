@@ -1,5 +1,6 @@
 package leo.lija.system;
 
+import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
@@ -11,10 +12,11 @@ import leo.lija.system.db.RoomRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.event.MessageEvent;
+import leo.lija.system.entities.event.MoretimeEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,17 +29,26 @@ import static leo.lija.chess.Pos.posAt;
 @Service
 public class AppXhr extends IOTools {
 
-    private final RoomRepo roomRepo;
+    private final Messenger messenger;
     private final Ai ai;
     private final Finisher finisher;
     private final AliveMemo aliveMemo;
+    private final int moretimeSeconds;
 
-    public AppXhr(GameRepo gameRepo, RoomRepo roomRepo, Ai ai, Finisher finisher, VersionMemo versionMemo, AliveMemo aliveMemo) {
+    public AppXhr(
+            GameRepo gameRepo,
+            Messenger messenger,
+            Ai ai,
+            Finisher finisher,
+            VersionMemo versionMemo,
+            AliveMemo aliveMemo,
+            @Value("${moretime.seconds}") int moretimeSeconds) {
         super(gameRepo, versionMemo);
-        this.roomRepo = roomRepo;
+        this.messenger = messenger;
         this.ai = ai;
         this.finisher = finisher;
         this.aliveMemo = aliveMemo;
+        this.moretimeSeconds = moretimeSeconds;
     }
 
     public void play(String fullId, String fromString, String toString) {
@@ -58,7 +69,7 @@ public class AppXhr extends IOTools {
             Move move = newChessGameAndMove.getSecond();
             g1.update(newChessGame, move);
 
-            if (g1.player().isAi()) {
+            if (g1.player().isAi() && g1.playable()) {
                 Pair<Game, Move> aiResult;
                 try {
                     aiResult = ai.apply(g1);
@@ -69,8 +80,7 @@ public class AppXhr extends IOTools {
                 move = aiResult.getSecond();
                 g1.update(newChessGame, move);
             }
-            gameRepo.save(g1);
-            versionMemo.put(g1);
+            save(g1);
             aliveMemo.put(g1.getId(), color);
         });
     }
@@ -101,12 +111,21 @@ public class AppXhr extends IOTools {
 
     public void talk(String fullId, String message) {
         attempt(fullId, pov -> {
-            if (pov.game().invited().isHuman() && message.length() <= 140 && !message.isEmpty()) {
-                roomRepo.addMessage(pov.game().getId(), pov.color().getName(), message);
-                pov.game().withEvents(List.of(new MessageEvent(pov.color().getName(), message)));
-                save(pov.game());
-            }
-            else throw new AppException("Cannot talk");
+            messenger.playerMessage(pov.game(), pov.color(), message);
+            save(pov.game());
+        });
+    }
+
+    public float moretime(String fullId) {
+        return fromPov(fullId, pov -> {
+           return pov.game().getClock().filter(c -> pov.game().playable()).map(clock -> {
+               Color color = pov.color().getOpposite();
+               Clock newClock = clock.giveTime(color, moretimeSeconds);
+               pov.game().withEvents(List.of(new MoretimeEvent(color, moretimeSeconds)));
+               pov.game().withClock(newClock);
+               save(pov.game());
+               return newClock.remainingTime(color);
+           }).orElseThrow(() -> new AppException("cannot add more time"));
         });
     }
 

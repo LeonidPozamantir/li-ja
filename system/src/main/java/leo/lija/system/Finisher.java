@@ -32,7 +32,7 @@ public class Finisher {
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
-    private final RoomRepo roomRepo;
+    private final Messenger messenger;
     private final AliveMemo aliveMemo;
     private final VersionMemo versionMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
@@ -87,11 +87,7 @@ public class Finisher {
         if (finisherLock.isLocked(game)) throw new AppException("game finish is locked");
         finisherLock.lock(game);
         DbGame g2 = game.finish(status, winner);
-        message.filter(m -> g2.invited().isHuman())
-            .ifPresent(msg -> {
-                roomRepo.addSystemMessage(g2.getId(), msg);
-                g2.withEvents(List.of(new MessageEvent("system", msg)));
-            });
+        message.ifPresent(m -> messenger.systemMessage(g2, m));
         gameRepo.save(g2);
         versionMemo.put(g2);
         updateElo(g2);

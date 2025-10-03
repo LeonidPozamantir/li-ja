@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class RoomRepo {
 
     public void addMessage(String id, String author, String message) {
         Room r = room(id);
-        r.getMessages().add(new Room.Message(author, message));
+        r.getMessages().add(new Room.RoomMessage(author, message));
         repo.save(r);
     }
 

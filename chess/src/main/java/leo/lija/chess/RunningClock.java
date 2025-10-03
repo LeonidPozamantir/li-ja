@@ -23,6 +23,7 @@ public class RunningClock extends Clock {
         return new RunningClock(limit, increment, color.getOpposite(), addedTime.whiteTime, addedTime.blackTime, t);
     }
 
+    @Override
     public RunningClock addTime(Color c, float t) {
         return switch (c) {
             case WHITE -> new RunningClock(limit, increment, color, whiteTime + t, blackTime, timer);
@@ -30,6 +31,7 @@ public class RunningClock extends Clock {
         };
     }
 
+    @Override
     public RunningClock giveTime(Color c, float t) {
         return addTime(c, -t);
     }

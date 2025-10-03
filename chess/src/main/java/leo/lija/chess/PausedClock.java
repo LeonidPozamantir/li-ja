@@ -16,4 +16,17 @@ public class PausedClock extends Clock {
     RunningClock step() {
         return new RunningClock(limit, increment, color, whiteTime, blackTime, now()).giveTime(WHITE, increment).step();
     }
+
+    @Override
+    public PausedClock addTime(Color c, float t) {
+        return switch (c) {
+            case WHITE -> new PausedClock(limit, increment, color, whiteTime + t, blackTime);
+            case BLACK -> new PausedClock(limit, increment, color, whiteTime, blackTime + t);
+        };
+    }
+
+    @Override
+    public PausedClock giveTime(Color c, float t) {
+        return addTime(c, -t);
+    }
 }

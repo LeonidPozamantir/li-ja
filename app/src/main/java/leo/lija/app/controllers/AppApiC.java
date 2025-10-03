@@ -5,7 +5,6 @@ import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
-import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppApi;
 import leo.lija.system.entities.Room;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class AppApiC {
     }
 
     @GetMapping("/room/{gameId}")
-    public List<Room.Message> room(@PathVariable String gameId) {
+    public List<Room.RoomMessage> room(@PathVariable String gameId) {
         return api.room(gameId);
     }
 
@@ -75,7 +74,7 @@ public class AppApiC {
 
     @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")
     public void rematchAccept(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm r) {
-        api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry());
+        api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry(), r.messages());
     }
 
 }

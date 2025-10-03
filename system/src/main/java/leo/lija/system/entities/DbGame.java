@@ -214,7 +214,9 @@ public class DbGame {
         clock = game.getClock();
         check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
 
-        if (abortableBefore != abortable() || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE) || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK)) {
+        if (playable() && (abortableBefore != abortable()
+                || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE)
+                || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK))) {
             withEvents(List.of(new ReloadTableEvent()));
         }
     }
@@ -307,6 +309,10 @@ public class DbGame {
             .filter(c -> playable())
             .filter(c -> c.outoftime(player().getColor()))
             .map(c -> player());
+    }
+
+    public void withClock(Clock c) {
+        clock = Optional.of(c);
     }
 
     public DbPlayer creator() {

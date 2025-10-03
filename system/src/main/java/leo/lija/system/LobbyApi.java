@@ -6,7 +6,6 @@ import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.entry.Entry;
-import leo.lija.system.entities.entry.EntryGame;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.EntryMemo;
 import leo.lija.system.memo.HookMemo;
@@ -20,16 +19,18 @@ public class LobbyApi extends IOTools {
 
     private final HookRepo hookRepo;
     private final EntryRepo entryRepo;
+    private final Messenger messenger;
     private final LobbyMemo lobbyMemo;
     private final MessageMemo messageMemo;
     private final EntryMemo entryMemo;
     private final AliveMemo aliveMemo;
     private final HookMemo hookMemo;
 
-    LobbyApi(HookRepo hookRepo, EntryRepo entryRepo, LobbyMemo lobbyMemo, MessageMemo messageMemo, EntryMemo entryMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
+    LobbyApi(HookRepo hookRepo, EntryRepo entryRepo, Messenger messenger, LobbyMemo lobbyMemo, MessageMemo messageMemo, EntryMemo entryMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
         super(gameRepo, versionMemo);
         this.hookRepo = hookRepo;
         this.entryRepo = entryRepo;
+        this.messenger = messenger;
         this.lobbyMemo = lobbyMemo;
         this.messageMemo = messageMemo;
         this.entryMemo = entryMemo;
@@ -37,9 +38,11 @@ public class LobbyApi extends IOTools {
         this.hookMemo = hookMemo;
     }
 
-    public void join(String gameId, String colorName, String entryData) {
+    public void join(String gameId, String colorName, String entryData, String messageString) {
         Color color = ioColor(colorName);
         DbGame game = gameRepo.game(gameId);
+        messenger.systemMessages(game, messageString);
+        save(game);
         aliveMemo.put(gameId, color);
         aliveMemo.put(gameId, color.getOpposite());
         versionInc();

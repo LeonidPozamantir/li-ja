@@ -6,13 +6,9 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
-import leo.lija.system.db.RoomRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Room;
-import leo.lija.system.entities.event.EndEvent;
-import leo.lija.system.entities.event.Event;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.exceptions.AppException;
@@ -20,8 +16,6 @@ import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -30,22 +24,22 @@ import java.util.stream.Collectors;
 @Service
 public class AppApi extends IOTools {
 
-    AppApi(GameRepo gameRepo, RoomRepo roomRepo, Ai ai, VersionMemo versionMemo, AliveMemo aliveMemo, LobbyApi lobbyApi) {
+    AppApi(GameRepo gameRepo, Messenger messenger, Ai ai, VersionMemo versionMemo, AliveMemo aliveMemo, LobbyApi lobbyApi) {
         super(gameRepo, versionMemo);
-        this.roomRepo = roomRepo;
+        this.messenger = messenger;
         this.ai = ai;
         this.aliveMemo = aliveMemo;
         this.addEntry = lobbyApi::addEntry;
     }
 
-    private final RoomRepo roomRepo;
+    private final Messenger messenger;
     private final Ai ai;
     private final AliveMemo aliveMemo;
     private final BiConsumer<DbGame, String> addEntry;
 
     public void join(String fullId, String url, String messages, String entryData) {
         Pov pov = gameRepo.pov(fullId);
-        systemMessages(pov.game(), messages);
+        messenger.systemMessages(pov.game(), messages);
         pov.game().withEvents(pov.color().getOpposite(), List.of(new RedirectEvent(url)));
         save(pov.game());
         addEntry.accept(pov.game(), entryData);
@@ -68,17 +62,27 @@ public class AppApi extends IOTools {
         }
     }
 
-    public void rematchAccept(String gameId, String newGameId, String colorName, String whiteRedirect, String blackRedirect, String entryData) {
+    public void rematchAccept(
+            String gameId,
+            String newGameId,
+            String colorName,
+            String whiteRedirect,
+            String blackRedirect,
+            String entryData,
+            String messageString) {
         Color color = ioColor(colorName);
         DbGame g1 = gameRepo.game(gameId);
+        DbGame newGame = gameRepo.game(newGameId);
         g1.withEvents(
             List.of(new RedirectEvent(whiteRedirect)),
             List.of(new RedirectEvent(blackRedirect))
         );
         save(g1);
+        messenger.systemMessages(newGame, messageString);
+        save(newGame);
         aliveMemo.put(newGameId, color.getOpposite());
         aliveMemo.transfer(gameId, color.getOpposite(), newGameId, color);
-        addEntry.accept(g1, entryData);
+        addEntry.accept(newGame, entryData);
     }
 
     public void updateVersion(String gameId) {
@@ -93,7 +97,7 @@ public class AppApi extends IOTools {
     public void draw(String gameId, String colorName, String messages) {
         Color color = ioColor(colorName);
         DbGame g1 = gameRepo.game(gameId);
-        systemMessages(g1, messages);
+        messenger.systemMessages(g1, messages);
         g1.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
         save(g1);
     }
@@ -102,8 +106,8 @@ public class AppApi extends IOTools {
         return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
     }
 
-    public List<Room.Message> room(String gameId) {
-        return roomRepo.room(gameId).render();
+    public List<Room.RoomMessage> room(String gameId) {
+        return messenger.render(gameId);
     }
 
     public void reloadTable(String gameId) {
@@ -117,13 +121,5 @@ public class AppApi extends IOTools {
         DbGame game = gameRepo.game(gameId);
         return game.toChess().situation().destinations().entrySet().stream()
             .collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::toString).collect(Collectors.joining())));
-    }
-
-    private void systemMessages(DbGame game, String messageString) {
-        if (game.invited().isHuman()) {
-            List<String> messages = Arrays.asList(messageString.split("\\$"));
-            roomRepo.addSystemMessages(game.getId(), messages);
-            game.withEvents(messages.stream().map(msg -> (Event) new MessageEvent("system", msg)).toList());
-        }
     }
 }
