@@ -7,6 +7,7 @@ import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppApi;
+import leo.lija.system.entities.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,12 +26,6 @@ import java.util.Map;
 public class AppApiC {
 
     private final AppApi api;
-
-    @PostMapping("/talk/{gameId}")
-    public ResponseEntity<String> talk(@PathVariable String gameId, @Valid @RequestBody TalkForm talk) {
-        api.talk(gameId, talk.author(), talk.message());
-        return ResponseEntity.ok().body("ok");
-    }
 
     @PostMapping("/update-version/{gameId}")
     public void updateVersion(@PathVariable String gameId) {
@@ -41,6 +37,11 @@ public class AppApiC {
         api.reloadTable(gameId);
     }
 
+    @GetMapping("/room/{gameId}")
+    public List<Room.Message> room(@PathVariable String gameId) {
+        return api.room(gameId);
+    }
+
     @PostMapping("/alive/{gameId}/{color}")
     public void alive(@PathVariable String gameId, @PathVariable String color) {
         api.alive(gameId, color);
@@ -49,11 +50,6 @@ public class AppApiC {
     @PostMapping("/draw/{gameId}/{color}")
     public void draw(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody MessagesForm msgs) {
         api.draw(gameId, color, msgs.messages());
-    }
-
-    @PostMapping("/draw-accept/{gameId}/{color}")
-    public void drawAccept(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody MessagesForm msgs) {
-        api.drawAccept(gameId, color, msgs.messages());
     }
 
     @PostMapping("/start/{gameId}")

@@ -3,6 +3,7 @@ package leo.lija.system;
 import leo.lija.chess.Color;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.Pov;
+import leo.lija.system.entities.Room;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.RedirectEvent;
@@ -75,9 +76,8 @@ public class AppSyncer {
 
     private Map<String, Object> renderMessage(String author, String message) {
         return Map.of(
-            "type", "html",
-            "author", author,
-            "message", message
+            "type", "message",
+            "message", new Room.Message(author, message)
         );
     }
 

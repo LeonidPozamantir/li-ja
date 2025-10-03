@@ -7,43 +7,37 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
+import leo.lija.system.db.RoomRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
+import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 
 import static leo.lija.chess.Pos.posAt;
-import static leo.lija.system.Utils.MOVE_STRING;
 
 @Service
-@RequiredArgsConstructor
-public class AppXhr {
+public class AppXhr extends IOTools {
 
-    private final GameRepo gameRepo;
+    private final RoomRepo roomRepo;
     private final Ai ai;
     private final Finisher finisher;
-    private final VersionMemo versionMemo;
     private final AliveMemo aliveMemo;
 
-    public void playMove(String fullId, String moveString) {
-        playMove(fullId, moveString, Optional.empty());
-    }
-
-    public void playMove(String fullId, String moveString, Optional<String> promString) {
-        Matcher matcher = MOVE_STRING.matcher(moveString);
-        if (matcher.find()) {
-            String orig = matcher.group(1);
-            String dest = matcher.group(2);
-            play(fullId, orig, dest, promString);
-        } else throw new AppException("Wrong move");
+    public AppXhr(GameRepo gameRepo, RoomRepo roomRepo, Ai ai, Finisher finisher, VersionMemo versionMemo, AliveMemo aliveMemo) {
+        super(gameRepo, versionMemo);
+        this.roomRepo = roomRepo;
+        this.ai = ai;
+        this.finisher = finisher;
+        this.aliveMemo = aliveMemo;
     }
 
     public void play(String fullId, String fromString, String toString) {
@@ -99,6 +93,21 @@ public class AppXhr {
 
     public void outoftime(String fullId) {
         attempt(fullId, finisher::outoftime);
+    }
+
+    public void drawAccept(String fullId) {
+        attempt(fullId, finisher::drawAccept);
+    }
+
+    public void talk(String fullId, String message) {
+        attempt(fullId, pov -> {
+            if (pov.game().invited().isHuman() && message.length() <= 140 && !message.isEmpty()) {
+                roomRepo.addMessage(pov.game().getId(), pov.color().getName(), message);
+                pov.game().withEvents(List.of(new MessageEvent(pov.color().getName(), message)));
+                save(pov.game());
+            }
+            else throw new AppException("Cannot talk");
+        });
     }
 
     private void attempt(String fullId, Consumer<Pov> action) {

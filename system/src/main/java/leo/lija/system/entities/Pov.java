@@ -10,6 +10,10 @@ public record Pov(DbGame game, Color color) {
         return game.player(color);
     }
 
+    public DbPlayer opponent() {
+        return game.player(color.getOpposite());
+    }
+
     public boolean isPlayerFullId(Optional<String> fullId) {
         return fullId.map(fid -> game.isPlayerFullId(player(), fid)).orElse(false);
     }

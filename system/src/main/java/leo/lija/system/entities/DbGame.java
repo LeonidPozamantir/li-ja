@@ -279,16 +279,14 @@ public class DbGame {
         return playable() && abortable();
     }
 
-    public DbGame finish(Status status, Optional<Color> winner, Optional<String> msg) {
+    public DbGame finish(Status status, Optional<Color> winner) {
         DbGame res = copy();
         res.status = status;
         res.winnerId = winner.flatMap(c -> player(c).getUserId());
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);
         res.positionHashes = "";
-        List<Event> newEvts = new ArrayList<>(List.of(new EndEvent()));
-        if (msg.isPresent()) newEvts.add(new MessageEvent("system", msg.get()));
-        res.withEvents(newEvts);
+        res.withEvents(List.of(new EndEvent()));
         return res;
     }
 
@@ -309,6 +307,14 @@ public class DbGame {
             .filter(c -> playable())
             .filter(c -> c.outoftime(player().getColor()))
             .map(c -> player());
+    }
+
+    public DbPlayer creator() {
+        return player(creatorColor);
+    }
+
+    public DbPlayer invited() {
+        return player(creatorColor.getOpposite());
     }
 
     public static final int GAME_ID_SIZE = 8;

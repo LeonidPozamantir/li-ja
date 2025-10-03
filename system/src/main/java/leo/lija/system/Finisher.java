@@ -5,11 +5,13 @@ import leo.lija.chess.EloCalculator;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HistoryRepo;
+import leo.lija.system.db.RoomRepo;
 import leo.lija.system.db.UserRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Status;
 import leo.lija.system.entities.User;
+import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.FinisherLock;
@@ -17,6 +19,7 @@ import leo.lija.system.memo.VersionMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static leo.lija.chess.Color.BLACK;
@@ -29,6 +32,7 @@ public class Finisher {
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
+    private final RoomRepo roomRepo;
     private final AliveMemo aliveMemo;
     private final VersionMemo versionMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
@@ -54,8 +58,13 @@ public class Finisher {
         DbGame game = pov.game();
         Color color = pov.color();
         if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition()) {
-            finish(game, Status.DRAW, Optional.of(color));
+            finish(game, Status.DRAW);
         } else throw new AppException("game is not threefold repetition");
+    }
+
+    public void drawAccept(Pov pov) {
+        if (pov.opponent().getIsOfferingDraw()) finish(pov.game(), Status.DRAW, Optional.empty(), Optional.of("Draw offer accepted"));
+        else throw new AppException("opponent is not proposing a draw");
     }
 
     public void outoftime(Pov pov) {
@@ -77,7 +86,12 @@ public class Finisher {
     private void finish(DbGame game, Status status, Optional<Color> winner, Optional<String> message) {
         if (finisherLock.isLocked(game)) throw new AppException("game finish is locked");
         finisherLock.lock(game);
-        DbGame g2 = game.finish(status, winner, message);
+        DbGame g2 = game.finish(status, winner);
+        message.filter(m -> g2.invited().isHuman())
+            .ifPresent(msg -> {
+                roomRepo.addSystemMessage(g2.getId(), msg);
+                g2.withEvents(List.of(new MessageEvent("system", msg)));
+            });
         gameRepo.save(g2);
         versionMemo.put(g2);
         updateElo(g2);

@@ -67,6 +67,10 @@ public class DbPlayer {
         return aiLevel.isPresent();
     }
 
+    public boolean isHuman() {
+        return !isAi();
+    }
+
     public boolean wins() {
         return isWinner.orElse(false);
     }

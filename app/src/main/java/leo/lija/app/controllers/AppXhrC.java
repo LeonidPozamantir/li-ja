@@ -2,12 +2,12 @@ package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
 import leo.lija.app.forms.MoveForm;
-import leo.lija.system.Pinger;
-import leo.lija.system.AppXhr;
+import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppSyncer;
+import leo.lija.system.AppXhr;
+import leo.lija.system.Pinger;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -74,6 +73,16 @@ public class AppXhrC extends BaseController {
     @GetMapping("/claim-draw/{fullId}")
     public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
         return validRedir(() -> xhr.claimDraw(fullId), fullId);
+    }
+
+    @PostMapping("/draw-accept/{fullId}")
+    public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
+        return validRedir(() -> xhr.drawAccept(fullId), fullId);
+    }
+
+    @PostMapping("/talk/{fullId}")
+    public void talk(@PathVariable String fullId, @Valid @RequestBody TalkForm talkForm) {
+        xhr.talk(fullId, talkForm.message());
     }
 
     @GetMapping("/ping")
