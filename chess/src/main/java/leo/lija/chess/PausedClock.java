@@ -1,5 +1,7 @@
 package leo.lija.chess;
 
+import java.util.Optional;
+
 import static leo.lija.chess.Color.WHITE;
 
 public class PausedClock extends Clock {
@@ -9,12 +11,17 @@ public class PausedClock extends Clock {
     }
 
     public PausedClock(int limit, int increment, Color color, float whiteTime, float blackTime) {
-        super(limit, increment, color, whiteTime, blackTime, 0);
+        super(limit, increment, color, whiteTime, blackTime, 0, Optional.empty());
     }
 
     @Override
     RunningClock step() {
         return new RunningClock(limit, increment, color, whiteTime, blackTime, now()).giveTime(WHITE, increment).step();
+    }
+
+    @Override
+    public PausedClock stop() {
+        return this;
     }
 
     @Override

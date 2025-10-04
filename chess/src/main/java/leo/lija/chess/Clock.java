@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,8 @@ public abstract class Clock {
     protected final float whiteTime;
     protected final float blackTime;
     protected final double timer;
+
+    public final Optional<Double> timerOption;
 
     public float time(Color c) {
         return c == WHITE ? whiteTime : blackTime;
@@ -55,6 +58,8 @@ public abstract class Clock {
     }
 
     abstract RunningClock step();
+
+    public abstract PausedClock stop();
 
     public abstract <T extends Clock> T addTime(Color c, float t);
 

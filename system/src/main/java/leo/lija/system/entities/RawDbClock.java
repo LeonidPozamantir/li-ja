@@ -17,12 +17,12 @@ import java.util.Optional;
 @Getter
 public class RawDbClock {
 
-    private String color;
-    private Integer increment;
+    private String color;           // c
+    private Integer increment;      // i
     @Column(name = "time_limit")
-    private Integer limit;
-    private float white;
-    private float black;
+    private Integer limit;          // l
+    private float white;            // w
+    private float black;            // b
     private Double timer;
 
     public Optional<Clock> decode() {

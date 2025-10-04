@@ -23,14 +23,14 @@ public class RawDbPlayer {
 
     @NotNull
     @Column(nullable = false)
-    private String color;
+    private String color;           // c
 
     @NotNull
     @Column(nullable = false)
     private String ps;
 
     private Integer aiLevel;
-    private Boolean isWinner;
+    private Boolean isWinner;       // w
     private String evts;
     private Integer elo;
     private Boolean isOfferingDraw;

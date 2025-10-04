@@ -288,6 +288,7 @@ public class DbGame {
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);
         res.positionHashes = "";
+        res.clock = clock.map(Clock::stop);
         res.withEvents(List.of(new EndEvent()));
         return res;
     }

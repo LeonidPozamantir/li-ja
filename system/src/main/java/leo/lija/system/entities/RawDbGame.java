@@ -7,6 +7,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
+@Table(name = "game")
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Data
@@ -42,11 +44,11 @@ public class RawDbGame {
     private String lastMove;
     @Column(name = "pos_check")
     private String check;
-    private String creatorColor;
+    private String creatorColor;        // cc
     private String positionHashes;
     private String castles;
     private boolean isRated;
-    private int variant;
+    private int variant;                // v
     private String winnerId;
 
     public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String check, String creatorColor, String positionHashes, String castles, boolean isRated, int variant, String winnerId) {

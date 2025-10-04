@@ -8,7 +8,6 @@ import leo.lija.system.entities.event.PossibleMovesEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.digester.ArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,7 +111,7 @@ public class EventStack {
                             .flatMap(decoder -> decoder.decode(data)
                                 .map(event -> Pair.of(version, event))));
                 }).filter(Optional::isPresent).map(Optional::get)
-                .collect(Collectors.toCollection(ArrayStack::new))
+                .collect(Collectors.toCollection(ArrayList::new))
         );
     }
 
