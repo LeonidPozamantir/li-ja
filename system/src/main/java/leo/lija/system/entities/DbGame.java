@@ -201,12 +201,8 @@ public class DbGame {
         pgn = game.getPgnMoves();
         turns = game.getTurns();
         positionHashes = history.positionHashes().mkString();
-        castles = List.of(
-            history.canCastle(WHITE, Side.KING_SIDE) ? "K" : "",
-            history.canCastle(WHITE, Side.QUEEN_SIDE) ? "Q" : "",
-            history.canCastle(BLACK, Side.KING_SIDE) ? "k" : "",
-            history.canCastle(BLACK, Side.QUEEN_SIDE) ? "q" : ""
-        ).stream().collect(Collectors.joining());
+        castles = history.castleNotation();
+        lastMove = history.lastMove().map(p -> p.getFirst() + " " + p.getSecond());
 
         if (situation.checkmate()) status = Status.MATE;
         else if (situation.stalemate()) status = Status.STALEMATE;

@@ -19,7 +19,7 @@ public class RoomRepo {
 
     public void addMessage(String id, String author, String message) {
         Room r = room(id);
-        r.getMessages().add(new Room.RoomMessage(author, message));
+        r.getMessages().add(Room.encode(author, message));
         repo.save(r);
     }
 

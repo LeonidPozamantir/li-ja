@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class AppApi extends IOTools {
 
-    AppApi(GameRepo gameRepo,  Ai ai, VersionMemo versionMemo, AliveMemo aliveMemo, Messenger messenger, Starter starter) {
+    AppApi(GameRepo gameRepo, VersionMemo versionMemo, AliveMemo aliveMemo, Messenger messenger, Starter starter) {
         super(gameRepo, versionMemo);
         this.aliveMemo = aliveMemo;
         this.messenger = messenger;
@@ -39,7 +39,9 @@ public class AppApi extends IOTools {
     }
 
     public void start(String gameId, String entryData) {
-        starter.start(gameId, entryData);
+        DbGame g1 = gameRepo.game(gameId);
+        starter.start(g1, entryData);
+        save(g1);
     }
 
     public void rematchAccept(

@@ -33,11 +33,6 @@ public class Starter extends IOTools {
         this.ai = ai;
     }
 
-    public DbGame start(String gameId, String entryData) {
-        DbGame game =  gameRepo.game(gameId);
-        return start(game, entryData);
-    }
-
     public DbGame start(DbGame game, String entryData) {
         if (game.getVariant() != Variant.STANDARD) gameRepo.saveInitialFen(game);
         addEntry(game, entryData);
