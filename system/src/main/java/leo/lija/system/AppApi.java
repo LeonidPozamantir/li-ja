@@ -1,65 +1,45 @@
 package leo.lija.system;
 
 import leo.lija.chess.Color;
-import leo.lija.chess.Game;
-import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
-import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Room;
 import leo.lija.system.entities.event.RedirectEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
-import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
 public class AppApi extends IOTools {
 
-    AppApi(GameRepo gameRepo, Messenger messenger, Ai ai, VersionMemo versionMemo, AliveMemo aliveMemo, LobbyApi lobbyApi) {
+    AppApi(GameRepo gameRepo,  Ai ai, VersionMemo versionMemo, AliveMemo aliveMemo, Messenger messenger, Starter starter) {
         super(gameRepo, versionMemo);
-        this.messenger = messenger;
-        this.ai = ai;
         this.aliveMemo = aliveMemo;
-        this.addEntry = lobbyApi::addEntry;
+        this.messenger = messenger;
+        this.starter = starter;
     }
 
     private final Messenger messenger;
-    private final Ai ai;
     private final AliveMemo aliveMemo;
-    private final BiConsumer<DbGame, String> addEntry;
+    private final Starter starter;
 
     public void join(String fullId, String url, String messages, String entryData) {
         Pov pov = gameRepo.pov(fullId);
+        starter.start(pov.game(), entryData);
         messenger.systemMessages(pov.game(), messages);
         pov.game().withEvents(pov.color().getOpposite(), List.of(new RedirectEvent(url)));
         save(pov.game());
-        addEntry.accept(pov.game(), entryData);
     }
 
     public void start(String gameId, String entryData) {
-        DbGame game = gameRepo.game(gameId);
-        addEntry.accept(game, entryData);
-        if (game.player().isAi()) {
-            Pair<Game, Move> aiResult;
-            try {
-                aiResult = ai.apply(game);
-            } catch (Exception e) {
-                throw new AppException("AI failure");
-            }
-            Game newChessGame = aiResult.getFirst();
-            Move move = aiResult.getSecond();
-            game.update(newChessGame, move);
-            save(game);
-        }
+        starter.start(gameId, entryData);
     }
 
     public void rematchAccept(
@@ -79,10 +59,10 @@ public class AppApi extends IOTools {
         );
         save(g1);
         messenger.systemMessages(newGame, messageString);
+        starter.start(newGame, entryData);
         save(newGame);
         aliveMemo.put(newGameId, color.getOpposite());
         aliveMemo.transfer(gameId, color.getOpposite(), newGameId, color);
-        addEntry.accept(newGame, entryData);
     }
 
     public void updateVersion(String gameId) {

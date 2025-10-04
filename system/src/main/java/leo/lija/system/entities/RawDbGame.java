@@ -13,6 +13,7 @@ import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Pos;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @Table(name = "game")
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@AllArgsConstructor
 @Data
 public class RawDbGame {
 
@@ -50,23 +52,7 @@ public class RawDbGame {
     private boolean isRated;
     private int variant;                // v
     private String winnerId;
-
-    public RawDbGame(String id, List<RawDbPlayer> players, String pgn, int status, int turns, RawDbClock clock, String lastMove, String check, String creatorColor, String positionHashes, String castles, boolean isRated, int variant, String winnerId) {
-        this.id = id;
-        this.players = players;
-        this.pgn = pgn;
-        this.status = status;
-        this.turns = turns;
-        this.clock = clock;
-        this.lastMove = lastMove;
-        this.check = check;
-        this.creatorColor = creatorColor;
-        this.positionHashes = positionHashes;
-        this.castles = castles;
-        this.isRated = isRated;
-        this.variant = variant;
-        this.winnerId = winnerId;
-    }
+    private String initialFen;
 
     public Optional<DbGame> decode() {
         if (players.size() < 2) return Optional.empty();
@@ -111,7 +97,8 @@ public class RawDbGame {
             dbGame.getCastles(),
             dbGame.isRated(),
             dbGame.getVariant().id(),
-            dbGame.getWinnerId().orElse(null)
+            dbGame.getWinnerId().orElse(null),
+    null
         );
     }
 }

@@ -1,6 +1,7 @@
 package leo.lija.system.db;
 
 import leo.lija.chess.Color;
+import leo.lija.chess.format.Fen;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Pov;
@@ -49,7 +50,6 @@ public class GameRepo {
     }
 
     public void save(DbGame game) {
-        if (game.getId() == null || !repo.existsById(game.getId())) return;
         repo.save(encode(game));
     }
 
@@ -67,5 +67,9 @@ public class GameRepo {
 
     public RawDbGame encode(DbGame dbGame) {
         return RawDbGame.encode(dbGame);
+    }
+
+    public void saveInitialFen(DbGame dbGame) {
+        repo.saveInitialFen(dbGame.getId(), Fen.obj2Str(dbGame.toChess()));
     }
 }
