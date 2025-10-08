@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("lobby")
@@ -28,12 +29,12 @@ public class LobbyXhrC {
         @RequestParam Optional<Integer> messageId,
         @RequestParam Optional<Integer> entryId
     ) {
-        return syncer.sync(
+        return CompletableFuture.supplyAsync(() -> syncer.sync(
             hookId,
             auth.orElse(0) == 1,
             state.orElse(0),
             messageId.orElse(-1),
             entryId.orElse(0)
-        );
+        )).join();
     }
 }

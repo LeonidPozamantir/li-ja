@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,12 +32,16 @@ public class AppXhrC extends BaseController {
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
-        return syncer.sync(gameId, color, version, Optional.of(fullId));
+        return syncAll(gameId, color, version, Optional.of(fullId));
     }
 
     @GetMapping("/sync/{gameId}/{color}/{version}")
     public Map<String, Object> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
-        return syncer.sync(gameId, color, version, Optional.empty());
+        return syncAll(gameId, color, version, Optional.empty());
+    }
+
+    private Map<String, Object> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
+        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId)).join();
     }
 
     @PostMapping("/move/{fullId}")
