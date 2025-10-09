@@ -61,6 +61,15 @@ public class GameRepo {
         return repo.findAll(PageRequest.of(0, 1)).stream().findAny().flatMap(this::decode);
     }
 
+    public void setEloDiffs(String id, int white, int black) {
+        Optional<RawDbGame> game = repo.findById(id);
+        game.ifPresent(g -> {
+            g.getPlayers().get(0).setEloDiff(white);
+            g.getPlayers().get(1).setEloDiff(black);
+            repo.save(g);
+        });
+    }
+
     public Optional<DbGame> decode(RawDbGame raw) {
         return raw.decode();
     }

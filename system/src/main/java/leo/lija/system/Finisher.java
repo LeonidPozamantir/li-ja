@@ -116,6 +116,7 @@ public class Finisher {
                     );
                     int whiteElo = elos.getFirst();
                     int blackElo = elos.getSecond();
+                    gameRepo.setEloDiffs(game.getId(), whiteElo - whiteUser.getElo(), blackElo - blackUser.getElo());
                     userRepo.setElo(whiteUserId, whiteElo);
                     userRepo.setElo(blackUserId, blackElo);
                     historyRepo.addEntry(whiteUser.getUsername(), whiteElo, game.getId());
