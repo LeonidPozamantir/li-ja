@@ -99,7 +99,7 @@ public class LobbySyncer {
                 entry.getData().getPlayers(),
                 entry.getData().getVariant(),
                 entry.getData().getRated() ? "Rated" : "Casual",
-                entry.getData().getClock().isEmpty() ? "Unlimited" : entry.getData().getClock().stream().map(String::valueOf).collect(Collectors.joining(" + "))
+                Optional.ofNullable(entry.getData().getClock()).orElse("Unlimited")
             )).toList()
         );
     }

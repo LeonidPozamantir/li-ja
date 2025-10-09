@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import leo.lija.chess.Clock;
 import leo.lija.system.entities.DbGame;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class Entry {
                 ),
                 game.getVariant().name(),
                 game.isRated(),
-                game.getClock().map(c -> List.of(c.limitInMinutes(), c.incrementInSeconds())).orElse(List.of())
+                game.getClock().map(Clock::show).orElse(null)
             )
         ));
     }
