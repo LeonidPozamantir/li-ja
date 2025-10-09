@@ -22,6 +22,10 @@ public abstract class BooleanExpiryMemo {
         cache.put(key, true);
     }
 
+    public void remove(String key) {
+        cache.invalidate(key);
+    }
+
     public Set<String> keys() {
         return cache.asMap().keySet();
     }

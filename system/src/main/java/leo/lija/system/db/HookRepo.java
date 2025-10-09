@@ -30,7 +30,7 @@ public interface HookRepo extends JpaRepository<Hook, String> {
     void deleteByOwnerId(String ownerId);
 
     @Transactional
-    default boolean keepOnlyIds(Collection<String> ids) {
+    default boolean keepOnlyOwnerIds(Collection<String> ids) {
         List<String> removableIds = getOtherIds(ids);
         if (!removableIds.isEmpty()) {
             deleteAllById(removableIds);
@@ -39,7 +39,7 @@ public interface HookRepo extends JpaRepository<Hook, String> {
         return false;
     }
 
-    @Query("select h.id from Hook h where h.id not in :ids and h.match = false ")
+    @Query("select h.id from Hook h where h.ownerId not in :ids and h.match = false ")
     List<String> getOtherIds(Collection<String> ids);
 
     @Transactional

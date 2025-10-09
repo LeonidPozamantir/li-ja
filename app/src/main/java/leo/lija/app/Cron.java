@@ -26,7 +26,7 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.hook-cleanup-dead.frequency}")
     void hookCleanupDead() {
-        boolean hasRemoved = hookRepo.keepOnlyIds(hookMemo.keys());
+        boolean hasRemoved = hookRepo.keepOnlyOwnerIds(hookMemo.keys());
         if (hasRemoved) lobbyMemo.increase();
     }
 
