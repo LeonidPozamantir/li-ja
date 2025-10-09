@@ -16,9 +16,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,10 @@ public class RawDbGame {
     private int variant;                // v
     private String winnerId;
     private String initialFen;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     public Optional<DbGame> decode() {
         if (players.size() < 2) return Optional.empty();
@@ -98,7 +103,8 @@ public class RawDbGame {
             dbGame.isRated(),
             dbGame.getVariant().id(),
             dbGame.getWinnerId().orElse(null),
-    null
+            null,
+            null
         );
     }
 }
