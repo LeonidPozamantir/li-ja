@@ -8,6 +8,7 @@ import leo.lija.system.AppXhr;
 import leo.lija.system.Pinger;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,7 @@ public class AppXhrC extends BaseController {
     private final AppSyncer syncer;
     private final Pinger pinger;
     private final AliveMemo aliveMemo;
+    private final TaskExecutor executor;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
@@ -41,7 +43,7 @@ public class AppXhrC extends BaseController {
     }
 
     private Map<String, Object> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
-        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId)).join();
+        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId), executor).join();
     }
 
     @PostMapping("/move/{fullId}")

@@ -3,6 +3,7 @@ package leo.lija.app.controllers;
 import leo.lija.system.LobbySyncer;
 import leo.lija.system.LobbyXhr;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class LobbyXhrC {
 
     private final LobbyXhr xhr;
     private final LobbySyncer syncer;
+    private final TaskExecutor executor;
 
     @GetMapping({"/sync/{hookId}", "/sync", "/api/lobby/preload/{hookId}", "/api/lobby/preload"})
     public Map<String, Object> sync(
@@ -35,6 +37,6 @@ public class LobbyXhrC {
             state.orElse(0),
             messageId.orElse(-1),
             entryId.orElse(0)
-        )).join();
+        ), executor).join();
     }
 }
