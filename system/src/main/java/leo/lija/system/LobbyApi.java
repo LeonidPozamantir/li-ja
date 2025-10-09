@@ -45,8 +45,8 @@ public class LobbyApi extends IOTools {
     }
 
     public void create(String hookOwnerId) {
-        versionInc();
         hookMemo.put(hookOwnerId);
+        versionInc();
     }
 
     public void alive(String hookOwnerId) {

@@ -32,6 +32,10 @@ public class Hook {
     @Column(nullable = false)
     private Integer variant;
 
+    @NotNull
+    @Column(nullable = false)
+    private Boolean hasClock;
+
     private Integer time;
     private Integer increment;
 
@@ -88,7 +92,7 @@ public class Hook {
             "variant", realVariant().toString(),
             "mode", realMode().toString(),
             "color", color,
-            "clock", time != null && increment != null ? renderClock(time, increment) : "Unlimited",
+            "clock", time != null && hasClock && increment != null ? renderClock(time, increment) : "Unlimited",
             "emin", eloMin(),
             "emax", eloMax()
         ));
