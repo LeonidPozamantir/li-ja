@@ -13,4 +13,13 @@ public class LobbyXhr {
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;
     private final LobbyMemo lobbyMemo;
+
+    public void cancel(String ownerId) {
+        hookRepo.deleteByOwnerId(ownerId);
+        versionInc();
+    }
+
+    private int versionInc() {
+        return lobbyMemo.increase();
+    }
 }

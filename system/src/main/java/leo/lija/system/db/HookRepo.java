@@ -27,6 +27,9 @@ public interface HookRepo extends JpaRepository<Hook, String> {
     void deleteById(String id);
 
     @Transactional
+    void deleteByOwnerId(String ownerId);
+
+    @Transactional
     default boolean keepOnlyIds(Collection<String> ids) {
         List<String> removableIds = getOtherIds(ids);
         if (!removableIds.isEmpty()) {

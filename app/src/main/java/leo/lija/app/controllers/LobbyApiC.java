@@ -28,11 +28,6 @@ public class LobbyApiC {
         api.create(hookOwnerId);
     }
 
-    @PostMapping("/remove/{hookId}")
-    public void remove(@PathVariable String hookId) {
-        api.remove(hookId);
-    }
-
     @PostMapping("/alive/{hookOwnerId}")
     public void alive(@PathVariable String hookOwnerId) {
         api.alive(hookOwnerId);
