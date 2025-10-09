@@ -29,15 +29,13 @@ public class CraftyAi implements Ai {
     @Override
     public Pair<Game, Move> apply(DbGame dbGame) {
 
-        Game oldGame;
-        if (dbGame.getVariant() == Variant.STANDARD) oldGame = dbGame.toChess();
-        else if (dbGame.getVariant() == Variant.CHESS960) oldGame = dbGame.toChess().updateBoard(board ->
-                board.updateHistory(History::withoutAnyCastles));
-        else {
-            oldGame = null;
-        }
+        Game oldGame = dbGame.toChess();
+        String fen = Fen.obj2Str(dbGame.getVariant() == Variant.CHESS960
+            ? oldGame.updateBoard(board -> board.updateHistory(History::withoutAnyCastles))
+            : oldGame
+        );
 
-        String strMove = runCrafty(Fen.obj2Str(oldGame), dbGame.aiLevel().orElse(1));
+        String strMove = runCrafty(fen, dbGame.aiLevel().orElse(1));
         Pos orig = Pos.posAt(strMove.substring(0, 2)).get();
         Pos dest = Pos.posAt(strMove.substring(2, 4)).get();
         return oldGame.apply(orig, dest);
