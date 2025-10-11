@@ -152,7 +152,7 @@ public class Actor {
 						Pos target = b2AndTarget.getSecond();
 						return b2.place(color.rook(), newRookPos.get())
 							.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)))
-							.map(b -> moveCastle(target, b, Optional.of(Pair.of(rookPos, newRookPos.get()))));
+							.map(b -> moveCastle(target, b, Optional.of(Pair.of(Pair.of(kingPos, newKingPos.get()), Pair.of(rookPos, newRookPos.get())))));
 					});
 			});
 	}
@@ -267,7 +267,7 @@ public class Actor {
 		return move(dest, after, Optional.empty(), Optional.empty(), Optional.empty(), true);
 	}
 
-	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pos, Pos>> castle) {
+	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle) {
 		return move(dest, after, Optional.empty(), castle, Optional.empty(), false);
 	}
 
@@ -275,7 +275,7 @@ public class Actor {
 		return move(dest, after, Optional.empty(), Optional.empty(), promotion, false);
 	}
 
-	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pos, Pos>> castle, Optional<Role> promotion, boolean enpassant) {
+	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle, Optional<Role> promotion, boolean enpassant) {
 		return new Move(piece, pos, dest, board, after, capture, promotion, castle, enpassant);
 	}
 

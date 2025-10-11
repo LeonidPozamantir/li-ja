@@ -3,7 +3,6 @@ package leo.lija.system.entities.event;
 import leo.lija.chess.Color;
 import leo.lija.chess.Move;
 import leo.lija.chess.Situation;
-import leo.lija.chess.utils.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public interface Event {
             MoveEvent.apply(move),
             move.enpassant() ? move.capture().map(EnpassantEvent::new).orElse(null) : null,
             move.promotion().map(role -> new PromotionEvent(role, move.dest())).orElse(null),
-            move.castle().map(rook -> new CastlingEvent(Pair.of(move.orig(), move.dest()), rook, move.color())).orElse(null)
+            move.castle().map(kingAndRook -> new CastlingEvent(kingAndRook.getFirst(), kingAndRook.getSecond(), move.color())).orElse(null)
         ).filter(Objects::nonNull).toList();
     }
 

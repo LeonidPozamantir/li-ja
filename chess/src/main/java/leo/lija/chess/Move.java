@@ -17,7 +17,7 @@ public record Move(
     @With Board after,
     Optional<Pos> capture,
     @With Optional<Role> promotion,
-    Optional<Pair<Pos, Pos>> castle,
+    Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle,
     boolean enpassant
 ) {
 
