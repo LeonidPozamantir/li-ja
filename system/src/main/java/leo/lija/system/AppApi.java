@@ -99,6 +99,12 @@ public class AppApi extends IOTools {
         aliveMemo.put(gameId, color);
     }
 
+    public int playerVersion(String gameId, String colorName) {
+        Color color = ioColor(colorName);
+        Pov pov = gameRepo.pov(gameId, color);
+        return pov.player().eventStack().lastVersion();
+    }
+
     public void draw(String gameId, String colorName, String messages) {
         Color color = ioColor(colorName);
         DbGame g1 = gameRepo.game(gameId);

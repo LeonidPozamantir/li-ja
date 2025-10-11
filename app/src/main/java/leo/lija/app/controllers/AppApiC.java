@@ -62,6 +62,11 @@ public class AppApiC {
         return String.valueOf(api.activity(gameId, color));
     }
 
+    @GetMapping("/player-version/{gameId}/{color}")
+    public int playerVersion(@PathVariable String gameId, @PathVariable String color) {
+        return api.playerVersion(gameId, color);
+    }
+
     @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")
     public void rematchAccept(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm r) {
         api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry(), r.messages());
