@@ -123,6 +123,7 @@ public class AppXhr extends IOTools {
                Clock newClock = clock.giveTime(color, moretimeSeconds);
                pov.game().withEvents(List.of(new MoretimeEvent(color, moretimeSeconds)));
                pov.game().withClock(newClock);
+               messenger.systemMessage(pov.game(), "%s + %d seconds".formatted(color, moretimeSeconds));
                save(pov.game());
                return newClock.remainingTime(color);
            }).orElseThrow(() -> new AppException("cannot add more time"));
