@@ -147,8 +147,8 @@ public class Actor {
 					.flatMap(b1 -> {
 						Pos p = newKingPos.get();
 						if (p.equals(kingPos)) return Optional.of(Pair.of(b1, rookPos));
-						else if (p.nextTo(kingPos)) return b1.move(kingPos, p).map(b -> Pair.of(b, rookPos));
-						else return b1.move(kingPos, newKingPos.get()).map(b -> Pair.of(b, p));
+						if (p.nextTo(kingPos)) return b1.move(kingPos, p).map(b -> Pair.of(b, rookPos));
+						return b1.move(kingPos, newKingPos.get()).map(b -> Pair.of(b, p));
 					})
 					.flatMap(b2AndTarget -> {
 						Board b2 = b2AndTarget.getFirst();

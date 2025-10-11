@@ -26,19 +26,14 @@ public class AppApiC {
 
     private final AppApi api;
 
-    @PostMapping("/update-version/{gameId}")
-    public void updateVersion(@PathVariable String gameId) {
-        api.updateVersion(gameId);
+    @GetMapping("/show/{fullId}")
+    public Map<String, Object> show(@PathVariable String fullId) {
+        return api.show(fullId);
     }
 
     @PostMapping("/reload-table/{gameId}")
     public void reloadTable(@PathVariable String gameId) {
         api.reloadTable(gameId);
-    }
-
-    @GetMapping("/room/{gameId}")
-    public List<Room.RoomMessage> room(@PathVariable String gameId) {
-        return api.room(gameId);
     }
 
     @PostMapping("/alive/{gameId}/{color}")
@@ -65,11 +60,6 @@ public class AppApiC {
     @GetMapping("/activity/{gameId}/{color}")
     public String activity(@PathVariable String gameId, @PathVariable String color) {
         return String.valueOf(api.activity(gameId, color));
-    }
-
-    @GetMapping("/possible-moves/{gameId}/{color}")
-    public Map<String, Object> possibleMoves(@PathVariable String gameId, @PathVariable String color) {
-        return api.possibleMoves(gameId, color);
     }
 
     @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")

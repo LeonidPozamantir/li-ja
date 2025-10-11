@@ -12,6 +12,7 @@ import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +30,22 @@ public class AppApi extends IOTools {
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
     private final Starter starter;
+
+    public Map<String, Object> show(String fullId) {
+        Pov pov = gameRepo.pov(fullId);
+        aliveMemo.put(pov.game().getId(), pov.color());
+        List<Room.RoomMessage> roomData = messenger.render(pov.game().getId());
+        Map<String, Object> res = new HashMap<>(Map.of(
+            "stackVersion", pov.player().eventStack().lastVersion(),
+            "roomData", roomData,
+            "opponentActivity", aliveMemo.activity(pov.game().getId(), pov.color().getOpposite())
+        ));
+        if (pov.game().playableBy(pov.player())) {
+            res.put("possibleMoves", pov.game().toChess().situation().destinations().entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::toString).collect(Collectors.joining()))));
+        }
+        return res;
+    }
 
     public void join(String fullId, String url, String messages, String entryData) {
         Pov pov = gameRepo.pov(fullId);
@@ -71,6 +88,12 @@ public class AppApi extends IOTools {
         versionMemo.put(gameRepo.game(gameId));
     }
 
+    public void reloadTable(String gameId) {
+        DbGame g1 = gameRepo.game(gameId);
+        g1.withEvents(List.of(new ReloadTableEvent()));
+        save(g1);
+    }
+
     public void alive(String gameId, String colorName) {
         Color color = ioColor(colorName);
         aliveMemo.put(gameId, color);
@@ -88,20 +111,4 @@ public class AppApi extends IOTools {
         return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
     }
 
-    public List<Room.RoomMessage> room(String gameId) {
-        return messenger.render(gameId);
-    }
-
-    public void reloadTable(String gameId) {
-        DbGame g1 = gameRepo.game(gameId);
-        g1.withEvents(List.of(new ReloadTableEvent()));
-        save(g1);
-    }
-
-    public Map<String, Object> possibleMoves(String gameId, String colorName) {
-        Color color = ioColor(colorName);
-        DbGame game = gameRepo.game(gameId);
-        return game.toChess().situation().destinations().entrySet().stream()
-            .collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::toString).collect(Collectors.joining())));
-    }
 }

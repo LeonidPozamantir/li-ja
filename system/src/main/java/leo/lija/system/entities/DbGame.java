@@ -244,6 +244,10 @@ public class DbGame {
         return status.id() < Status.ABORTED.id();
     }
 
+    public boolean playableBy(DbPlayer p) {
+        return playable() && player().getUserId().equals(p.getUserId());
+    }
+
     public Optional<Integer> aiLevel() {
         return players().stream().filter(DbPlayer::isAi).findAny()
             .flatMap(DbPlayer::getAiLevel);
