@@ -143,11 +143,17 @@ public class Actor {
 				}
 				if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
 
-				Optional<Board> newBoard = board.take(rookPos)
-					.flatMap(b -> b.move(kingPos, newKingPos.get()))
-					.flatMap(b -> b.place(color.rook(), newRookPos.get()))
-					.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)));
-				return newBoard.map(b -> moveCastle(newKingPos.get(), b, Optional.of(Pair.of(rookPos, newRookPos.get()))));
+				return board.take(rookPos)
+					.map(b1 -> b1.move(kingPos, newKingPos.get())
+						.map(b -> Pair.of(b, newKingPos.get()))
+						.orElse(Pair.of(b1, rookPos)))
+					.flatMap(b2AndTarget -> {
+						Board b2 = b2AndTarget.getFirst();
+						Pos target = b2AndTarget.getSecond();
+						return b2.place(color.rook(), newRookPos.get())
+							.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)))
+							.map(b -> moveCastle(target, b, Optional.of(Pair.of(rookPos, newRookPos.get()))));
+					});
 			});
 	}
 

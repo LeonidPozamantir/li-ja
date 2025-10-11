@@ -91,19 +91,47 @@ RQK   R """).withHistory(History.castle(WHITE, true, true));
 		@Nested
 		@DisplayName("possible")
 		class Possible {
-			RichGame game = new RichGame(goodHist, WHITE);
-			@Test
-			@DisplayName("viable moves")
-			void viableMoves() {
-				assertThat(game.board.destsFrom(E1).get()).containsExactlyInAnyOrder(F1, G1);
-			}
 
-			@Test
-			@DisplayName("correct new board")
-			void correctNewBoard() {
-				beGame(game.playMove(E1, G1), """
+			@Nested
+			class Standard {
+				RichGame game = new RichGame(goodHist, WHITE);
+
+				@Test
+				@DisplayName("viable moves")
+				void viableMoves() {
+					assertThat(game.board.destsFrom(E1).get()).containsExactlyInAnyOrder(F1, G1);
+				}
+
+				@Test
+				@DisplayName("correct new board")
+				void correctNewBoard() {
+					beGame(game.playMove(E1, G1), """
 PPPPPPPP
 R  Q RK """);
+				}
+			}
+
+			@Nested
+			@DisplayName("chess 960 close kingside")
+			class Chess960 {
+				Board board = visual.str2Obj("""
+   PPPPP
+B     KR""");
+				RichGame game = new RichGame(board, WHITE);
+
+				@Test
+				@DisplayName("viable moves")
+				void viableMoves() {
+					assertThat(board.destsFrom(G1).get()).containsExactlyInAnyOrder(F1, H1);
+				}
+
+				@Test
+				@DisplayName("correct new board")
+				void correctNewBoard() {
+					beGame(game.playMove(G1, H1), """
+   PPPPP
+B    RK """);
+				}
 			}
 		}
 	}
