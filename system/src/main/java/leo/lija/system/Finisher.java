@@ -89,6 +89,8 @@ public class Finisher {
         DbGame g2 = game.finish(status, winner);
         message.ifPresent(m -> messenger.systemMessage(g2, m));
         gameRepo.save(g2);
+        Optional<String> winnerId = winner.flatMap(c -> g2.player(c).getUserId());
+        gameRepo.finish(g2.getId(), winnerId);
         versionMemo.put(g2);
         updateElo(g2);
         incNbGames(g2, WHITE);

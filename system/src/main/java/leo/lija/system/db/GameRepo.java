@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
@@ -66,6 +67,20 @@ public class GameRepo {
         game.ifPresent(g -> {
             g.getPlayers().get(0).setEloDiff(white);
             g.getPlayers().get(1).setEloDiff(black);
+            repo.save(g);
+        });
+    }
+
+    public void finish(String id, Optional<String> winnerId) {
+        Optional<RawDbGame> game = repo.findById(id);
+        game.ifPresent(g -> {
+            g.setPositionHashes("");
+            winnerId.ifPresent(userId -> g.setWinnerUserId(userId));
+            g.getPlayers().get(0).setLastDrawOffer(null);
+            g.getPlayers().get(1).setLastDrawOffer(null);
+            g.getPlayers().get(0).setIsOfferingDraw(null);
+            g.getPlayers().get(1).setIsOfferingDraw(null);
+            g.getClock().setTimer(null);
             repo.save(g);
         });
     }

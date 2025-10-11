@@ -7,6 +7,7 @@ import leo.lija.chess.PausedClock;
 import leo.lija.chess.RunningClock;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +15,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Getter
+@Data
 public class RawDbClock {
 
     private String color;           // c

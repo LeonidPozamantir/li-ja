@@ -54,13 +54,12 @@ public class DbGame {
     private String castles;
     private boolean isRated;
     private Variant variant;
-    private Optional<String> winnerId;
 
     public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD, Optional.empty());
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD);
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant, Optional<String> winnerId) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -75,11 +74,10 @@ public class DbGame {
         this.castles = castles;
         this.isRated = isRated;
         this.variant = variant;
-        this.winnerId = winnerId;
     }
 
     public DbGame copy() {
-        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant, winnerId);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant);
     }
 
     public List<DbPlayer> players() {
@@ -280,10 +278,8 @@ public class DbGame {
     public DbGame finish(Status status, Optional<Color> winner) {
         DbGame res = copy();
         res.status = status;
-        res.winnerId = winner.flatMap(c -> player(c).getUserId());
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);
-        res.positionHashes = "";
         res.clock = clock.map(Clock::stop);
         res.withEvents(List.of(new EndEvent()));
         return res;
