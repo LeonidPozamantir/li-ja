@@ -113,7 +113,7 @@ R  Q RK """);
 
 			@Nested
 			@DisplayName("chess 960 close kingside")
-			class Chess960 {
+			class Chess960Kingside {
 				Board board = visual.str2Obj("""
    PPPPP
 B     KR""");
@@ -131,6 +131,29 @@ B     KR""");
 					beGame(game.playMove(G1, H1), """
    PPPPP
 B    RK """);
+				}
+			}
+
+			@Nested
+			@DisplayName("chess 960 close queenside")
+			class Chess960Queenside {
+				Board board = visual.str2Obj("""
+PPPPPPPP
+RK     B""");
+				RichGame game = new RichGame(board, WHITE);
+
+				@Test
+				@DisplayName("viable moves")
+				void viableMoves() {
+					assertThat(board.destsFrom(B1).get()).containsExactlyInAnyOrder(A1, C1);
+				}
+
+				@Test
+				@DisplayName("correct new board")
+				void correctNewBoard() {
+					beGame(game.playMove(B1, A1), """
+PPPPPPPP
+  KR   B""");
 				}
 			}
 		}
