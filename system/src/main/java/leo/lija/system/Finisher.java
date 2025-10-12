@@ -5,38 +5,40 @@ import leo.lija.chess.EloCalculator;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HistoryRepo;
-import leo.lija.system.db.RoomRepo;
 import leo.lija.system.db.UserRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Status;
 import leo.lija.system.entities.User;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.FinisherLock;
 import leo.lija.system.memo.VersionMemo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
 @Service
-@RequiredArgsConstructor
-public class Finisher {
+public class Finisher extends IOTools {
 
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
-    private final GameRepo gameRepo;
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
-    private final VersionMemo versionMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
+
+    public Finisher(GameRepo gameRepo, VersionMemo versionMemo, HistoryRepo historyRepo, UserRepo userRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
+        super(gameRepo, versionMemo);
+        this.historyRepo = historyRepo;
+        this.userRepo = userRepo;
+        this.messenger = messenger;
+        this.aliveMemo = aliveMemo;
+        this.finisherLock = finisherLock;
+    }
 
     public void abort(Pov pov) {
         if (pov.game().abortable()) finish(pov.game(), Status.ABORTED);
@@ -75,6 +77,11 @@ public class Finisher {
         }).orElseThrow(() -> new AppException("no outoftime applicable"));
     }
 
+    public void moveFinish(DbGame game, Color color) {
+        if (game.getStatus() == Status.MATE) finish(game, Status.MATE, Optional.of(color));
+        else if (game.getStatus() == Status.STALEMATE || game.getStatus() == Status.DRAW) finish(game, game.getStatus());
+    }
+
     private void finish(DbGame game, Status status) {
         finish(game, status, Optional.empty(), Optional.empty());
     }
@@ -88,10 +95,9 @@ public class Finisher {
         finisherLock.lock(game);
         DbGame g2 = game.finish(status, winner);
         message.ifPresent(m -> messenger.systemMessage(g2, m));
-        gameRepo.save(g2);
+        save(g2);
         Optional<String> winnerId = winner.flatMap(c -> g2.player(c).getUserId());
         gameRepo.finish(g2.getId(), winnerId);
-        versionMemo.put(g2);
         updateElo(g2);
         incNbGames(g2, WHITE);
         incNbGames(g2, BLACK);

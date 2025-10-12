@@ -68,8 +68,12 @@ public class AppXhr extends IOTools {
             Game newChessGame = newChessGameAndMove.getFirst();
             Move move = newChessGameAndMove.getSecond();
             g1.update(newChessGame, move);
+            aliveMemo.put(g1.getId(), color);
 
-            if (g1.player().isAi() && g1.playable()) {
+            if (g1.finished()) {
+                save(g1);
+                finisher.moveFinish(g1, color);
+            } else if (g1.player().isAi() && g1.playable()) {
                 Pair<Game, Move> aiResult;
                 try {
                     aiResult = ai.apply(g1);
@@ -79,9 +83,9 @@ public class AppXhr extends IOTools {
                 newChessGame = aiResult.getFirst();
                 move = aiResult.getSecond();
                 g1.update(newChessGame, move);
-            }
-            save(g1);
-            aliveMemo.put(g1.getId(), color);
+                save(g1);
+                finisher.moveFinish(g1, color.getOpposite());
+            } else save(g1);
         });
     }
 

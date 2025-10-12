@@ -25,7 +25,6 @@ public interface Event {
     static List<Event> fromSituation(Situation situation) {
         return Stream.of(
             situation.check() ? situation.kingPos().map(CheckEvent::new).orElse(null) : null,
-            situation.end() ? new EndEvent() : null,
             situation.threefoldRepetition() ? new ThreefoldEvent() : null
         ).filter(Objects::nonNull).toList();
     }
