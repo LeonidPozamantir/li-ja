@@ -6,6 +6,7 @@ import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppSyncer;
 import leo.lija.system.AppXhr;
 import leo.lija.system.Pinger;
+import leo.lija.system.db.GameRepo;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskExecutor;
@@ -31,6 +32,7 @@ public class AppXhrC extends BaseController {
     private final Pinger pinger;
     private final AliveMemo aliveMemo;
     private final TaskExecutor executor;
+    private final GameRepo gameRepo;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
@@ -114,6 +116,11 @@ public class AppXhrC extends BaseController {
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
     public long nbPlayers() {
         return aliveMemo.count();
+    }
+
+    @GetMapping("/how-many-games-now")
+    public int nbGames() {
+        return gameRepo.countPlaying();
     }
 
 }

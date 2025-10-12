@@ -111,4 +111,8 @@ public class GameRepo {
             .map(Optional::get)
             .toList();
     }
+
+    public int countPlaying() {
+        return repo.countPlaying(LocalDateTime.now().minusSeconds(15));
+    }
 }
