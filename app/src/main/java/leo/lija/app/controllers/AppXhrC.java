@@ -98,8 +98,7 @@ public class AppXhrC extends BaseController {
 
     @PostMapping("/moretime/{fullId}")
     public float moretime(@PathVariable String fullId) {
-        float time = xhr.moretime(fullId);
-        return time;
+        return xhr.moretime(fullId);
     }
 
     @GetMapping("/ping")
