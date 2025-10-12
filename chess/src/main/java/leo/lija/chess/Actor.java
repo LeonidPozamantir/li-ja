@@ -207,7 +207,7 @@ public class Actor {
 		while (optNext.isPresent() && !friends().contains(optNext.get())) {
 			Pos next = optNext.get();
 			if (enemies().contains(next)) {
-				res.add(move(next, board.taking(pos, next).get(), Optional.of(pos))); // mistake?
+				res.add(move(next, board.taking(pos, next).get(), Optional.of(next)));
 				break;
 			}
 			res.add(move(next, board.moveTo(pos, next)));
