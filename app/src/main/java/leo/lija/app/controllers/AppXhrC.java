@@ -63,8 +63,8 @@ public class AppXhrC extends BaseController {
     }
 
     @PostMapping("/outoftime/{fullId}")
-    public ResponseEntity<Void> outoftime(@PathVariable String fullId) {
-        return validRedir(() -> xhr.outoftime(fullId), fullId);
+    public void outoftime(@PathVariable String fullId) {
+        xhr.outoftime(fullId);
     }
 
     @GetMapping("/resign/{fullId}")
