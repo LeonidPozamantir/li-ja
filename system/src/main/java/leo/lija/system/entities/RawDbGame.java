@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -55,9 +56,12 @@ public class RawDbGame {
     private String winnerUserId;
     private String initialFen;
 
-    @UpdateTimestamp
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public Optional<DbGame> decode() {
         if (players.size() < 2) return Optional.empty();
@@ -101,6 +105,7 @@ public class RawDbGame {
             dbGame.getCastles(),
             dbGame.isRated(),
             dbGame.getVariant().id(),
+            null,
             null,
             null,
             null

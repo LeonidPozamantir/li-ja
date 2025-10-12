@@ -6,12 +6,15 @@ import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.RawDbGame;
+import leo.lija.system.entities.Status;
 import leo.lija.system.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static leo.lija.system.entities.DbGame.GAME_ID_SIZE;
@@ -95,5 +98,17 @@ public class GameRepo {
 
     public void saveInitialFen(DbGame dbGame) {
         repo.saveInitialFen(dbGame.getId(), Fen.obj2Str(dbGame.toChess()));
+    }
+
+    public void cleanupUnplayed() {
+        repo.cleanupUnplayed(LocalDateTime.now().minusDays(2));
+    }
+
+    public List<DbGame> candidateToAutofinish() {
+        return repo.candidatesToAutofinish(Status.STARTED.id(), LocalDateTime.now().minusHours(2)).stream()
+            .map(RawDbGame::decode)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
     }
 }

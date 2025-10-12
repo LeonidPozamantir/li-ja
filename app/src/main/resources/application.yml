@@ -12,11 +12,11 @@ server:
   tomcat:
     connection-timeout: 2s
 
-sync:
+sync: #milliseconds
   duration: 7000
   sleep: 200
 
-lobby:
+lobby: #milliseconds
   sync:
     duration: 10000
     sleep: 250
@@ -25,7 +25,7 @@ lobby:
   entry:
     max: 12
 
-memo:
+memo: #seconds
   version:
     timeout: 1800
   alive:
@@ -49,11 +49,15 @@ moretime:
 
 cron:
   online-username:
-    frequency: 2000
+    frequency: 2100ms
   hook-cleanup-dead:
-    frequency: 2000
+    frequency: 2s
   hook-cleanup-old:
-    frequency: 21000
+    frequency: 21s
+  game-cleanup-unplayed:
+    frequency: 2h6m
+  game-auto-finish:
+    frequency: 1h
 
 async:
   actions:

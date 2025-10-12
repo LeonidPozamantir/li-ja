@@ -106,7 +106,7 @@ public class AppXhr extends IOTools {
     }
 
     public void outoftime(String fullId) {
-        attempt(fullId, finisher::outoftime);
+        attempt(fullId, p -> finisher.outoftime(p.game()));
     }
 
     public void drawAccept(String fullId) {

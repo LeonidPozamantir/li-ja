@@ -16,6 +16,7 @@ import leo.lija.system.memo.FinisherLock;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static leo.lija.chess.Color.BLACK;
@@ -69,12 +70,16 @@ public class Finisher extends IOTools {
         else throw new AppException("opponent is not proposing a draw");
     }
 
-    public void outoftime(Pov pov) {
-        pov.game().outoftimePlayer().map(player -> {
-            finish(pov.game(), Status.OUTOFTIME,
-                Optional.of(player.getColor().getOpposite()).filter((c) -> pov.game().toChess().getBoard().hasEnoughMaterialToMate(c)));
+    public void outoftime(DbGame game) {
+        game.outoftimePlayer().map(player -> {
+            finish(game, Status.OUTOFTIME,
+                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)));
             return null;
         }).orElseThrow(() -> new AppException("no outoftime applicable"));
+    }
+
+    public void outoftimes(List<DbGame> games) {
+        games.forEach(this::outoftime);
     }
 
     public void moveFinish(DbGame game, Color color) {
