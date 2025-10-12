@@ -52,9 +52,11 @@ public class AppXhrC extends BaseController {
             return ResponseEntity.badRequest().body("Invalid move");
         }
 
-        xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
+        return CompletableFuture.supplyAsync(() -> {
+            xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
+            return ResponseEntity.ok().body("ok");
+        }).join();
 
-        return ResponseEntity.ok().body("ok");
     }
 
     @GetMapping("/abort/{fullId}")
@@ -93,9 +95,9 @@ public class AppXhrC extends BaseController {
     }
 
     @PostMapping("/moretime/{fullId}")
-    public String moretime(@PathVariable String fullId) {
+    public float moretime(@PathVariable String fullId) {
         float time = xhr.moretime(fullId);
-        return String.valueOf(time);
+        return time;
     }
 
     @GetMapping("/ping")
@@ -110,8 +112,8 @@ public class AppXhrC extends BaseController {
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
-    public String nbPlayers() {
-        return String.valueOf(aliveMemo.count());
+    public long nbPlayers() {
+        return aliveMemo.count();
     }
 
 }

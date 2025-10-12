@@ -58,8 +58,8 @@ public class AppApiC {
     }
 
     @GetMapping("/activity/{gameId}/{color}")
-    public String activity(@PathVariable String gameId, @PathVariable String color) {
-        return String.valueOf(api.activity(gameId, color));
+    public int activity(@PathVariable String gameId, @PathVariable String color) {
+        return api.activity(gameId, color);
     }
 
     @GetMapping("/player-version/{gameId}/{color}")
