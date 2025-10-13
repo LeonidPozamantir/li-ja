@@ -39,7 +39,6 @@ public class RawDbGame {
     private List<RawDbPlayer> players;
 
     @NotNull
-    @Column(nullable = false)
     private String pgn;
     private int status;
     private int turns;
@@ -75,7 +74,8 @@ public class RawDbGame {
                                     id,
                                     whitePlayer,
                                     blackPlayer,
-                                    pgn, trueStatus,
+                                    Optional.ofNullable(pgn).orElse(""),
+                                    trueStatus,
                                     turns,
                                     validClock,
                                     Optional.ofNullable(lastMove),

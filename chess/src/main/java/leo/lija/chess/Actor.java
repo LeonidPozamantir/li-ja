@@ -283,10 +283,6 @@ public class Actor {
 		return move(dest, after, Optional.empty(), castle, Optional.empty(), false);
 	}
 
-	private Move movePromote(Pos dest, Board after, Optional<Role> promotion) {
-		return move(dest, after, Optional.empty(), Optional.empty(), promotion, false);
-	}
-
 	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle, Optional<Role> promotion, boolean enpassant) {
 		return new Move(piece, pos, dest, board, after, capture, promotion, castle, enpassant);
 	}
