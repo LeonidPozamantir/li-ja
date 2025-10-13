@@ -149,16 +149,6 @@ public class Actor {
 			});
 	}
 
-	private List<Move> preventsCastle(List<Move> ms) {
-		if (history().canCastle(color())) {
-			History newHistory = history().withoutCastles(color());
-			return ms.stream()
-				.map(m -> m.withHistory(newHistory))
-				.toList();
-		}
-		return ms;
-	}
-
 	private List<Move> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
 		List<Pos> tos = dirs.stream()
 			.map(dir -> dir.apply(pos))
