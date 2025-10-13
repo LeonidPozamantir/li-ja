@@ -3,12 +3,14 @@ package leo.lija.chess;
 import io.vavr.collection.List;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.utils.Pair;
+import lombok.Builder;
 import lombok.With;
 
 import java.util.Optional;
 
 import static leo.lija.chess.Role.PAWN;
 
+@Builder(toBuilder = true)
 public record Move(
     Piece piece,
     Pos orig,

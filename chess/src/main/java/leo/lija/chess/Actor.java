@@ -235,14 +235,15 @@ public class Actor {
 	}
 
 	private Optional<Move> forward(Pos p) {
-		if (pos.getY() == color().getPromotablePawnY()) return board.promote(pos, p).map(b -> movePromote(p, b, Optional.of(QUEEN)));
-		return board.move(pos, p).map(b -> move(p, b));
+		return board.move(pos, p).map(b -> move(p, b)).flatMap(this::maybePromote);
 	}
 
 	private Optional<Move> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
-		Optional<Pos> optPos = horizontal.apply(next).filter(enemies()::contains);
-		Optional<Board> optBoard = optPos.flatMap(p -> board.taking(pos, p));
-		return optBoard.map(b -> move(optPos.get(), b, optPos));
+		return horizontal.apply(next)
+			.filter(enemies()::contains)
+			.flatMap(p -> board.taking(pos, p)
+				.map(b -> move(p, b, Optional.of(p))))
+			.flatMap(this::maybePromote);
 	}
 
 	private Optional<Move> enpassant(Function<Pos, Optional<Pos>> dir, Pos next, Function<Pos, Optional<Pos>> horizontal) {
@@ -256,6 +257,14 @@ public class Actor {
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
 			return Optional.of(moveEnPassant(optTargetPos.get(), b, optVictimPos));
 		});
+	}
+
+	private Optional<Move> maybePromote(Move m) {
+		if (m.dest().getY() == m.color().getPromotablePawnY()) {
+			return m.after().promote(m.dest()).map(b2 ->
+				m.toBuilder().after(b2).promotion(Optional.of(QUEEN)).build());
+		}
+		return Optional.of(m);
 	}
 
 	private Move move(Pos dest, Board after) {
