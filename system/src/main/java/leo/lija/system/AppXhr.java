@@ -13,6 +13,7 @@ import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.MoretimeEvent;
+import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
@@ -111,6 +112,24 @@ public class AppXhr extends IOTools {
 
     public void drawAccept(String fullId) {
         attempt(fullId, finisher::drawAccept);
+    }
+
+    public void drawOffer(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (game.playerCanOfferDraw(color)) {
+                if (game.player(color.getOpposite()).getIsOfferingDraw()) finisher.drawAccept(pov);
+                else {
+                    messenger.systemMessages(game, "Draw offer sent");
+                    game.updatePlayer(color, p -> p.offerDraw(game.getTurns()));
+                    game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                    save(game);
+                }
+            } else {
+                throw new AppException("invalid draw offer " + fullId);
+            }
+        });
     }
 
     public void talk(String fullId, String message) {

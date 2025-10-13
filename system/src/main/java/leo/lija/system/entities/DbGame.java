@@ -10,12 +10,10 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
-import leo.lija.chess.Side;
 import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static leo.lija.chess.Color.BLACK;
@@ -194,8 +191,8 @@ public class DbGame {
         Situation situation = game.situation();
         List<Event> events = new ArrayList<>(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
-        whitePlayer = updatePlayer(game, whitePlayer, events);
-        blackPlayer = updatePlayer(game, blackPlayer, events);
+        whitePlayer = copyPlayer(game, whitePlayer, events);
+        blackPlayer = copyPlayer(game, blackPlayer, events);
         pgn = game.getPgnMoves();
         turns = game.getTurns();
         positionHashes = history.positionHashes().mkString();
@@ -215,7 +212,7 @@ public class DbGame {
         }
     }
 
-    private DbPlayer updatePlayer(Game game, DbPlayer player, List<Event> events) {
+    private DbPlayer copyPlayer(Game game, DbPlayer player, List<Event> events) {
         String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
 
         List<Event> newEvents = new ArrayList<>(events);
@@ -238,6 +235,11 @@ public class DbGame {
     public void withEvents(List<Event> whiteEvents, List<Event> blackEvents) {
         whitePlayer.withEvents(whiteEvents);
         blackPlayer.withEvents(blackEvents);
+    }
+
+    public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {
+        if (color == WHITE) whitePlayer = f.apply(whitePlayer);
+        if (color == BLACK) blackPlayer = f.apply(blackPlayer);
     }
 
     public boolean playable() {

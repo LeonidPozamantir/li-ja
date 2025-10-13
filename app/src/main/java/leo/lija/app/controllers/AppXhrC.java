@@ -76,12 +76,12 @@ public class AppXhrC extends BaseController {
         return validRedir(() -> xhr.resign(fullId), fullId);
     }
 
-    @GetMapping("/force-resign/{fullId}")
+    @GetMapping("/resign-force/{fullId}")
     public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
         return validRedir(() -> xhr.forceResign(fullId), fullId);
     }
 
-    @GetMapping("/claim-draw/{fullId}")
+    @GetMapping("/draw-claim/{fullId}")
     public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
         return validRedir(() -> xhr.claimDraw(fullId), fullId);
     }
@@ -89,6 +89,11 @@ public class AppXhrC extends BaseController {
     @GetMapping("/draw-accept/{fullId}")
     public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
         return validRedir(() -> xhr.drawAccept(fullId), fullId);
+    }
+
+    @GetMapping("/draw-offer/{fullId}")
+    public ResponseEntity<Void> drawOffer(@PathVariable String fullId) {
+        return validRedir(() -> xhr.drawOffer(fullId), fullId);
     }
 
     @PostMapping("/talk/{fullId}")
