@@ -46,19 +46,8 @@ public class Actor {
 			case BISHOP -> longRange(BISHOP.dirs);
 			case QUEEN -> longRange(QUEEN.dirs);
 			case KNIGHT -> shortRange(KNIGHT.dirs);
-			case KING -> Stream.concat(preventsCastle(shortRange(KING.dirs)).stream(), castle().stream()).toList();
-			case ROOK -> {
-				Color color = color();
-				yield board.kingPosOf(color)
-					.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
-					.filter(side -> board.getHistory().canCastle(color, side))
-					.map(side -> {
-						History h = board.getHistory().withoutCastle(color, side);
-						return longRange(ROOK.dirs).stream()
-							.map(m -> m.withHistory(h))
-							.toList();
-					}).orElse(longRange(ROOK.dirs));
-			}
+			case KING -> Stream.concat(shortRange(KING.dirs).stream(), castle().stream()).toList();
+			case ROOK -> longRange(ROOK.dirs);
 			case PAWN -> pawn();
 		};
 
