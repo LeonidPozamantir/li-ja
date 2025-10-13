@@ -61,5 +61,5 @@ cron:
 
 async:
   actions:
-    core-size: 8
+    core-size: 16
     max-size: 2048
