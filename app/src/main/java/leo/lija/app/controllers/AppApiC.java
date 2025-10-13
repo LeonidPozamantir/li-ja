@@ -3,10 +3,8 @@ package leo.lija.app.controllers;
 import jakarta.validation.Valid;
 import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
-import leo.lija.app.forms.MessagesForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.system.AppApi;
-import leo.lija.system.entities.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -39,11 +36,6 @@ public class AppApiC {
     @PostMapping("/alive/{gameId}/{color}")
     public void alive(@PathVariable String gameId, @PathVariable String color) {
         api.alive(gameId, color);
-    }
-
-    @PostMapping("/draw/{gameId}/{color}")
-    public void draw(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody MessagesForm msgs) {
-        api.draw(gameId, color, msgs.messages());
     }
 
     @PostMapping("/start/{gameId}")

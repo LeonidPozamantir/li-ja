@@ -8,10 +8,9 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
-import leo.lija.system.db.RoomRepo;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Pov;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.MoretimeEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.exceptions.AppException;
@@ -102,12 +101,12 @@ public class AppXhr extends IOTools {
         attempt(fullId, finisher::forceResign);
     }
 
-    public void claimDraw(String fullId) {
-        attempt(fullId, finisher::claimDraw);
-    }
-
     public void outoftime(String fullId) {
         attempt(fullId, p -> finisher.outoftime(p.game()));
+    }
+
+    public void drawClaim(String fullId) {
+        attempt(fullId, finisher::drawClaim);
     }
 
     public void drawAccept(String fullId) {
@@ -128,6 +127,44 @@ public class AppXhr extends IOTools {
                 }
             } else {
                 throw new AppException("invalid draw offer " + fullId);
+            }
+        });
+    }
+
+    public void drawCancel(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (pov.player().getIsOfferingDraw()) {
+                messenger.systemMessages(game, "Draw offer cancelled");
+                game.updatePlayer(color, p -> {
+                    DbPlayer res = p.copy();
+                    res.setIsOfferingDraw(false);
+                    return res;
+                });
+                game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                save(game);
+            } else {
+                throw new AppException("no draw offer to cancel " + fullId);
+            }
+        });
+    }
+
+    public void drawDecline(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (game.player(color.getOpposite()).getIsOfferingDraw()) {
+                messenger.systemMessages(game, "Draw offer declined");
+                game.updatePlayer(color.getOpposite(), p -> {
+                    DbPlayer res = p.copy();
+                    res.setIsOfferingDraw(false);
+                    return res;
+                });
+                game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                save(game);
+            } else {
+                throw new AppException("no draw offer to decline " + fullId);
             }
         });
     }

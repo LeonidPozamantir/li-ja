@@ -105,14 +105,6 @@ public class AppApi extends IOTools {
         return pov.player().eventStack().lastVersion();
     }
 
-    public void draw(String gameId, String colorName, String messages) {
-        Color color = ioColor(colorName);
-        DbGame g1 = gameRepo.game(gameId);
-        messenger.systemMessages(g1, messages);
-        g1.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
-        save(g1);
-    }
-
     public int activity(String gameId, String colorName) {
         return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
     }

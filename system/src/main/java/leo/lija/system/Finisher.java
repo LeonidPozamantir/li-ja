@@ -57,7 +57,7 @@ public class Finisher extends IOTools {
         } else throw new AppException("game is not force-resignable");
     }
 
-    public void claimDraw(Pov pov) {
+    public void drawClaim(Pov pov) {
         DbGame game = pov.game();
         Color color = pov.color();
         if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition()) {

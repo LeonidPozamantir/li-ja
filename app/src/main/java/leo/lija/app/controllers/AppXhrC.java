@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,39 +62,53 @@ public class AppXhrC extends BaseController {
 
     }
 
-    @GetMapping("/abort/{fullId}")
-    public ResponseEntity<Void> abort(@PathVariable String fullId) {
-        return validRedir(() -> xhr.abort(fullId), fullId);
-    }
-
     @PostMapping("/outoftime/{fullId}")
     public void outoftime(@PathVariable String fullId) {
         xhr.outoftime(fullId);
     }
 
+    @GetMapping("/abort/{fullId}")
+    public ResponseEntity<Void> abort(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::abort);
+    }
+
     @GetMapping("/resign/{fullId}")
     public ResponseEntity<Void> resign(@PathVariable String fullId) {
-        return validRedir(() -> xhr.resign(fullId), fullId);
+        return validAndRedirect(fullId, xhr::resign);
     }
 
     @GetMapping("/resign-force/{fullId}")
     public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
-        return validRedir(() -> xhr.forceResign(fullId), fullId);
+        return validAndRedirect(fullId, xhr::forceResign);
     }
 
     @GetMapping("/draw-claim/{fullId}")
-    public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
-        return validRedir(() -> xhr.claimDraw(fullId), fullId);
+    public ResponseEntity<Void> drawClaim(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawClaim);
     }
 
     @GetMapping("/draw-accept/{fullId}")
     public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
-        return validRedir(() -> xhr.drawAccept(fullId), fullId);
+        return validAndRedirect(fullId, xhr::drawAccept);
     }
 
     @GetMapping("/draw-offer/{fullId}")
     public ResponseEntity<Void> drawOffer(@PathVariable String fullId) {
-        return validRedir(() -> xhr.drawOffer(fullId), fullId);
+        return validAndRedirect(fullId, xhr::drawOffer);
+    }
+
+    @GetMapping("/draw-cancel/{fullId}")
+    public ResponseEntity<Void> drawCancel(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawCancel);
+    }
+
+    @GetMapping("/draw-decline/{fullId}")
+    public ResponseEntity<Void> drawDecline(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawDecline);
+    }
+
+    private ResponseEntity<Void> validAndRedirect(String fullId, Consumer<String> f) {
+        return validRedir(() -> f.accept(fullId), fullId);
     }
 
     @PostMapping("/talk/{fullId}")
