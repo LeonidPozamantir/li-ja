@@ -10,6 +10,7 @@ import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.event.CheckEvent;
 import leo.lija.system.entities.event.EndEvent;
+import leo.lija.system.entities.event.EnpassantEvent;
 import leo.lija.system.entities.event.Event;
 import leo.lija.system.entities.event.MoveEvent;
 import leo.lija.system.entities.event.PossibleMovesEvent;
@@ -298,6 +299,40 @@ K
             void blackEvents() {
                 assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new PossibleMovesEvent(Map.of()));
             }
+        }
+
+        @Nested
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        class Enpassant {
+
+            RichDbGame dbg;
+
+            @BeforeAll
+            void init() {
+                dbg = new RichDbGame(newDbGameWithBoard(visual.str2Obj("""
+  Pp
+
+
+PP P P P
+RNBRKR R
+""")));
+                dbg.setTurns(10);
+                dbg.setLastMove(Optional.of("d7 d5"));
+                dbg.withoutEvents().afterMove(C5, D6);
+            }
+
+            @Test
+            @DisplayName("white events")
+            void whiteEvents() {
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new EnpassantEvent(D5));
+            }
+
+            @Test
+            @DisplayName("black events")
+            void blackEvents() {
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new EnpassantEvent(D5));
+            }
+
         }
     }
 

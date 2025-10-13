@@ -254,7 +254,7 @@ public class Actor {
 			Optional<Pos> optVictimFrom = optVictimPos.flatMap(dir).flatMap(dir);
 			if (!board.getHistory().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))) return Optional.empty();
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
-			return Optional.of(moveEnPassant(optTargetPos.get(), b));
+			return Optional.of(moveEnPassant(optTargetPos.get(), b, optVictimPos));
 		});
 	}
 
@@ -266,8 +266,8 @@ public class Actor {
 		return move(dest, after, capture, Optional.empty(), Optional.empty(), false);
 	}
 
-	private Move moveEnPassant(Pos dest, Board after) {
-		return move(dest, after, Optional.empty(), Optional.empty(), Optional.empty(), true);
+	private Move moveEnPassant(Pos dest, Board after, Optional<Pos> capture) {
+		return move(dest, after, capture, Optional.empty(), Optional.empty(), true);
 	}
 
 	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle) {
