@@ -36,20 +36,31 @@ public record Move(
     }
 
     public Board finalizeAfter() {
-        return after.updateHistory(h -> {
+        return after.updateHistory(h1 -> {
+            // last move and position hashes
             List<String> positionHashes = piece.is(PAWN) || captures() || promotes() || castles()
                 ? List.empty()
-                : h.positionHashesWith(after.positionHash());
-            History h1 = new History(Optional.of(Pair.of(orig, dest)), positionHashes, h.whiteCastleKingSide(), h.whiteCastleQueenSide(), h.blackCastleKingSide(), h.blackCastleQueenSide());
-            if (piece.is(KING) && h1.canCastle(color())) return h1.withoutCastles(color());
-            if (piece.is(ROOK)) {
-                return after.kingPosOf(color())
+                : h1.positionHashesWith(after.positionHash());
+            History h2 = new History(Optional.of(Pair.of(orig, dest)), positionHashes, h1.whiteCastleKingSide(), h1.whiteCastleQueenSide(), h1.blackCastleKingSide(), h1.blackCastleQueenSide());
+            // my broken castles
+            History h3;
+            if (piece.is(KING) && h2.canCastle(color())) h3 = h2.withoutCastles(color());
+            else if (piece.is(ROOK)) {
+                h3 = after.kingPosOf(color())
                     .flatMap(kingPos -> Side.kingRookSide(kingPos, orig))
-                    .filter(side -> h1.canCastle(color(), side))
-                    .map(side -> h1.withoutCastle(color(), side))
-                    .orElse(h1);
-            }
-            return h1;
+                    .filter(side -> h2.canCastle(color(), side))
+                    .map(side -> h2.withoutCastle(color(), side))
+                    .orElse(h2);
+            } else h3 = h2;
+            // opponent broken castles
+            return capture
+                .flatMap(cPos -> before.at(cPos)
+                    .filter(cPiece -> cPiece.is(ROOK))
+                    .flatMap(cPiece -> after.kingPosOf(color().getOpposite())
+                        .flatMap(kingPos -> Side.kingRookSide(kingPos, cPos)
+                            .filter(side -> h3.canCastle(color().getOpposite(), side))
+                            .map(side -> h3.withoutCastle(color().getOpposite(), side)))))
+                .orElse(h3);
         });
     }
 
