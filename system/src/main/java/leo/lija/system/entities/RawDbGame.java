@@ -57,7 +57,6 @@ public class RawDbGame {
     private String initialFen;
 
     @CreationTimestamp
-    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
