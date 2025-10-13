@@ -260,13 +260,13 @@ RNBRKR R
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
             }
 
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1), new EndEvent());
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new CheckEvent(E1));
             }
         }
 
@@ -290,13 +290,13 @@ K
             @Test
             @DisplayName("white events")
             void whiteEvents() {
-                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
+                assertThat(playerEvents(dbg, WHITE).get().stream().map(Pair::getSecond).toList()).contains(new PossibleMovesEvent(Map.of()));
             }
 
             @Test
             @DisplayName("black events")
             void blackEvents() {
-                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new EndEvent());
+                assertThat(playerEvents(dbg, BLACK).get().stream().map(Pair::getSecond).toList()).contains(new PossibleMovesEvent(Map.of()));
             }
         }
     }
