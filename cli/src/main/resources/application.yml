@@ -4,9 +4,6 @@ spring:
   datasource:
     generate-unique-name: false
     name: lija
-  mvc:
-    throw-exception-if-no-handler-found: true
-    static-path-pattern: /assets/**
 
 sync:
   duration: 7000
@@ -42,11 +39,3 @@ crafty:
 
 moretime:
   seconds: 15
-
-cron:
-  online-username:
-    frequency: 2000
-  hook-cleanup-dead:
-    frequency: 2000
-  hook-cleanup-old:
-    frequency: 21000

@@ -1,6 +1,7 @@
 package leo.lija.app;
 
 import leo.lija.system.Finisher;
+import leo.lija.system.command.GameFinishCommand;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.db.UserRepo;
@@ -25,7 +26,7 @@ public class Cron {
     private final HookMemo hookMemo;
     private final LobbyMemo lobbyMemo;
     private final GameRepo gameRepo;
-    private final Finisher finisher;
+    private final GameFinishCommand gameFinishCommand;
 
     @Scheduled(fixedRateString = "${cron.online-username.frequency}")
     void onlineUsername() {
@@ -51,8 +52,6 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.game-auto-finish.frequency}")
     void gameAutoFinish() {
-        List<DbGame> games = gameRepo.candidateToAutofinish();
-        System.out.println("[cron] finish %d games (%s)".formatted(games.size(), games.subList(0, Math.min(3, games.size())).stream().map(DbGame::toString).collect(Collectors.joining(", "))));
-        finisher.outoftimes(games);
+        gameFinishCommand.apply();
     }
 }
