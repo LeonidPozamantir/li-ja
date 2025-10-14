@@ -306,7 +306,7 @@ public class DbGame {
     public Optional<DbPlayer> outoftimePlayer() {
         return clock
             .filter(c -> playable())
-            .filter(c -> c.outoftime(player().getColor()))
+            .filter(c -> !c.isRunning() || c.outoftime(player().getColor()))
             .map(c -> player());
     }
 

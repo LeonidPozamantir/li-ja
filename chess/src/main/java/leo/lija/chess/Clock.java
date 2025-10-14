@@ -49,6 +49,10 @@ public abstract class Clock {
         return limit / 60;
     }
 
+    public int estimateTotalTime() {
+        return limit + 30 * increment;
+    }
+
     abstract RunningClock step();
 
     public abstract PausedClock stop();
@@ -61,8 +65,8 @@ public abstract class Clock {
         return limitInMinutes() + " + " + increment;
     }
 
-    public int estimateTotalTime() {
-        return limit + 30 * increment;
+    public boolean isRunning() {
+        return timerOption.isPresent();
     }
 
     protected double now() {

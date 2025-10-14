@@ -75,7 +75,7 @@ public class Finisher extends IOTools {
             finish(game, Status.OUTOFTIME,
                 Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)));
             return null;
-        }).orElseThrow(() -> new AppException("no outoftime applicable"));
+        }).orElseThrow(() -> new AppException("no outoftime applicable " + game.getClock()));
     }
 
     public void outoftimes(List<DbGame> games) {
