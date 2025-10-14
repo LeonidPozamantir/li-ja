@@ -82,7 +82,11 @@ public class CraftyAi implements Ai {
     @SneakyThrows
     private File writeFile(String prefix, List<String> data) {
         File file = File.createTempFile(prefix, ".tmp");
-        file.deleteOnExit();
+        try {
+            file.deleteOnExit();
+        } catch (Exception e) {
+            System.out.println("Error deleting crafty file on exit: " + e.getMessage());
+        }
         printToFile(file, p -> data.forEach(p::println));
         return file;
     }
