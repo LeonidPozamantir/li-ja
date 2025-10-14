@@ -55,9 +55,9 @@ cron:
   hook-cleanup-old:
     frequency: 21s
   game-cleanup-unplayed:
-    frequency: 2h6m
+    frequency: 2h6m36s
   game-auto-finish:
-    frequency: 1h
+    frequency: 1h4m12s
 
 async:
   actions:

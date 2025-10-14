@@ -4,12 +4,16 @@ import leo.lija.system.Finisher;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.db.UserRepo;
+import leo.lija.system.entities.DbGame;
 import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;
 import leo.lija.system.memo.UsernameMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,11 +45,14 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.game-cleanup-unplayed.frequency}")
     void gameCleanupUnplayed() {
+        System.out.println("[cron] remove old unplayed games");
         gameRepo.cleanupUnplayed();
     }
 
     @Scheduled(fixedRateString = "${cron.game-auto-finish.frequency}")
     void gameAutoFinish() {
-        finisher.outoftimes(gameRepo.candidateToAutofinish());
+        List<DbGame> games = gameRepo.candidateToAutofinish();
+        System.out.println("[cron] finish %d games (%s)".formatted(games.size(), games.subList(0, Math.min(3, games.size())).stream().map(DbGame::toString).collect(Collectors.joining(", "))));
+        finisher.outoftimes(games);
     }
 }
