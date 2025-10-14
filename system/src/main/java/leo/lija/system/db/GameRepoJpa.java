@@ -23,7 +23,7 @@ public interface GameRepoJpa extends JpaRepository<RawDbGame, String> {
     @Transactional
     void cleanupUnplayed(LocalDateTime until);
 
-    @Query("select g from RawDbGame g where g.clock is not null and g.status = :statusStarted and g.updatedAt < :until")
+    @Query("select g from RawDbGame g where g.clock is not null and g.clock.limit is not null and g.status = :statusStarted and g.updatedAt < :until")
     List<RawDbGame> candidatesToAutofinish(int statusStarted, LocalDateTime until);
 
     @Query("select count(g) from RawDbGame g where g.updatedAt > :after")

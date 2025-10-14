@@ -18,7 +18,7 @@ public class GameFinishCommand {
 
     public void apply() {
         List<DbGame> games = gameRepo.candidateToAutofinish();
-        System.out.println("[cron] finish %d games (%s)".formatted(games.size(), games.subList(0, Math.min(3, games.size())).stream().map(DbGame::toString).collect(Collectors.joining(", "))));
+        System.out.println("[cron] finish %d games (%s)".formatted(games.size(), games.subList(0, Math.min(3, games.size())).stream().map(DbGame::getId).collect(Collectors.joining(", "))));
         finisher.outoftimes(games);
     }
 }
