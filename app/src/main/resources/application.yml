@@ -4,6 +4,9 @@ spring:
   datasource:
     generate-unique-name: false
     name: lija
+    hikari:
+      maximum-pool-size: 100
+      connection-timeout: 15000
   mvc:
     throw-exception-if-no-handler-found: true
     static-path-pattern: /assets/**
