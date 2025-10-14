@@ -76,6 +76,8 @@ public class AppApi extends IOTools {
             List.of(new RedirectEvent(whiteRedirect)),
             List.of(new RedirectEvent(blackRedirect))
         );
+        // tell spectators to reload the table
+        g1.withEvents(List.of(new ReloadTableEvent()));
         save(g1);
         messenger.systemMessages(newGame, messageString);
         starter.start(newGame, entryData);
