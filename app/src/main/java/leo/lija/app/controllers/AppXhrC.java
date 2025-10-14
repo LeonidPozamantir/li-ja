@@ -36,17 +36,21 @@ public class AppXhrC extends BaseController {
     private final GameRepo gameRepo;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
-    public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
+    public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
         return syncAll(gameId, color, version, Optional.of(fullId));
     }
 
     @GetMapping("/sync/{gameId}/{color}/{version}")
-    public Map<String, Object> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
+    public ResponseEntity<Map<String, Object>> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
         return syncAll(gameId, color, version, Optional.empty());
     }
 
-    private Map<String, Object> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
-        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId), executor).join();
+    private ResponseEntity<Map<String, Object>> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
+        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId), executor)
+            .thenApply(mapOption -> mapOption
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build())
+            ).join();
     }
 
     @PostMapping("/move/{fullId}")

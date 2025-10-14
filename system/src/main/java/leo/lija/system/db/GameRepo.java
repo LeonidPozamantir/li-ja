@@ -46,11 +46,21 @@ public class GameRepo {
         return validGame.player(color);
     }
 
+    public Optional<DbGame> gameOption(String gameId) {
+        if (gameId.length() != GAME_ID_SIZE) return Optional.empty();
+        return repo.findById(gameId).flatMap(RawDbGame::decode);
+    }
+
     public Pov pov(String fullId) {
         DbGame g = game(fullId.substring(0, GAME_ID_SIZE));
         String playerId = fullId.substring(GAME_ID_SIZE);
         DbPlayer player = g.player(playerId).orElseThrow(() -> new AppException("No player found for id " + fullId));
         return Pov.apply(g, player);
+    }
+
+    public Optional<Pov> povOption(String gameId, Color color) {
+        return gameOption(gameId)
+            .map(g -> new Pov(g, g.player().getColor()));
     }
 
     public void save(DbGame game) {
