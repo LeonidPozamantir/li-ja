@@ -30,13 +30,18 @@ public class SocketIOService {
             lobby.join(client, data);
         });
 
-        server.addEventListener("lobby/talk", String.class, (client, data, ackSender) -> {
-            String sessionId = client.getSessionId().toString();
-            lobby.talk(sessionToUsername.get(sessionId), data);
+        server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, data, ackSender) -> {
+            if (data.t.equals("talk")) lobby.talk(data.data.txt, data.data.u);
         });
 
         server.start();
     }
+
+    public record LobbyTalkForm(String t, Data data) {
+        public record Data(String txt, String u) {}
+    }
+
+
 
     @PreDestroy
     public void destroy() {

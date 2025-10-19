@@ -16,37 +16,27 @@ public class Lobby {
 
     private ConcurrentHashMap<String, String> members = new ConcurrentHashMap<>();
 
-    public void join(SocketIOClient client, String username) {
-        if (members.containsKey(username)) client.sendEvent("lobby/cannot-connect", "This username is already used");
-        else {
-            client.joinRoom("lobby");
-            members.put(username, client.getSessionId().toString());
-            notifyJoin(username);
-        }
+    public void join(SocketIOClient client, String uid) {
+        client.joinRoom("lobby");
+        members.put(uid, client.getSessionId().toString());
     }
 
-    public void notifyJoin(String username) {
-        notifyAll("join", username, "has entered the lobby");
+    public void talk(String txt, String u) {
+        notifyAll("talk", Map.of(
+            "txt", txt,
+            "u", u
+        ));
     }
 
-    public void talk(String username, String text) {
-        notifyAll("talk", username, text);
+    public void quit(String uid) {
+        members.remove(uid);
     }
 
-    public void quit(String username) {
-        members.remove(username);
-        notifyAll("quit", username, "has left the lobby");
-    }
-
-    public void notifyAll(String kind, String user, String text) {
+    public void notifyAll(String t, Map<String, Object> data) {
         Map<String, Object> msg = Map.of(
-            "kind", kind,
-            "user", user,
-            "message", text,
-            "members", members.keySet()
+            "t", t,
+            "d", data
         );
         server.getRoomOperations("lobby").sendEvent("lobby/send-message", msg);
     }
-
-
 }

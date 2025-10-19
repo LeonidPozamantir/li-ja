@@ -19,10 +19,7 @@ sync: #milliseconds
   duration: 7000
   sleep: 200
 
-lobby: #milliseconds
-  sync:
-    duration: 10000
-    sleep: 250
+lobby:
   message:
     max: 30
   entry:

@@ -10,9 +10,6 @@ sync:
   sleep: 200
 
 lobby:
-  sync:
-    duration: 10000
-    sleep: 250
   message:
     max: 30
   entry:
