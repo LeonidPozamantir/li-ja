@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,14 +49,12 @@ public class LobbyPreloader {
     }
 
     public Map<String, Object> stdResponse(boolean chat, List<Hook> hooks, Optional<String> myHookId) {
-        List<Message> messages = chat ? messageRepo.recent(config.sync().message().max()) : List.of();
+        List<Message> messages = chat ? messageRepo.recent() : List.of();
 
 
         List<Entry> entries = entryRepo.recent(config.sync().entry().max());
         return Map.of(
-                "pool", !hooks.isEmpty()
-                        ? Map.of("hooks", renderHooks(hooks, myHookId))
-                        : Map.of("message", "No game available right now, create one!"),
+                "pool", renderHooks(hooks, myHookId),
                 "chat", !messages.isEmpty() ? renderMessages(messages) : List.of(),
                 "timeline", !entries.isEmpty() ? renderEntries(entries) : List.of()
         );
@@ -66,7 +63,7 @@ public class LobbyPreloader {
     private List<Map<String, String>> renderMessages(List<Message> messages) {
         return messages.reversed().stream().map(message -> Map.of(
                 "u", message.getUsername(),
-                "txt", message.getMessage()
+                "txt", message.getText()
             )).toList();
     }
 
@@ -80,16 +77,13 @@ public class LobbyPreloader {
             )).toList();
     }
 
-    private Map<String, Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
-        return hooks.stream().collect(Collectors.toMap(Hook::getId, hook -> {
-            Map<String, Object> res = hook.render();
-            if (myHookId.isPresent() && myHookId.get().equals(hook.getOwnerId())) {
+    private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
+        return hooks.stream().map(h -> {
+            Map<String, Object> res = h.render();
+            if (myHookId.isPresent() && myHookId.get().equals(h.getOwnerId()))
                 res.putAll(Map.of("action", "cancel", "id", myHookId.get()));
-            } else {
-                res.putAll(Map.of("action", "join", "id", hook.getId()));
-            }
             return res;
-        }));
+        }).toList();
     }
 
 }

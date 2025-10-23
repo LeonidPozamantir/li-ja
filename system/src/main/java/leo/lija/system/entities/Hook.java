@@ -87,6 +87,7 @@ public class Hook {
 
     public Map<String, Object> render() {
         HashMap<String, Object> res = new HashMap<>(Map.of(
+            "id", id,
             "username", username,
             "elo", elo,
             "variant", realVariant().toString(),
@@ -94,7 +95,8 @@ public class Hook {
             "color", color,
             "clock", time != null && hasClock && increment != null ? renderClock(time, increment) : "Unlimited",
             "emin", eloMin(),
-            "emax", eloMax()
+            "emax", eloMax(),
+            "action", "join"
         ));
         if (engine) res.put("engine", true);
         return res;

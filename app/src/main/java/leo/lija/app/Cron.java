@@ -33,11 +33,11 @@ public class Cron {
         userRepo.updateOnlineUserNames(usernameMemo.keys());
     }
 
-    @Scheduled(fixedRateString = "${cron.hook-cleanup-dead.frequency}")
-    void hookCleanupDead() {
-        boolean hasRemoved = hookRepo.keepOnlyOwnerIds(hookMemo.keys());
-        if (hasRemoved) lobbyMemo.increase();
-    }
+//    @Scheduled(fixedRateString = "${cron.hook-cleanup-dead.frequency}")
+//    void hookCleanupDead() {
+//        boolean hasRemoved = hookRepo.keepOnlyOwnerIds(hookMemo.keys());
+//        if (hasRemoved) lobbyMemo.increase();
+//    }
 
     @Scheduled(fixedRateString = "${cron.hook-cleanup-old.frequency}")
     void hookCleanupOld() {

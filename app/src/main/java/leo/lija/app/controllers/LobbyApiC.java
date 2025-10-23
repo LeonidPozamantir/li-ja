@@ -48,8 +48,4 @@ public class LobbyApiC {
         api.alive(hookOwnerId);
     }
 
-    @PostMapping("/message")
-    public void message() {
-        api.messageRefresh();
-    }
 }

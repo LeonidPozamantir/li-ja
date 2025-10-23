@@ -2,6 +2,8 @@ package leo.lija.app;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import leo.lija.system.db.MessageRepo;
+import leo.lija.system.entities.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Lobby {
 
     private final SocketIOServer server;
+    private final MessageRepo messageRepo;
 
     private ConcurrentHashMap<String, String> members = new ConcurrentHashMap<>();
 
@@ -22,9 +25,10 @@ public class Lobby {
     }
 
     public void talk(String txt, String u) {
+        Message message = messageRepo.add(txt, u);
         notifyAll("talk", Map.of(
-            "txt", txt,
-            "u", u
+            "txt", message.getText(),
+            "u", message.getUsername()
         ));
     }
 
