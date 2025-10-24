@@ -1,17 +1,19 @@
 package leo.lija.app;
 
-import leo.lija.system.command.GameFinishCommand;
-import leo.lija.system.db.GameRepo;
-import leo.lija.system.db.HookRepo;
-import leo.lija.system.db.UserRepo;
-import leo.lija.system.memo.HookMemo;
-import leo.lija.system.memo.LobbyMemo;
-import leo.lija.system.memo.UsernameMemo;
+import leo.lija.app.command.GameFinishCommand;
+import leo.lija.app.db.GameRepo;
+import leo.lija.app.db.HookRepo;
+import leo.lija.app.db.UserRepo;
+import leo.lija.app.memo.HookMemo;
+import leo.lija.app.memo.LobbyMemo;
+import leo.lija.app.memo.UsernameMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnWebApplication
 @RequiredArgsConstructor
 public class Cron {
 

@@ -1,6 +1,6 @@
 package leo.lija.cli;
 
-import leo.lija.system.db.GameRepoJpa;
+import leo.lija.app.db.GameRepoJpa;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -29,7 +29,7 @@
 
 		<dependency>
 			<groupId>leo</groupId>
-			<artifactId>system</artifactId>
+			<artifactId>app</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

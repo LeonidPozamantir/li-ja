@@ -2,8 +2,8 @@ package leo.lija.app;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import leo.lija.system.db.MessageRepo;
-import leo.lija.system.entities.Message;
+import leo.lija.app.db.MessageRepo;
+import leo.lija.app.entities.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

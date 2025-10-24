@@ -1,4 +1,6 @@
 spring:
+  main:
+    web-application-type: none
   application:
     name: lija
   datasource:
@@ -36,3 +38,8 @@ crafty:
 
 moretime:
   seconds: 15
+
+async:
+  actions:
+    core-size: 16
+    max-size: 2048

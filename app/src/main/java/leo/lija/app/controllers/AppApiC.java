@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
-import leo.lija.system.AppApi;
+import leo.lija.app.AppApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

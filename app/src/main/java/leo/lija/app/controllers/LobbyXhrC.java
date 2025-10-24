@@ -1,6 +1,6 @@
 package leo.lija.app.controllers;
 
-import leo.lija.system.LobbyXhr;
+import leo.lija.app.LobbyXhr;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

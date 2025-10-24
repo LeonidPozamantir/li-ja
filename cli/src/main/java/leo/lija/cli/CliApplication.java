@@ -1,6 +1,6 @@
 package leo.lija.cli;
 
-import leo.lija.system.command.GameFinishCommand;
+import leo.lija.app.command.GameFinishCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import java.util.function.Supplier;
 
 @SpringBootApplication(scanBasePackages = "leo.lija")
-@EnableJpaRepositories({"leo.lija.system"})
-@EntityScan({"leo.lija.system"})
-@ConfigurationPropertiesScan({"leo.lija"})
+@EnableJpaRepositories({"leo.lija.app.db"})
+@EntityScan({"leo.lija.app.entities"})
+@ConfigurationPropertiesScan({"leo.lija.app.config"})
 @RequiredArgsConstructor
 public class CliApplication implements CommandLineRunner {
 

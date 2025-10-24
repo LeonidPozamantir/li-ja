@@ -2,8 +2,8 @@ package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
 import leo.lija.app.forms.LobbyJoinForm;
-import leo.lija.system.LobbyApi;
-import leo.lija.system.LobbyPreloader;
+import leo.lija.app.LobbyApi;
+import leo.lija.app.LobbyPreloader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

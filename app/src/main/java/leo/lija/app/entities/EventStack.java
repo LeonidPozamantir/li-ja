@@ -1,0 +1,130 @@
+package leo.lija.app.entities;
+
+import leo.lija.chess.utils.Pair;
+import leo.lija.app.Utils;
+import leo.lija.app.entities.event.Event;
+import leo.lija.app.entities.event.EventDecoderMap;
+import leo.lija.app.entities.event.PossibleMovesEvent;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@Getter
+@RequiredArgsConstructor
+@EqualsAndHashCode
+public class EventStack {
+
+    private final List<Pair<Integer, Event>> events;
+    private Optional<List<Pair<Integer, Event>>> cachedSortedEvents = Optional.empty();
+
+    public List<Pair<Integer, Event>> sortedEvents() {
+        if (cachedSortedEvents.isEmpty()) cachedSortedEvents = Optional.of(events.stream().sorted(Comparator.comparingInt(Pair::getFirst)).toList());
+        return cachedSortedEvents.get();
+    }
+
+    public Integer firstVersion() {
+        if (events.isEmpty()) return 0;
+        return sortedEvents().getFirst().getFirst();
+    }
+
+    public Integer lastVersion() {
+        if (events.isEmpty()) return 0;
+        return sortedEvents().getLast().getFirst();
+    }
+
+    public String encode() {
+        return events.stream()
+            .map(e -> {
+                Integer version = e.getFirst();
+                Event event = e.getSecond();
+                return version.toString() + event.encode();
+            }).collect(Collectors.joining("|"));
+    }
+
+    public EventStack optimize() {
+        final boolean[] previous = {false};
+        return new EventStack(
+          events.reversed().stream().limit(MAX_EVENTS)
+              .map(e -> {
+                  Pair<Integer, Event> res;
+                 if (e.getSecond() instanceof PossibleMovesEvent && previous[0]) res = Pair.of(e.getFirst(), new PossibleMovesEvent(Map.of()));
+                 else if (e.getSecond() instanceof PossibleMovesEvent) {
+                     previous[0] = true;
+                     res = Pair.of(e.getFirst(), e.getSecond());
+                 }
+                 else res = e;
+                 return res;
+              }).collect(Collectors.toCollection(ArrayList::new)).reversed()
+        );
+    }
+
+    public Optional<List<Event>> eventsSince(Integer version) {
+        if (version >= firstVersion() - 1 && version <= lastVersion()) {
+            return Optional.of(
+                sortedEvents().stream()
+                    .dropWhile(ve -> ve.getFirst() <= version)
+                    .map(Pair::getSecond)
+                    .toList()
+            );
+        }
+        return Optional.empty();
+    }
+
+    public EventStack withEvents(List<Event> newEvents) {
+        Integer[] v = {lastVersion()};
+        events.addAll(newEvents.stream().map(e -> {
+            v[0]++;
+            return Pair.of(v[0], e);
+        }).toList());
+        return this;
+    }
+
+    public static final int MAX_EVENTS = 16;
+
+    private static final Pattern EVENT_ENCODING = Pattern.compile("^(\\d+)(\\w)(.*)$");
+
+    public static EventStack decode(String evts) {
+        return new EventStack(
+            Arrays.stream(evts.split("\\|"))
+                .map(evt -> {
+                    Matcher matcher = EVENT_ENCODING.matcher(evt);
+                    if (!matcher.find()) {
+                        Optional<Pair<Integer, Event>> res = Optional.empty();
+                        return res;
+                    }
+                    String v = matcher.group(1);
+                    String code = matcher.group(2);
+                    String data = matcher.group(3);
+                    return Utils.parseIntOption(v)
+                        .flatMap(version -> Optional.ofNullable(EventDecoderMap.all.get(code.charAt(0)))
+                            .flatMap(decoder -> decoder.decode(data)
+                                .map(event -> Pair.of(version, event))));
+                }).filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toCollection(ArrayList::new))
+        );
+    }
+
+    public static EventStack apply() {
+        return new EventStack(new ArrayList<>());
+    }
+
+    public static EventStack build(Event ...events) {
+        return new EventStack(
+            IntStream.range(0, events.length)
+                .boxed()
+                .map(i -> Pair.of(i, events[i]))
+                .toList()
+        );
+    }
+}
