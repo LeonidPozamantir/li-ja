@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Repository
-@RequiredArgsConstructor
-public class MessageRepo {
+public class MessageRepo extends CappedRepo<Message> {
 
-    private final MessageRepoJpa repo;
-
-    @Value("${lobby.message.max}")
-    private int max;
+    public MessageRepo(MessageRepoJpa repo, @Value("${lobby.message.max}") int max) {
+        super(repo, max);
+    }
 
     private static final Pattern URL_REGEX = Pattern.compile("lija\\.com/([\\w-]{8})[\\w-]{4}");
 
@@ -31,7 +29,4 @@ public class MessageRepo {
         return repo.save(new Message(null, username, t1));
     }
 
-    public List<Message> recent() {
-        return repo.findAll(PageRequest.of(1, max, Sort.by(Sort.Direction.DESC, "id"))).toList();
-    }
 }

@@ -1,6 +1,5 @@
 package leo.lija.system;
 
-import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;

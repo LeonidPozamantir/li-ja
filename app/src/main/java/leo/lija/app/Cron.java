@@ -1,20 +1,15 @@
 package leo.lija.app;
 
-import leo.lija.system.Finisher;
 import leo.lija.system.command.GameFinishCommand;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.db.UserRepo;
-import leo.lija.system.entities.DbGame;
 import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;
 import leo.lija.system.memo.UsernameMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

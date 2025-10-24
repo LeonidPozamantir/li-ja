@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Entity
 @Table(name = "lobby_room")
 @NoArgsConstructor
@@ -29,4 +31,11 @@ public class Message {
     @NotNull
     @Column(nullable = false)
     private String text;
+
+    public Map<String, String> render() {
+        return Map.of(
+            "txt", text,
+            "u", username
+        );
+    }
 }

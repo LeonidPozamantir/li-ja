@@ -1,14 +1,12 @@
 package leo.lija.system;
 
-import leo.lija.system.config.LobbyConfigProperties;
 import leo.lija.system.db.EntryRepo;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
 import leo.lija.system.db.MessageRepo;
-import leo.lija.system.dto.EntryDto;
+import leo.lija.system.entities.Entry;
 import leo.lija.system.entities.Hook;
 import leo.lija.system.entities.Message;
-import leo.lija.system.entities.entry.Entry;
 import leo.lija.system.memo.HookMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ public class LobbyPreloader {
     private final MessageRepo messageRepo;
     private final EntryRepo entryRepo;
     private final HookMemo hookMemo;
-    private final LobbyConfigProperties config;
 
     public Map<String, Object> apply(boolean auth, boolean chat, Optional<String> myHookId) {
         myHookId.ifPresent(hookMemo::put);
@@ -52,29 +49,12 @@ public class LobbyPreloader {
         List<Message> messages = chat ? messageRepo.recent() : List.of();
 
 
-        List<Entry> entries = entryRepo.recent(config.sync().entry().max());
+        List<Entry> entries = entryRepo.recent();
         return Map.of(
                 "pool", renderHooks(hooks, myHookId),
-                "chat", !messages.isEmpty() ? renderMessages(messages) : List.of(),
-                "timeline", !entries.isEmpty() ? renderEntries(entries) : List.of()
+                "chat", messages.reversed().stream().map(Message::render).toList(),
+                "timeline", entries.reversed().stream().map(Entry::render).toList()
         );
-    }
-
-    private List<Map<String, String>> renderMessages(List<Message> messages) {
-        return messages.reversed().stream().map(message -> Map.of(
-                "u", message.getUsername(),
-                "txt", message.getText()
-            )).toList();
-    }
-
-    private List<EntryDto> renderEntries(List<Entry> entries) {
-        return entries.reversed().stream().map(entry -> new EntryDto(
-                entry.getData().getId(),
-                entry.getData().getPlayers(),
-                entry.getData().getVariant(),
-                entry.getData().getRated() ? "Rated" : "Casual",
-                Optional.ofNullable(entry.getData().getClock()).orElse("Unlimited")
-            )).toList();
     }
 
     private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
