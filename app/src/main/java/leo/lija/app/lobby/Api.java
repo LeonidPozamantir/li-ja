@@ -1,5 +1,8 @@
-package leo.lija.app;
+package leo.lija.app.lobby;
 
+import leo.lija.app.IOTools;
+import leo.lija.app.Messenger;
+import leo.lija.app.Starter;
 import leo.lija.chess.Color;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
@@ -11,7 +14,7 @@ import leo.lija.app.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LobbyApi extends IOTools {
+public class Api extends IOTools {
 
     private final HookRepo hookRepo;
     private final Messenger messenger;
@@ -20,7 +23,7 @@ public class LobbyApi extends IOTools {
     private final AliveMemo aliveMemo;
     private final HookMemo hookMemo;
 
-    LobbyApi(HookRepo hookRepo, Messenger messenger, Starter starter, LobbyMemo lobbyMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
+    Api(HookRepo hookRepo, Messenger messenger, Starter starter, LobbyMemo lobbyMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
         super(gameRepo, versionMemo);
         this.hookRepo = hookRepo;
         this.messenger = messenger;
@@ -28,6 +31,12 @@ public class LobbyApi extends IOTools {
         this.lobbyMemo = lobbyMemo;
         this.aliveMemo = aliveMemo;
         this.hookMemo = hookMemo;
+    }
+
+    public void cancel(String ownerId) {
+        hookRepo.deleteByOwnerId(ownerId);
+        hookMemo.remove(ownerId);
+        versionInc();
     }
 
     public void join(String gameId, String colorName, String entryData, String messageString) {

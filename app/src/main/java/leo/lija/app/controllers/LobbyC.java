@@ -2,9 +2,11 @@ package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
 import leo.lija.app.forms.LobbyJoinForm;
-import leo.lija.app.LobbyApi;
-import leo.lija.app.LobbyPreloader;
+import leo.lija.app.lobby.Api;
+import leo.lija.app.lobby.Preload;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,18 +15,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/lobby")
 @RequiredArgsConstructor
-public class LobbyApiC {
+public class LobbyC {
 
-    private final LobbyApi api;
-    private final LobbyPreloader preloader;
+    private final Api api;
+    private final Preload preloader;
 
-    @GetMapping("/preload")
+    @PostMapping("/lobby/cancel/{ownerId}")
+    public ResponseEntity<Void> cancel(@PathVariable String ownerId) {
+        api.cancel(ownerId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create("/"))
+            .build();
+    }
+
+    @GetMapping("/api/lobby/preload")
     public Map<String, Object> preload(@RequestParam Optional<Integer> auth, @RequestParam Optional<Integer> chat, @RequestParam Optional<String> myHookId) {
         return preloader.apply(
             auth.orElse(0) == 1,
@@ -33,17 +43,17 @@ public class LobbyApiC {
         );
     }
 
-    @PostMapping("/join/{gameId}/{color}")
+    @PostMapping("/api/lobby/join/{gameId}/{color}")
     public void join(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody LobbyJoinForm lobbyJoinForm) {
         api.join(gameId, color, lobbyJoinForm.entry(), lobbyJoinForm.messages());
     }
 
-    @PostMapping("/create/{hookOwnerId}")
+    @PostMapping("/api/lobby/create/{hookOwnerId}")
     public void create(@PathVariable String hookOwnerId) {
         api.create(hookOwnerId);
     }
 
-    @PostMapping("/alive/{hookOwnerId}")
+    @PostMapping("/api/lobby/alive/{hookOwnerId}")
     public void alive(@PathVariable String hookOwnerId) {
         api.alive(hookOwnerId);
     }

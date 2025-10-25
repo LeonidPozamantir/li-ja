@@ -4,7 +4,7 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import leo.lija.app.Lobby;
+import leo.lija.app.lobby.Lobby;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package leo.lija.app;
+package leo.lija.app.lobby;
 
 import leo.lija.app.db.EntryRepo;
 import leo.lija.app.db.GameRepo;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
-public class LobbyPreloader {
+public class Preload {
 
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;

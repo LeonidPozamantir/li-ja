@@ -1,5 +1,6 @@
 package leo.lija.app;
 
+import leo.lija.app.lobby.Lobby;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
@@ -17,20 +18,25 @@ public class Starter extends IOTools {
 
     private final EntryRepo entryRepo;
     private final Ai ai;
+    private final Lobby lobbySocket;
 
     public Starter(
             GameRepo gameRepo,
             EntryRepo entryRepo,
             VersionMemo versionMemo,
-            Ai ai) {
+            Ai ai, Lobby lobbySocket) {
         super(gameRepo, versionMemo);
         this.entryRepo = entryRepo;
         this.ai = ai;
+        this.lobbySocket = lobbySocket;
     }
 
     public DbGame start(DbGame game, String entryData) {
         if (game.getVariant() != Variant.STANDARD) gameRepo.saveInitialFen(game);
-        Entry.apply(game, entryData).ifPresent(entryRepo::add);
+        Entry.apply(game, entryData).ifPresent(entry -> {
+            entryRepo.add(entry);
+            lobbySocket.addEntry(entry);
+        });
         if (game.player().isAi()) {
             Pair<Game, Move> aiResult;
             try {

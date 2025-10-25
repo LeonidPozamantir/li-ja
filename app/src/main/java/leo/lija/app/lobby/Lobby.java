@@ -1,8 +1,9 @@
-package leo.lija.app;
+package leo.lija.app.lobby;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import leo.lija.app.db.MessageRepo;
+import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,10 @@ public class Lobby {
             "txt", message.getText(),
             "u", message.getUsername()
         ));
+    }
+
+    public void addEntry(Entry entry) {
+        notifyAll("entry", entry.render());
     }
 
     public void quit(String uid) {
