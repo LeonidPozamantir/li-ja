@@ -16,16 +16,11 @@ public class EntryMemo {
 
     @PostConstruct
     void init() {
-        try {
-            refresh();
-        } catch (Exception e) {
-            // do nothing
-        }
+        refresh();
     }
 
     public int refresh() {
-        privateId = getId.get().orElseThrow(() -> new AppException("No last entry found"));
-        return privateId;
+        return getId.get().orElse(0);
     }
 
     public int increase() {
