@@ -40,6 +40,7 @@ memo: #seconds
   finisher-lock:
     timeout: 30
 ai:
+  server: false
   use: remote
   crafty:
     exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe

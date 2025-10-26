@@ -12,6 +12,7 @@ import leo.lija.system.memo.HookMemo;
 import leo.lija.system.memo.LobbyMemo;
 import leo.lija.system.memo.UsernameMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnBooleanProperty(name = "ai.server", havingValue = false)
 @RequiredArgsConstructor
 public class Cron {
 
