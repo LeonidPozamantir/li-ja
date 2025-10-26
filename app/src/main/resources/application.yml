@@ -39,25 +39,25 @@ memo: #seconds
     timeout: 6
   finisher-lock:
     timeout: 30
-
-crafty:
-  exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
-  book-path:
+ai:
+  use: remote
+  crafty:
+    exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
+    book-path:
+  remote:
+    url: "http://localhost:8080/ai"
 
 moretime:
   seconds: 15
 
 cron:
-  online-username:
-    frequency: 2100ms
-  hook-cleanup-dead:
-    frequency: 2s
-  hook-cleanup-old:
-    frequency: 21s
-  game-cleanup-unplayed:
-    frequency: 2h6m36s
-  game-auto-finish:
-    frequency: 1h4m12s
+  frequency:
+    online-username: 2100ms
+    hook-cleanup-dead: 2s
+    hook-cleanup-old: 21s
+    game-cleanup-unplayed: 2h6m36s
+    game-auto-finish: 1h4m12s
+    remote-ai-health: 10s
 
 async:
   actions:

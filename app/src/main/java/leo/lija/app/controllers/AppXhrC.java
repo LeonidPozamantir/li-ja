@@ -6,6 +6,7 @@ import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppSyncer;
 import leo.lija.system.AppXhr;
 import leo.lija.system.Pinger;
+import leo.lija.system.ai.CraftyServer;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AppXhrC extends BaseController {
     private final AliveMemo aliveMemo;
     private final TaskExecutor executor;
     private final GameRepo gameRepo;
+    private final CraftyServer craftyServer;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
@@ -134,6 +136,15 @@ public class AppXhrC extends BaseController {
         @RequestParam("hook_id") Optional<String> hookId
     ) {
         return pinger.ping(username, playerKey, watcher, getNbWatchers, hookId);
+    }
+
+    @GetMapping("/ai")
+    public ResponseEntity<String> ai(@RequestParam Optional<String> fen, @RequestParam Optional<Integer> level) {
+        return CompletableFuture.supplyAsync(() -> craftyServer.apply(fen.orElse(""), level.orElse(1)), executor)
+            .thenApply(s -> ResponseEntity.ok().body(s))
+            .exceptionally(e -> ResponseEntity.badRequest().body(e.getMessage()))
+            .join();
+
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})

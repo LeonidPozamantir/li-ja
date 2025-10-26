@@ -7,6 +7,7 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.ai.AiService;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.DbPlayer;
@@ -30,7 +31,7 @@ import static leo.lija.chess.Pos.posAt;
 public class AppXhr extends IOTools {
 
     private final Messenger messenger;
-    private final Ai ai;
+    private final AiService ai;
     private final Finisher finisher;
     private final AliveMemo aliveMemo;
     private final int moretimeSeconds;
@@ -38,7 +39,7 @@ public class AppXhr extends IOTools {
     public AppXhr(
             GameRepo gameRepo,
             Messenger messenger,
-            Ai ai,
+            AiService ai,
             Finisher finisher,
             VersionMemo versionMemo,
             AliveMemo aliveMemo,

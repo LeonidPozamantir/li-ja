@@ -1,6 +1,8 @@
 package leo.lija.app;
 
 import leo.lija.system.Finisher;
+import leo.lija.system.ai.AiService;
+import leo.lija.system.ai.RemoteAi;
 import leo.lija.system.command.GameFinishCommand;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HookRepo;
@@ -27,8 +29,10 @@ public class Cron {
     private final LobbyMemo lobbyMemo;
     private final GameRepo gameRepo;
     private final GameFinishCommand gameFinishCommand;
+    private final RemoteAi remoteAi;
+    private final AiService aiService;
 
-    @Scheduled(fixedRateString = "${cron.online-username.frequency}")
+    @Scheduled(fixedRateString = "${cron.frequency.online-username}")
     void onlineUsername() {
         userRepo.updateOnlineUserNames(usernameMemo.keys());
     }
@@ -39,19 +43,26 @@ public class Cron {
 //        if (hasRemoved) lobbyMemo.increase();
 //    }
 
-    @Scheduled(fixedRateString = "${cron.hook-cleanup-old.frequency}")
+    @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-old}")
     void hookCleanupOld() {
         hookRepo.cleanupOld();
     }
 
-    @Scheduled(fixedRateString = "${cron.game-cleanup-unplayed.frequency}")
+    @Scheduled(fixedRateString = "${cron.frequency.game-cleanup-unplayed}")
     void gameCleanupUnplayed() {
         System.out.println("[cron] remove old unplayed games");
         gameRepo.cleanupUnplayed();
     }
 
-    @Scheduled(fixedRateString = "${cron.game-auto-finish.frequency}")
+    @Scheduled(fixedRateString = "${cron.frequency.game-auto-finish}")
     void gameAutoFinish() {
         gameFinishCommand.apply();
+    }
+
+    @Scheduled(fixedRateString = "${cron.frequency.remote-ai-health}")
+    void remoteAiHealth() {
+        boolean health = remoteAi.health();
+        aiService.setRemoteAiHealth(health);
+        if (!health) System.out.println("remote AI is down");
     }
 }
