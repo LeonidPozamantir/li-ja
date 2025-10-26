@@ -138,15 +138,6 @@ public class AppXhrC extends BaseController {
         return pinger.ping(username, playerKey, watcher, getNbWatchers, hookId);
     }
 
-    @GetMapping("/ai")
-    public ResponseEntity<String> ai(@RequestParam Optional<String> fen, @RequestParam Optional<Integer> level) {
-        return CompletableFuture.supplyAsync(() -> craftyServer.apply(fen.orElse(""), level.orElse(1)), executor)
-            .thenApply(s -> ResponseEntity.ok().body(s))
-            .exceptionally(e -> ResponseEntity.badRequest().body(e.getMessage()))
-            .join();
-
-    }
-
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
     public long nbPlayers() {
         return aliveMemo.count();
