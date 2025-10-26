@@ -63,6 +63,7 @@ public class Cron {
     void remoteAiHealth() {
         boolean health = remoteAi.health();
         aiService.setRemoteAiHealth(health);
-        if (!health) System.out.println("remote AI is down");
+        if (health) System.out.println("remote AI is up");
+        else System.out.println("remote AI is down");
     }
 }
