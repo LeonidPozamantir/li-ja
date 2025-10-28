@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@Disabled
 public class CraftyAiTest extends AiTest {
 
     CraftyAiTest(@Autowired CraftyAi craftyAi) {
