@@ -2,6 +2,7 @@ package leo.lija.app.ai;
 
 import leo.lija.app.config.CraftyConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -16,7 +17,12 @@ public class AiConfig {
     }
 
     @Bean
-    public CraftyAi craftyAi(@Autowired CraftyConfigProperties config) {
-        return new CraftyAi(config);
+    public CraftyAi craftyAi(CraftyServer server) {
+        return new CraftyAi(server);
+    }
+
+    @Bean
+    public RemoteAi remoteAi(@Value("${ai.remote.url}") String remoteUrl) {
+        return new RemoteAi(remoteUrl);
     }
 }

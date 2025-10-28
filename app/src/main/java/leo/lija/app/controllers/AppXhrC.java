@@ -1,6 +1,7 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
+import leo.lija.app.ai.CraftyServer;
 import leo.lija.app.forms.MoveForm;
 import leo.lija.app.forms.TalkForm;
 import leo.lija.app.AppSyncer;
@@ -34,6 +35,7 @@ public class AppXhrC extends BaseController {
     private final AliveMemo aliveMemo;
     private final TaskExecutor executor;
     private final GameRepo gameRepo;
+    private final CraftyServer craftyServer;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {

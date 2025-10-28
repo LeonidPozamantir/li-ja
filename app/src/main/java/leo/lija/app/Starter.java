@@ -1,5 +1,6 @@
 package leo.lija.app;
 
+import leo.lija.app.ai.AiService;
 import leo.lija.app.lobby.Lobby;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
@@ -17,14 +18,15 @@ import org.springframework.stereotype.Service;
 public class Starter extends IOTools {
 
     private final EntryRepo entryRepo;
-    private final Ai ai;
     private final Lobby lobbySocket;
+    private final AiService ai;
 
     public Starter(
             GameRepo gameRepo,
             EntryRepo entryRepo,
             VersionMemo versionMemo,
-            Ai ai, Lobby lobbySocket) {
+            Lobby lobbySocket,
+            AiService ai) {
         super(gameRepo, versionMemo);
         this.entryRepo = entryRepo;
         this.ai = ai;
