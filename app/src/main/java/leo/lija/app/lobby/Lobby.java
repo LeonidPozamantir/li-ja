@@ -22,8 +22,8 @@ public class Lobby {
         socketIOService.setLobby(this);
     }
 
-    public void join(String uid, Optional<String> hook) {
-        hub.join(uid);
+    public void join(String uid, Integer version, Optional<String> hook) {
+        hub.join(uid, version);
         hook.ifPresent(hookPool::register);
     }
 

@@ -38,7 +38,7 @@ public class SocketIOService {
             sessionToUsername.put(sessionId, event.uid);
             usernameToClient.put(event.uid, client);
             usernameToHook.put(event.uid, event.hook);
-            lobby.join(event.uid, Optional.ofNullable(event.hook).filter(h -> !h.isEmpty()));
+            lobby.join(event.uid, event.version, Optional.ofNullable(event.hook).filter(h -> !h.isEmpty()));
         });
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) -> {
@@ -49,7 +49,7 @@ public class SocketIOService {
 
     }
 
-    public record JoinForm(String uid, String hook) {}
+    public record JoinForm(String uid, Integer version, String hook) {}
 
     public record LobbyTalkForm(String t, Data data) {
         public record Data(String txt, String u) {}

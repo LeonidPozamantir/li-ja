@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +20,14 @@ public class Hub {
 
     private final SocketIOService socketService;
     private final MessageRepo messageRepo;
+    private final History history;
 
-    private Set<String> members = ConcurrentHashMap.newKeySet();
+    private final Set<String> members = ConcurrentHashMap.newKeySet();
 
-    public void join(String uid) {
+    public void join(String uid, Integer version) {
         socketService.addToRoom("lobby", uid);
+        List<Map<String, Object>> messages = history.since(version);
+        messages.forEach(m -> socketService.sendMessage("lobby", m));
         members.add(uid);
     }
 
@@ -69,6 +73,7 @@ public class Hub {
             "t", t,
             "d", data
         );
-        socketService.sendMessage("lobby", msg);
+        Map<String, Object> vmsg = history.add(msg);
+        socketService.sendMessage("lobby", vmsg);
     }
 }

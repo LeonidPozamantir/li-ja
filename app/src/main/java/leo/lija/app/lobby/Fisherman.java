@@ -23,8 +23,12 @@ public class Fisherman {
 
     // DO NOT insert in db (done on client side)
     public void add(Hook hook) {
-        hookMemo.put(hook.getOwnerId());
+        shake(hook);
         socket.addHook(hook);
+    }
+
+    public void shake(Hook hook) {
+        hookMemo.put(hook.getOwnerId());
     }
 
     public void cleanup() {
