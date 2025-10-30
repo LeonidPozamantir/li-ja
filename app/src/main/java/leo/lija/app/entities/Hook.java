@@ -77,12 +77,20 @@ public class Hook {
         return Mode.apply(mode).orElse(Mode.CASUAL);
     }
 
-    public Optional<String> eloMin() {
-        return Optional.ofNullable(eloRange).map(er -> er.contains("-") ? er.substring(0, er.indexOf("-")) : er);
+    public Optional<Integer> eloMin() {
+        return Optional.ofNullable(eloRange).flatMap(er -> parseIntOptional(er.contains("-") ? er.substring(0, er.indexOf("-")) : er));
     }
 
-    public Optional<String> eloMax() {
-        return Optional.ofNullable(eloRange).map(er -> er.contains("-") ? er.substring(er.indexOf("-") + 1) : "");
+    public Optional<Integer> eloMax() {
+        return Optional.ofNullable(eloRange).flatMap(er -> parseIntOptional(er.contains("-") ? er.substring(er.indexOf("-") + 1) : ""));
+    }
+
+    private static Optional<Integer> parseIntOptional(String str) {
+        try {
+            return Optional.of(Integer.parseInt(str));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     public Map<String, Object> render() {
@@ -93,13 +101,17 @@ public class Hook {
             "variant", realVariant().toString(),
             "mode", realMode().toString(),
             "color", color,
-            "clock", time != null && hasClock && increment != null ? renderClock(time, increment) : "Unlimited",
+            "clock", clockOrUnlimited(),
             "emin", eloMin(),
             "emax", eloMax(),
             "action", "join"
         ));
         if (engine) res.put("engine", true);
         return res;
+    }
+
+    public String clockOrUnlimited() {
+        return time != null && hasClock && increment != null ? renderClock(time, increment) : "Unlimited";
     }
 
     private String renderClock(int time, int inc) {

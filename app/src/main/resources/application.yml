@@ -24,6 +24,7 @@ lobby:
     max: 30
   entry:
     max: 12
+  hook-pool.tick.frequency: 1s
 
 memo: #seconds
   version:

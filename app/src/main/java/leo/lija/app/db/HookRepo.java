@@ -29,18 +29,8 @@ public interface HookRepo extends JpaRepository<Hook, String> {
     @Transactional
     void deleteByOwnerId(String ownerId);
 
-    @Transactional
-    default boolean keepOnlyOwnerIds(Collection<String> ids) {
-        List<String> removableIds = getOtherIds(ids);
-        if (!removableIds.isEmpty()) {
-            deleteAllById(removableIds);
-            return true;
-        }
-        return false;
-    }
-
-    @Query("select h.id from Hook h where h.ownerId not in :ids and h.match = false ")
-    List<String> getOtherIds(Collection<String> ids);
+    @Query("select h from Hook h where h.ownerId not in :ids and h.match = false ")
+    List<Hook> unmatchedNotInOwnerIds(Collection<String> ids);
 
     @Transactional
     default void cleanupOld() {

@@ -1,51 +1,51 @@
 package leo.lija.app.lobby;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
-import leo.lija.app.db.MessageRepo;
+import jakarta.annotation.PostConstruct;
+import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.Entry;
-import leo.lija.app.entities.Message;
+import leo.lija.app.entities.Hook;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class Lobby {
 
-    private final SocketIOServer server;
-    private final MessageRepo messageRepo;
+    private final Hub hub;
+    private final HookPool hookPool;
+    private final SocketIOService socketIOService;
 
-    private ConcurrentHashMap<String, String> members = new ConcurrentHashMap<>();
-
-    public void join(SocketIOClient client, String uid) {
-        client.joinRoom("lobby");
-        members.put(uid, client.getSessionId().toString());
+    @PostConstruct
+    private void init() {
+        socketIOService.setLobby(this);
     }
 
-    public void talk(String txt, String u) {
-        Message message = messageRepo.add(txt, u);
-        notifyAll("talk", Map.of(
-            "txt", message.getText(),
-            "u", message.getUsername()
-        ));
+    public void join(String uid, Optional<String> hook) {
+        hub.join(uid);
+        hook.ifPresent(hookPool::register);
+    }
+
+    public void talk(SocketIOService.LobbyTalkForm event) {
+        hub.talk(event.data().txt(), event.data().u());
     }
 
     public void addEntry(Entry entry) {
-        notifyAll("entry", entry.render());
+        hub.addEntry(entry);
     }
 
-    public void quit(String uid) {
-        members.remove(uid);
+    public void quit(String uid, Optional<String> hook) {
+        hook.ifPresent(hookPool::unregister);
+        hub.quit(uid);
     }
 
-    public void notifyAll(String t, Map<String, Object> data) {
-        Map<String, Object> msg = Map.of(
-            "t", t,
-            "d", data
-        );
-        server.getRoomOperations("lobby").sendEvent("lobby/send-message", msg);
+    public void removeHook(Hook hook) {
+        hub.removeHook(hook);
     }
+
+    public void addHook(Hook hook) {
+        hub.addHook(hook);
+    }
+
 }

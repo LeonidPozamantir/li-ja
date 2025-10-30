@@ -113,10 +113,6 @@ public class AppXhrC extends BaseController {
         return validAndRedirect(fullId, xhr::drawDecline);
     }
 
-    private ResponseEntity<Void> validAndRedirect(String fullId, Consumer<String> f) {
-        return validRedir(() -> f.accept(fullId), fullId);
-    }
-
     @PostMapping("/talk/{fullId}")
     public void talk(@PathVariable String fullId, @Valid @RequestBody TalkForm talkForm) {
         xhr.talk(fullId, talkForm.message());
@@ -132,10 +128,9 @@ public class AppXhrC extends BaseController {
         @RequestParam Optional<String> username,
         @RequestParam("player_key") Optional<String> playerKey,
         @RequestParam Optional<String> watcher,
-        @RequestParam("get_nb_watchers") Optional<String> getNbWatchers,
-        @RequestParam("hook_id") Optional<String> hookId
+        @RequestParam("get_nb_watchers") Optional<String> getNbWatchers
     ) {
-        return pinger.ping(username, playerKey, watcher, getNbWatchers, hookId);
+        return pinger.ping(get(username), get(playerKey), get(watcher), get(getNbWatchers));
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
@@ -146,6 +141,10 @@ public class AppXhrC extends BaseController {
     @GetMapping("/how-many-games-now")
     public int nbGames() {
         return gameRepo.countPlaying();
+    }
+
+    private ResponseEntity<Void> validAndRedirect(String fullId, Consumer<String> f) {
+        return validRedir(() -> f.accept(fullId), fullId);
     }
 
 }

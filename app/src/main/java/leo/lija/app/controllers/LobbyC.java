@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-public class LobbyC {
+public class LobbyC extends BaseController {
 
     private final Api api;
     private final Preload preloader;
@@ -39,7 +38,7 @@ public class LobbyC {
         return preloader.apply(
             auth.orElse(0) == 1,
             chat.orElse(0) == 1,
-            myHookId.filter(h -> !h.isEmpty())
+            get(myHookId)
         );
     }
 
@@ -51,11 +50,6 @@ public class LobbyC {
     @PostMapping("/api/lobby/create/{hookOwnerId}")
     public void create(@PathVariable String hookOwnerId) {
         api.create(hookOwnerId);
-    }
-
-    @PostMapping("/api/lobby/alive/{hookOwnerId}")
-    public void alive(@PathVariable String hookOwnerId) {
-        api.alive(hookOwnerId);
     }
 
 }

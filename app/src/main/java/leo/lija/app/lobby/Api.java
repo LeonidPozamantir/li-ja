@@ -3,6 +3,7 @@ package leo.lija.app.lobby;
 import leo.lija.app.IOTools;
 import leo.lija.app.Messenger;
 import leo.lija.app.Starter;
+import leo.lija.app.entities.Hook;
 import leo.lija.chess.Color;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
@@ -13,30 +14,31 @@ import leo.lija.app.memo.LobbyMemo;
 import leo.lija.app.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class Api extends IOTools {
 
     private final HookRepo hookRepo;
+    private final Fisherman fisherman;
     private final Messenger messenger;
     private final Starter starter;
-    private final LobbyMemo lobbyMemo;
+    private final Lobby lobbySocket;
     private final AliveMemo aliveMemo;
-    private final HookMemo hookMemo;
 
-    Api(HookRepo hookRepo, Messenger messenger, Starter starter, LobbyMemo lobbyMemo, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo, HookMemo hookMemo) {
+    Api(HookRepo hookRepo, Fisherman fisherman, Messenger messenger, Starter starter, Lobby lobbySocket, VersionMemo versionMemo, GameRepo gameRepo, AliveMemo aliveMemo) {
         super(gameRepo, versionMemo);
         this.hookRepo = hookRepo;
+        this.fisherman = fisherman;
         this.messenger = messenger;
         this.starter = starter;
-        this.lobbyMemo = lobbyMemo;
+        this.lobbySocket = lobbySocket;
         this.aliveMemo = aliveMemo;
-        this.hookMemo = hookMemo;
     }
 
     public void cancel(String ownerId) {
-        hookRepo.deleteByOwnerId(ownerId);
-        hookMemo.remove(ownerId);
-        versionInc();
+        Optional<Hook> hook = hookRepo.findByOwnerId(ownerId);
+        hook.ifPresent(fisherman::remove);
     }
 
     public void join(String gameId, String colorName, String entryData, String messageString) {
@@ -47,19 +49,11 @@ public class Api extends IOTools {
         save(game);
         aliveMemo.put(gameId, color);
         aliveMemo.put(gameId, color.getOpposite());
-        versionInc();
     }
 
     public void create(String hookOwnerId) {
-        hookMemo.put(hookOwnerId);
-        versionInc();
+        Optional<Hook> hook = hookRepo.findByOwnerId(hookOwnerId);
+        hook.ifPresent(fisherman::add);
     }
 
-    public void alive(String hookOwnerId) {
-        hookMemo.put(hookOwnerId);
-    }
-
-    private int versionInc() {
-        return lobbyMemo.increase();
-    }
 }

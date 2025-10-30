@@ -6,6 +6,8 @@ import leo.lija.app.command.GameFinishCommand;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
+import leo.lija.app.lobby.Fisherman;
+import leo.lija.app.lobby.HookPool;
 import leo.lija.app.memo.HookMemo;
 import leo.lija.app.memo.LobbyMemo;
 import leo.lija.app.memo.UsernameMemo;
@@ -24,27 +26,31 @@ public class Cron {
     private final UserRepo userRepo;
     private final UsernameMemo usernameMemo;
     private final HookRepo hookRepo;
-    private final HookMemo hookMemo;
-    private final LobbyMemo lobbyMemo;
     private final GameRepo gameRepo;
     private final GameFinishCommand gameFinishCommand;
     private final RemoteAi remoteAi;
     private final AiService aiService;
+    private final HookPool lobbyHookPool;
+    private final Fisherman lobbyFisherman;
 
-    @Scheduled(fixedRateString = "${cron.frequency.online-username}")
-    void onlineUsername() {
-        userRepo.updateOnlineUserNames(usernameMemo.keys());
+    @Scheduled(fixedRateString = "${lobby.hook-pool.tick.frequency}")
+    void hookPool() {
+        lobbyHookPool.tick();
     }
 
-//    @Scheduled(fixedRateString = "${cron.hook-cleanup-dead.frequency}")
-//    void hookCleanupDead() {
-//        boolean hasRemoved = hookRepo.keepOnlyOwnerIds(hookMemo.keys());
-//        if (hasRemoved) lobbyMemo.increase();
-//    }
+    @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-dead}")
+    void hookCleanupDead() {
+        lobbyFisherman.cleanup();
+    }
 
     @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-old}")
     void hookCleanupOld() {
         hookRepo.cleanupOld();
+    }
+
+    @Scheduled(fixedRateString = "${cron.frequency.online-username}")
+    void onlineUsername() {
+        userRepo.updateOnlineUserNames(usernameMemo.keys());
     }
 
     @Scheduled(fixedRateString = "${cron.frequency.game-cleanup-unplayed}")

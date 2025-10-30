@@ -18,19 +18,16 @@ public class Pinger {
     private final AliveMemo aliveMemo;
     private final UsernameMemo usernameMemo;
     private final WatcherMemo watcherMemo;
-    private final HookMemo hookMemo;
 
     public Map<String, Object> ping(
         Optional<String> username,
         Optional<String> playerKey,
         Optional<String> watcherKey,
-        Optional<String> getNbWatchers,
-        Optional<String> hookId
+        Optional<String> getNbWatchers
     ) {
         playerKey.ifPresent(aliveMemo::put);
         username.ifPresent(usernameMemo::put);
         watcherKey.ifPresent(watcherMemo::put);
-        hookId.ifPresent(hookMemo::put);
         return flatten(Map.of(
             "nbp", Optional.of(aliveMemo.count()),
             "nbw", getNbWatchers.map(watcherMemo::count)

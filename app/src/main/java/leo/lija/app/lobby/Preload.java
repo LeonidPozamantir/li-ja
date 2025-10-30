@@ -24,10 +24,8 @@ public class Preload {
     private final GameRepo gameRepo;
     private final MessageRepo messageRepo;
     private final EntryRepo entryRepo;
-    private final HookMemo hookMemo;
 
     public Map<String, Object> apply(boolean auth, boolean chat, Optional<String> myHookId) {
-        myHookId.ifPresent(hookMemo::put);
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();
         Supplier<Map<String, Object>> response = () -> stdResponse(chat, hooks, myHookId);
         return myHookId
