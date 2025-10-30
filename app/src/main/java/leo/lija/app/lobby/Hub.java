@@ -57,14 +57,14 @@ public class Hub {
     }
 
     public void removeHook(Hook hook) {
-        notifyAll("hook_remove", Map.of("id", hook.getId()));
+        notifyAll("hook_remove", hook.getId());
     }
 
     public void quit(String uid) {
         members.remove(uid);
     }
 
-    public void notifyAll(String t, Map<String, Object> data) {
+    public void notifyAll(String t, Object data) {
         Map<String, Object> msg = Map.of(
             "t", t,
             "d", data
