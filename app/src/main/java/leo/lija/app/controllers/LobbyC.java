@@ -44,7 +44,7 @@ public class LobbyC extends BaseController {
 
     @PostMapping("/api/lobby/join/{gameId}/{color}")
     public void join(@PathVariable String gameId, @PathVariable String color, @Valid @RequestBody LobbyJoinForm lobbyJoinForm) {
-        api.join(gameId, color, lobbyJoinForm.entry(), lobbyJoinForm.messages());
+        api.join(gameId, color, lobbyJoinForm.entry(), lobbyJoinForm.messages(), lobbyJoinForm.hook(), lobbyJoinForm.myHook());
     }
 
     @PostMapping("/api/lobby/create/{hookOwnerId}")

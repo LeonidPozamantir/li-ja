@@ -9,8 +9,6 @@ import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.memo.AliveMemo;
-import leo.lija.app.memo.HookMemo;
-import leo.lija.app.memo.LobbyMemo;
 import leo.lija.app.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +36,18 @@ public class Api extends IOTools {
 
     public void cancel(String ownerId) {
         Optional<Hook> hook = hookRepo.findByOwnerId(ownerId);
-        hook.ifPresent(fisherman::remove);
+        hook.ifPresent(fisherman::delete);
     }
 
-    public void join(String gameId, String colorName, String entryData, String messageString) {
+    public void join(
+            String gameId,
+            String colorName,
+            String entryData,
+            String messageString,
+            String hookOwnerId,
+            Optional<String> myHookOwnerId
+    ) {
+        Optional<Hook> hook = hookRepo.findByOwnerId(hookOwnerId);
         Color color = ioColor(colorName);
         DbGame game = gameRepo.game(gameId);
         messenger.systemMessages(game, messageString);
@@ -49,6 +55,9 @@ public class Api extends IOTools {
         save(game);
         aliveMemo.put(gameId, color);
         aliveMemo.put(gameId, color.getOpposite());
+        hook.ifPresent(h -> fisherman.bite(h, game));
+        myHookOwnerId.ifPresent(ownerId -> hookRepo.findByOwnerId(ownerId)
+                .ifPresent(fisherman::delete));
     }
 
     public void create(String hookOwnerId) {

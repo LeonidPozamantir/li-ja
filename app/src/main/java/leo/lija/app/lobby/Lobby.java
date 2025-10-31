@@ -2,6 +2,7 @@ package leo.lija.app.lobby;
 
 import jakarta.annotation.PostConstruct;
 import leo.lija.app.config.SocketIOService;
+import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class Lobby {
     }
 
     public void join(String uid, Integer version, Optional<String> hook) {
-        hub.join(uid, version);
+        hub.join(uid, version, hook);
         hook.ifPresent(hookPool::register);
     }
 
@@ -48,4 +49,7 @@ public class Lobby {
         hub.addHook(hook);
     }
 
+    public void biteHook(Hook hook, DbGame game) {
+        hub.biteHook(hook, game);
+    }
 }

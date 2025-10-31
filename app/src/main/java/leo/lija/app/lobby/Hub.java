@@ -2,6 +2,7 @@ package leo.lija.app.lobby;
 
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.db.MessageRepo;
+import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,13 +24,13 @@ public class Hub {
     private final MessageRepo messageRepo;
     private final History history;
 
-    private final Set<String> members = ConcurrentHashMap.newKeySet();
+    private final Map<String, Member> members = new ConcurrentHashMap<>();
 
-    public void join(String uid, Integer version) {
+    public void join(String uid, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
         List<Map<String, Object>> messages = history.since(version);
         messages.forEach(m -> socketService.sendMessage("lobby", m));
-        members.add(uid);
+        members.put(uid, new Member(uid, hookOwnerId));
     }
 
     public void talk(String txt, String u) {
@@ -64,8 +66,21 @@ public class Hub {
         notifyAll("hook_remove", hook.getId());
     }
 
+    public void biteHook(Hook hook, DbGame game) {
+        members.values().stream().filter(m -> m.ownsHook(hook))
+                .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
+    }
+
     public void quit(String uid) {
         members.remove(uid);
+    }
+
+    public void notifyMember(String t, Object data, Member member) {
+        Map<String, Object> msg = Map.of(
+                "t", t,
+                "d", data
+        );
+        socketService.sendMessageToClient(member.uid(), msg);
     }
 
     public void notifyAll(String t, Object data) {

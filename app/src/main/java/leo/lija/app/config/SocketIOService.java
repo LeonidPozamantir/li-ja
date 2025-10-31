@@ -80,4 +80,9 @@ public class SocketIOService {
         server.getRoomOperations(room).sendEvent("send-message", msg);
     }
 
+    public void sendMessageToClient(String username, Object msg) {
+        SocketIOClient client = usernameToClient.get(username);
+        if (client != null) client.sendEvent("send-message", msg);
+    }
+
 }
