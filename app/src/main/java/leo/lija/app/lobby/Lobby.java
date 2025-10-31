@@ -42,6 +42,7 @@ public class Lobby {
     }
 
     public void removeHook(Hook hook) {
+        hookPool.unregister(hook.getOwnerId());
         hub.removeHook(hook);
     }
 

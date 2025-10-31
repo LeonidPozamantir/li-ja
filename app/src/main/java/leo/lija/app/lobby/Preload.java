@@ -57,8 +57,7 @@ public class Preload {
     private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<Hook> myHook) {
         return hooks.stream().map(h -> {
             Map<String, Object> res = h.render();
-            if (myHook.isPresent() && myHook.get() == h)
-                res.putAll(Map.of("action", "cancel", "id", h.getOwnerId()));
+            if (myHook.isPresent() && myHook.get() == h) res.put("ownerId", h.getOwnerId());
             return res;
         }).toList();
     }

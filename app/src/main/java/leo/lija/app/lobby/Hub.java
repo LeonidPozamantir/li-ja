@@ -28,8 +28,7 @@ public class Hub {
 
     public void join(String uid, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
-        List<Map<String, Object>> messages = history.since(version);
-        messages.forEach(m -> socketService.sendMessage("lobby", m));
+        history.since(version).forEach(m -> socketService.sendMessage("lobby", m));
         members.put(uid, new Member(uid, hookOwnerId));
     }
 
@@ -54,7 +53,6 @@ public class Hub {
                 "variant", hook.realVariant().toString(),
                 "color", hook.getColor(),
                 "clock", hook.clockOrUnlimited(),
-                "action", "join",
                 "engine", hook.getEngine()
         ));
         data.put("emin", hook.eloMin().orElse(null));

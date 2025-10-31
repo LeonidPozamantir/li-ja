@@ -103,8 +103,7 @@ public class Hook {
             "color", color,
             "clock", clockOrUnlimited(),
             "emin", eloMin(),
-            "emax", eloMax(),
-            "action", "join"
+            "emax", eloMax()
         ));
         if (engine) res.put("engine", true);
         return res;
