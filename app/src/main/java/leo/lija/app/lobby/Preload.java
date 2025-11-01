@@ -38,13 +38,13 @@ public class Preload {
         return myHook
             .map(h -> h.gameId()
                 .map(gameId -> gameRepo.gameOption(gameId)
-                    .map(g -> Map.of("Redirect", (Object) g.fullIdOf(g.getCreatorColor())))
-                    .orElse(Map.of("redirect", "/")))
+                    .map(g -> redirect(g.fullIdOf(g.getCreatorColor())))
+                    .orElse(redirect(null)))
                 .orElseGet(() -> {
                     fisherman.shake(h);
                     return std.get();
                 }))
-            .orElse(Map.of("redirect", "/"));
+            .orElse(redirect(null));
     }
 
     private Map<String, Object> stdResponse(boolean chat, List<Hook> hooks, Optional<String> myHookId) {
@@ -66,4 +66,7 @@ public class Preload {
         }).toList();
     }
 
+    private Map<String, Object> redirect(String url) {
+        return Map.of("redirect", "/" + Optional.ofNullable(url).orElse(""));
+    }
 }
