@@ -5,6 +5,8 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import leo.lija.app.controllers.BaseController;
+import leo.lija.app.exceptions.AppException;
 import leo.lija.app.lobby.Lobby;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -18,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @ConditionalOnWebApplication
 @RequiredArgsConstructor
-public class SocketIOService {
+public class SocketIOService extends BaseController {
 
     private final SocketIOServer server;
 
@@ -38,7 +40,11 @@ public class SocketIOService {
             sessionToUsername.put(sessionId, event.uid);
             usernameToClient.put(event.uid, client);
             usernameToHook.put(event.uid, event.hook);
-            lobby.join(event.uid, event.version, Optional.ofNullable(event.hook).filter(h -> !h.isEmpty()));
+            lobby.join(
+                    get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                    Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
+                    Optional.ofNullable(event.hook).filter(h -> !h.isEmpty())
+            );
         });
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) -> {
@@ -51,7 +57,7 @@ public class SocketIOService {
 
     public record JoinForm(String uid, Integer version, String hook) {}
 
-    public record LobbyTalkForm(String t, Data data) {
+    public record LobbyTalkForm(String t, Data d) {
         public record Data(String txt, String u) {}
     }
 

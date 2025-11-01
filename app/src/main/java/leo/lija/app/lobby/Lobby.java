@@ -5,6 +5,7 @@ import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
+import leo.lija.app.socket.Pool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class Lobby {
 
     private final Hub hub;
     private final HookPool hookPool;
+    private final Pool socketPool;
     private final SocketIOService socketIOService;
 
     @PostConstruct
@@ -25,11 +27,12 @@ public class Lobby {
 
     public void join(String uid, Integer version, Optional<String> hook) {
         hub.join(uid, version, hook);
+        socketPool.register(uid);
         hook.ifPresent(hookPool::register);
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
-        hub.talk(event.data().txt(), event.data().u());
+        hub.talk(event.d().txt(), event.d().u());
     }
 
     public void addEntry(Entry entry) {
@@ -37,6 +40,7 @@ public class Lobby {
     }
 
     public void quit(String uid, Optional<String> hook) {
+        socketPool.unregister(uid);
         hook.ifPresent(hookPool::unregister);
         hub.quit(uid);
     }
@@ -52,5 +56,9 @@ public class Lobby {
 
     public void biteHook(Hook hook, DbGame game) {
         hub.biteHook(hook, game);
+    }
+
+    public void nbPlayers(Integer nb) {
+        hub.nbPlayers(nb);
     }
 }

@@ -29,7 +29,6 @@ public class Pinger {
         username.ifPresent(usernameMemo::put);
         watcherKey.ifPresent(watcherMemo::put);
         return flatten(Map.of(
-            "nbp", Optional.of(aliveMemo.count()),
             "nbw", getNbWatchers.map(watcherMemo::count)
         ));
     }

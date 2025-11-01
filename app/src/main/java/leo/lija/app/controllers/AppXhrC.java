@@ -1,14 +1,11 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
-import leo.lija.app.ai.CraftyServer;
-import leo.lija.app.forms.MoveForm;
-import leo.lija.app.forms.TalkForm;
 import leo.lija.app.AppSyncer;
 import leo.lija.app.AppXhr;
-import leo.lija.app.Pinger;
 import leo.lija.app.db.GameRepo;
-import leo.lija.app.memo.AliveMemo;
+import leo.lija.app.forms.MoveForm;
+import leo.lija.app.forms.TalkForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -31,11 +27,8 @@ public class AppXhrC extends BaseController {
 
     private final AppXhr xhr;
     private final AppSyncer syncer;
-    private final Pinger pinger;
-    private final AliveMemo aliveMemo;
     private final TaskExecutor executor;
     private final GameRepo gameRepo;
-    private final CraftyServer craftyServer;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
     public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
@@ -123,19 +116,9 @@ public class AppXhrC extends BaseController {
         return xhr.moretime(fullId);
     }
 
-    @GetMapping("/ping")
-    public Map<String, Object> ping(
-        @RequestParam Optional<String> username,
-        @RequestParam("player_key") Optional<String> playerKey,
-        @RequestParam Optional<String> watcher,
-        @RequestParam("get_nb_watchers") Optional<String> getNbWatchers
-    ) {
-        return pinger.ping(get(username), get(playerKey), get(watcher), get(getNbWatchers));
-    }
-
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
     public long nbPlayers() {
-        return aliveMemo.count();
+        return 0;
     }
 
     @GetMapping("/how-many-games-now")

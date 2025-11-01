@@ -34,14 +34,14 @@ public class Hub {
 
     public void talk(String txt, String u) {
         Message message = messageRepo.add(txt, u);
-        notifyAll("talk", Map.of(
+        notifyVersion("talk", Map.of(
             "txt", message.getText(),
             "u", message.getUsername()
         ));
     }
 
     public void addEntry(Entry entry) {
-        notifyAll("entry", entry.render());
+        notifyVersion("entry", entry.render());
     }
 
     public void addHook(Hook hook) {
@@ -57,16 +57,20 @@ public class Hub {
         ));
         data.put("emin", hook.eloMin().orElse(null));
         data.put("emax", hook.eloMax().orElse(null));
-        notifyAll("hook_add", data);
+        notifyVersion("hook_add", data);
     }
 
     public void removeHook(Hook hook) {
-        notifyAll("hook_remove", hook.getId());
+        notifyVersion("hook_remove", hook.getId());
     }
 
     public void biteHook(Hook hook, DbGame game) {
         members.values().stream().filter(m -> m.ownsHook(hook))
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
+    }
+
+    public void nbPlayers(Integer nb) {
+        notifyAll("nbp", nb);
     }
 
     public void quit(String uid) {
@@ -82,11 +86,19 @@ public class Hub {
     }
 
     public void notifyAll(String t, Object data) {
-        Map<String, Object> msg = Map.of(
-            "t", t,
-            "d", data
-        );
-        Map<String, Object> vmsg = history.add(msg);
+        Map<String, Object> msg = makeMessage(t, data);
+        socketService.sendMessage("lobby", msg);
+    }
+
+    private void notifyVersion(String t, Object data) {
+        Map<String, Object> vmsg = history.add(makeMessage(t, data));
         socketService.sendMessage("lobby", vmsg);
+    }
+
+    private Map<String, Object> makeMessage(String t, Object data) {
+        return Map.of(
+                "t", t,
+                "d", data
+        );
     }
 }

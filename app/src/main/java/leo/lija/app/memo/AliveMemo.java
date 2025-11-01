@@ -65,10 +65,6 @@ public class AliveMemo {
         return activity(gameId, color) == 0;
     }
 
-    public long count() {
-        return cache.size();
-    }
-
     public String toKey(String gameId, Color color) {
         return gameId + "." + color.getLetter();
     }

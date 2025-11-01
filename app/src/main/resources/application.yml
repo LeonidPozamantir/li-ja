@@ -27,6 +27,11 @@ lobby:
   history.timeout: 20
   hook-pool.tick.frequency: 1s
 
+socket:
+  host: 0.0.0.0
+  port: 9092
+  pool.tick.frequency: 1s
+
 memo: #seconds
   version:
     timeout: 1800
@@ -41,6 +46,7 @@ memo: #seconds
     timeout: 6
   finisher-lock:
     timeout: 30
+  socket.timeout: 5
 ai:
   server: false
   use: remote
@@ -55,18 +61,15 @@ moretime:
 
 cron:
   frequency:
-    online-username: 2100ms
-    hook-cleanup-dead: 2s
+    online-username: 2700ms
+    hook-cleanup-dead: 2100ms
     hook-cleanup-old: 21s
     game-cleanup-unplayed: 2h6m36s
     game-auto-finish: 1h4m12s
     remote-ai-health: 10s
+    heart-beat: 2200ms
 
 async:
   actions:
     core-size: 16
     max-size: 2048
-
-socket:
-  host: 0.0.0.0
-  port: 9092
