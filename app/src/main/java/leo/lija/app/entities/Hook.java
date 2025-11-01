@@ -69,6 +69,10 @@ public class Hook {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    public Optional<String> gameId() {
+        return Optional.ofNullable(game);
+    }
+
     public Variant realVariant() {
         return Variant.apply(variant).orElse(Variant.STANDARD);
     }

@@ -27,37 +27,41 @@ public class Preload {
     private final EntryRepo entryRepo;
 
     public Map<String, Object> apply(boolean auth, boolean chat, Optional<String> myHookId) {
-        Optional<Hook> myHook = myHookId.flatMap(hookRepo::findByOwnerId);
-        myHook.ifPresent(fisherman::shake);
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();
-        Supplier<Map<String, Object>> response = () -> stdResponse(chat, hooks, myHook);
+        Supplier<Map<String, Object>> std = () -> stdResponse(chat, hooks, myHookId);
+        return myHookId
+            .map(id -> hookResponse(hookRepo.findByOwnerId(id), std))
+            .orElse(std.get());
+    }
+
+    private Map<String, Object> hookResponse(Optional<Hook> myHook, Supplier<Map<String, Object>> std) {
         return myHook
-            .map(hook -> hookResponse(hook, response))
-            .orElse(response.get());
+            .map(h -> h.gameId()
+                .map(gameId -> gameRepo.gameOption(gameId)
+                    .map(g -> Map.of("Redirect", (Object) g.fullIdOf(g.getCreatorColor())))
+                    .orElse(Map.of("redirect", "/")))
+                .orElseGet(() -> {
+                    fisherman.shake(h);
+                    return std.get();
+                }))
+            .orElse(Map.of("redirect", "/"));
     }
 
-    private Map<String, Object> hookResponse(Hook myHook, Supplier<Map<String, Object>> response) {
-        return Optional.ofNullable(myHook.getGame())
-            .map(gameRepo::game)
-            .map(game -> Map.of("redirect", (Object) game.fullIdOf(game.getCreatorColor())))
-            .orElse(response.get());
-    }
-
-    private Map<String, Object> stdResponse(boolean chat, List<Hook> hooks, Optional<Hook> myHook) {
+    private Map<String, Object> stdResponse(boolean chat, List<Hook> hooks, Optional<String> myHookId) {
         List<Message> messages = chat ? messageRepo.recent() : List.of();
         List<Entry> entries = entryRepo.recent();
         return Map.of(
                 "version", history.version(),
-                "pool", renderHooks(hooks, myHook),
+                "pool", renderHooks(hooks, myHookId),
                 "chat", messages.reversed().stream().map(Message::render).toList(),
                 "timeline", entries.reversed().stream().map(Entry::render).toList()
         );
     }
 
-    private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<Hook> myHook) {
+    private List<Map<String, Object>> renderHooks(List<Hook> hooks, Optional<String> myHookId) {
         return hooks.stream().map(h -> {
             Map<String, Object> res = h.render();
-            if (myHook.isPresent() && myHook.get() == h) res.put("ownerId", h.getOwnerId());
+            if (myHookId.isPresent() && myHookId.get().equals(h.getOwnerId())) res.put("ownerId", h.getOwnerId());
             return res;
         }).toList();
     }
