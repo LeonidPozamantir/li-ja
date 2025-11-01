@@ -30,7 +30,6 @@ lobby:
 socket:
   host: 0.0.0.0
   port: 9092
-  pool.tick.frequency: 1s
 
 memo: #seconds
   version:

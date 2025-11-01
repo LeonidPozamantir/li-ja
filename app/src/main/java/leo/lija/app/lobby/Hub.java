@@ -26,6 +26,10 @@ public class Hub {
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
 
+    public int count() {
+        return members.size();
+    }
+
     public void join(String uid, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
         history.since(version).forEach(m -> socketService.sendMessage("lobby", m));

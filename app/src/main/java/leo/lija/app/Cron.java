@@ -8,17 +8,17 @@ import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.lobby.HookPool;
-import leo.lija.app.lobby.Lobby;
-import leo.lija.app.memo.HookMemo;
-import leo.lija.app.memo.LobbyMemo;
-import leo.lija.app.memo.SocketMemo;
+import leo.lija.app.lobby.Hub;
 import leo.lija.app.memo.UsernameMemo;
-import leo.lija.app.socket.Pool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @ConditionalOnWebApplication
@@ -35,23 +35,19 @@ public class Cron {
     private final AiService aiService;
     private final HookPool lobbyHookPool;
     private final Fisherman lobbyFisherman;
-    private final Pool socketPool;
-    private final Lobby lobbySocket;
-    private final SocketMemo socketMemo;
+    private final Hub lobbyHub;
+    private final TaskExecutor actionsExecutor;
 
     @Scheduled(fixedRateString = "${lobby.hook-pool.tick.frequency}")
     void hookPool() {
         lobbyHookPool.tick();
     }
 
-    @Scheduled(fixedRateString = "${socket.pool.tick.frequency}")
-    void socketPool() {
-        socketPool.tick();
-    }
-
     @Scheduled(fixedRateString = "${cron.frequency.heart-beat}")
     void heartBeat() {
-        lobbySocket.nbPlayers((int) socketMemo.count());
+        CompletableFuture.supplyAsync(lobbyHub::count, actionsExecutor)
+            .orTimeout(100, TimeUnit.MILLISECONDS)
+            .thenAccept(lobbyHub::nbPlayers);
     }
 
     @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-dead}")
