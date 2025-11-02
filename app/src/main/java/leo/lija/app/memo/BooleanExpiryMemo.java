@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import leo.lija.app.config.MemoConfigProperties;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,6 +21,10 @@ public abstract class BooleanExpiryMemo {
 
     public void put(String key) {
         cache.put(key, true);
+    }
+
+    public void putAll(Collection<String> keys) {
+        keys.forEach(k -> cache.put(k, true));
     }
 
     public void remove(String key) {

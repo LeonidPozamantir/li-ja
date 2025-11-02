@@ -17,14 +17,8 @@ public class Fisherman {
 
     // DO delete in db
     public void delete(Hook hook) {
-        hide(hook);
-        hookRepo.deleteById(hook.getId());
-    }
-
-    // DO NOT delete in db
-    public void hide(Hook hook) {
         socket.removeHook(hook);
-        hookMemo.remove(hook.getOwnerId());
+        hookRepo.deleteById(hook.getId());
     }
 
     // DO NOT insert in db (done on client side)
@@ -34,7 +28,7 @@ public class Fisherman {
     }
 
     public void bite(Hook hook, DbGame game) {
-        hide(hook);
+        socket.removeHook(hook);
         socket.biteHook(hook, game);
     }
 

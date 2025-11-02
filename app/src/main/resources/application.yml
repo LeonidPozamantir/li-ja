@@ -61,6 +61,7 @@ moretime:
 cron:
   frequency:
     online-username: 2700ms
+    hook-tick: 1s
     hook-cleanup-dead: 2100ms
     hook-cleanup-old: 21s
     game-cleanup-unplayed: 2h6m36s

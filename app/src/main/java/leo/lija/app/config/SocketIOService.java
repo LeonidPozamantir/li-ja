@@ -70,8 +70,7 @@ public class SocketIOService extends BaseController {
         return client -> {
             String sessionId = client.getSessionId().toString();
             String username = sessionToUsername.get(sessionId);
-            String hook = usernameToHook.get(username);
-            lobby.quit(username, Optional.ofNullable(hook));
+            lobby.quit(username);
             usernameToClient.remove(username);
             sessionToUsername.remove(sessionId);
             usernameToHook.remove(username);

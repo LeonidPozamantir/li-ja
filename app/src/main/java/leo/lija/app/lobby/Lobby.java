@@ -15,7 +15,6 @@ import java.util.Optional;
 public class Lobby {
 
     private final Hub hub;
-    private final HookPool hookPool;
     private final SocketIOService socketIOService;
 
     @PostConstruct
@@ -25,7 +24,6 @@ public class Lobby {
 
     public void join(String uid, Integer version, Optional<String> hook) {
         hub.join(uid, version, hook);
-        hook.ifPresent(hookPool::register);
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
@@ -36,13 +34,11 @@ public class Lobby {
         hub.addEntry(entry);
     }
 
-    public void quit(String uid, Optional<String> hook) {
-        hook.ifPresent(hookPool::unregister);
+    public void quit(String uid) {
         hub.quit(uid);
     }
 
     public void removeHook(Hook hook) {
-        hookPool.unregister(hook.getOwnerId());
         hub.removeHook(hook);
     }
 

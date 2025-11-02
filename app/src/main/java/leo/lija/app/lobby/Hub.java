@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -26,8 +25,15 @@ public class Hub {
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
 
-    public int count() {
+    public int getCount() {
         return members.size();
+    }
+
+    public List<String> getHooks() {
+        return members.values().stream()
+            .filter(m -> m.hookOwnerId().isPresent())
+            .map(m -> m.hookOwnerId().get())
+            .toList();
     }
 
     public void join(String uid, Integer version, Optional<String> hookOwnerId) {
