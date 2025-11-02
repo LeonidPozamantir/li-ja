@@ -27,9 +27,9 @@ public class SocketIOService extends BaseController {
     @Setter
     private Lobby lobby;
 
-    private final Map<String, String> sessionToUsername = new ConcurrentHashMap<>();
-    private final Map<String, SocketIOClient> usernameToClient = new ConcurrentHashMap<>();
-    private final Map<String, String> usernameToHook = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionToUid = new ConcurrentHashMap<>();
+    private final Map<String, SocketIOClient> uidToClient = new ConcurrentHashMap<>();
+    private final Map<String, String> uidToHook = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -37,13 +37,14 @@ public class SocketIOService extends BaseController {
 
         server.addEventListener("lobby/join", JoinForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
-            sessionToUsername.put(sessionId, event.uid);
-            usernameToClient.put(event.uid, client);
-            usernameToHook.put(event.uid, event.hook);
+            sessionToUid.put(sessionId, event.uid);
+            uidToClient.put(event.uid, client);
+            uidToHook.put(event.uid, event.hook);
             lobby.join(
-                    get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
-                    Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
-                    Optional.ofNullable(event.hook).filter(h -> !h.isEmpty())
+                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
+                get(Optional.ofNullable(event.username)),
+                get(Optional.ofNullable(event.hook))
             );
         });
 
@@ -55,7 +56,7 @@ public class SocketIOService extends BaseController {
 
     }
 
-    public record JoinForm(String uid, Integer version, String hook) {}
+    public record JoinForm(String uid, Integer version, String username, String hook) {}
 
     public record LobbyTalkForm(String t, Data d) {
         public record Data(String txt, String u) {}
@@ -69,16 +70,16 @@ public class SocketIOService extends BaseController {
     private DisconnectListener onDisconnected() {
         return client -> {
             String sessionId = client.getSessionId().toString();
-            String username = sessionToUsername.get(sessionId);
+            String username = sessionToUid.get(sessionId);
             lobby.quit(username);
-            usernameToClient.remove(username);
-            sessionToUsername.remove(sessionId);
-            usernameToHook.remove(username);
+            uidToClient.remove(username);
+            sessionToUid.remove(sessionId);
+            uidToHook.remove(username);
         };
     }
 
     public void addToRoom(String room, String username) {
-        usernameToClient.get(username).joinRoom(room);
+        uidToClient.get(username).joinRoom(room);
     }
 
     public void sendMessage(String room, Object msg) {
@@ -86,7 +87,7 @@ public class SocketIOService extends BaseController {
     }
 
     public void sendMessageToClient(String username, Object msg) {
-        SocketIOClient client = usernameToClient.get(username);
+        SocketIOClient client = uidToClient.get(username);
         if (client != null) client.sendEvent("send-message", msg);
     }
 

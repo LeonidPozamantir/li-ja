@@ -9,7 +9,6 @@ import leo.lija.app.db.UserRepo;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.lobby.Hub;
 import leo.lija.app.memo.HookMemo;
-import leo.lija.app.memo.UsernameMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -27,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class Cron {
 
     private final UserRepo userRepo;
-    private final UsernameMemo usernameMemo;
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;
     private final GameFinishCommand gameFinishCommand;
@@ -66,7 +64,9 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.frequency.online-username}")
     void onlineUsername() {
-        userRepo.updateOnlineUserNames(usernameMemo.keys());
+        CompletableFuture.supplyAsync(lobbyHub::getUsernames)
+            .thenAccept(userRepo::updateOnlineUserNames)
+            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     @Scheduled(fixedRateString = "${cron.frequency.game-cleanup-unplayed}")

@@ -1,8 +1,6 @@
 package leo.lija.app;
 
 import leo.lija.app.memo.AliveMemo;
-import leo.lija.app.memo.HookMemo;
-import leo.lija.app.memo.UsernameMemo;
 import leo.lija.app.memo.WatcherMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,6 @@ import java.util.stream.Collectors;
 public class Pinger {
 
     private final AliveMemo aliveMemo;
-    private final UsernameMemo usernameMemo;
     private final WatcherMemo watcherMemo;
 
     public Map<String, Object> ping(
@@ -26,7 +23,6 @@ public class Pinger {
         Optional<String> getNbWatchers
     ) {
         playerKey.ifPresent(aliveMemo::put);
-        username.ifPresent(usernameMemo::put);
         watcherKey.ifPresent(watcherMemo::put);
         return flatten(Map.of(
             "nbw", getNbWatchers.map(watcherMemo::count)

@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +38,17 @@ public class Hub {
             .toList();
     }
 
-    public void join(String uid, Integer version, Optional<String> hookOwnerId) {
+    public Set<String> getUsernames() {
+        return members.values().stream()
+            .filter(m -> m.username().isPresent())
+            .map(m -> m.username().get())
+            .collect(Collectors.toSet());
+    }
+
+    public void join(String uid, Integer version, Optional<String> username, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
         history.since(version).forEach(m -> socketService.sendMessage("lobby", m));
-        members.put(uid, new Member(uid, hookOwnerId));
+        members.put(uid, new Member(uid, username, hookOwnerId));
     }
 
     public void talk(String txt, String u) {

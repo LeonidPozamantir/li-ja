@@ -22,8 +22,8 @@ public class Lobby {
         socketIOService.setLobby(this);
     }
 
-    public void join(String uid, Integer version, Optional<String> hook) {
-        hub.join(uid, version, hook);
+    public void join(String uid, Integer version, Optional<String> username, Optional<String> hook) {
+        hub.join(uid, version, username, hook);
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
