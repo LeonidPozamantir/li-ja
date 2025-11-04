@@ -9,13 +9,13 @@ import leo.lija.app.entities.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -27,18 +27,12 @@ public class Hub {
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
 
-    public List<String> getHooks() {
-        return members.values().stream()
-            .filter(m -> m.hookOwnerId().isPresent())
-            .map(m -> m.hookOwnerId().get())
-            .toList();
+    public void withHooks(Consumer<Collection<String>> op) {
+        op.accept(hookOwnerIds());
     }
 
-    public Set<String> getUsernames() {
-        return members.values().stream()
-            .filter(m -> m.username().isPresent())
-            .map(m -> m.username().get())
-            .collect(Collectors.toSet());
+    public void withUsernames(Consumer<Collection<String>> op) {
+        op.accept(usernames());
     }
 
     public void join(String uid, Integer version, Optional<String> username, Optional<String> hookOwnerId) {
@@ -92,7 +86,7 @@ public class Hub {
         members.remove(uid);
     }
 
-    public void notifyMember(String t, Object data, Member member) {
+    private void notifyMember(String t, Object data, Member member) {
         Map<String, Object> msg = Map.of(
                 "t", t,
                 "d", data
@@ -100,7 +94,7 @@ public class Hub {
         socketService.sendMessageToClient(member.uid(), msg);
     }
 
-    public void notifyAll(String t, Object data) {
+    private void notifyAll(String t, Object data) {
         Map<String, Object> msg = makeMessage(t, data);
         socketService.sendMessage("lobby", msg);
     }
@@ -108,6 +102,20 @@ public class Hub {
     private void notifyVersion(String t, Object data) {
         Map<String, Object> vmsg = history.add(makeMessage(t, data));
         socketService.sendMessage("lobby", vmsg);
+    }
+
+    private List<String> hookOwnerIds() {
+        return members.values().stream()
+                .filter(m -> m.hookOwnerId().isPresent())
+                .map(m -> m.hookOwnerId().get())
+                .toList();
+    }
+
+    private List<String> usernames() {
+        return members.values().stream()
+                .filter(m -> m.username().isPresent())
+                .map(m -> m.username().get())
+                .toList();
     }
 
     private Map<String, Object> makeMessage(String t, Object data) {

@@ -30,7 +30,6 @@ public class Cron {
     private final GameRepo gameRepo;
     private final GameFinishCommand gameFinishCommand;
     private final RemoteAi remoteAi;
-    private final AiService aiService;
     private final Fisherman lobbyFisherman;
     private final Hub lobbyHub;
     private final TaskExecutor actionsExecutor;
@@ -40,8 +39,7 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.frequency.hook-tick}")
     void hookTick() {
-        CompletableFuture.supplyAsync(lobbyHub::getHooks)
-            .thenAccept(hookMemo::putAll)
+        CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
@@ -62,8 +60,7 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.frequency.online-username}")
     void onlineUsername() {
-        CompletableFuture.supplyAsync(lobbyHub::getUsernames)
-            .thenAccept(userRepo::updateOnlineUserNames)
+        CompletableFuture.runAsync(() -> lobbyHub.withUsernames(userRepo::updateOnlineUserNames), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
