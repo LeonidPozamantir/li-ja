@@ -132,8 +132,8 @@ public class Finisher extends IOTools {
                     gameRepo.setEloDiffs(game.getId(), whiteElo - whiteUser.getElo(), blackElo - blackUser.getElo());
                     userRepo.setElo(whiteUserId, whiteElo);
                     userRepo.setElo(blackUserId, blackElo);
-                    historyRepo.addEntry(whiteUser.getUsername(), whiteElo, game.getId());
-                    historyRepo.addEntry(blackUser.getUsername(), blackElo, game.getId());
+                    historyRepo.addEntry(whiteUser.getUserNameCanonical(), whiteElo, game.getId());
+                    historyRepo.addEntry(blackUser.getUserNameCanonical(), blackElo, game.getId());
                     return null;
                 })
             );
