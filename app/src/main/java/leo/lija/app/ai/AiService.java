@@ -21,15 +21,12 @@ public class AiService {
     @Value("${ai.use}")
     private String aiUse;
 
-    @Setter
-    private boolean remoteAiHealth = false;
-
     public Pair<Game, Move> apply(DbGame dbGame) {
-        Ai ai;
-        if (aiUse.equals("remote")) {
-            ai = remoteAiHealth ? remoteAi : craftyAi;
-        } else if (aiUse.equals("crafty")) ai = craftyAi;
-        else ai = stupidAi;
+        Ai ai = switch (aiUse) {
+            case "remote" -> remoteAi.or(craftyAi);
+            case "crafty" -> craftyAi;
+            default -> stupidAi;
+        };
         return ai.apply(dbGame);
     }
 }

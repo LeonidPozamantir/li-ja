@@ -11,7 +11,11 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class RemoteAi extends FenBased implements Ai {
     
-    RestClient restClient;
+    private final RestClient restClient;
+
+    // indicates whether the remote AI is healthy
+    // frequently updated by a cron
+    private boolean health = false;
 
     public RemoteAi(String remoteUrl) {
         restClient = RestClient.builder()
@@ -28,6 +32,18 @@ public class RemoteAi extends FenBased implements Ai {
         return applyFen(oldGame, strMove);
     }
 
+    public Ai or(Ai fallback) {
+        return health ? this : fallback;
+    }
+
+    public void diagnose() {
+        boolean h = healthCheck();
+        if (h) {
+            if (!health) System.out.println("remote AI is up");
+        } else System.out.println("remote AI is down");
+        health = h;
+    }
+
     private String fetchMove(String oldFen, int level) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -38,7 +54,7 @@ public class RemoteAi extends FenBased implements Ai {
                 .body(String.class);
     }
 
-    public boolean health() {
+    private boolean healthCheck() {
         try {
             fetchMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq", 1);
         } catch (Exception e) {

@@ -80,9 +80,6 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.frequency.remote-ai-health}")
     void remoteAiHealth() {
-        boolean health = remoteAi.health();
-        aiService.setRemoteAiHealth(health);
-        if (health) System.out.println("remote AI is up");
-        else System.out.println("remote AI is down");
+        remoteAi.diagnose();
     }
 }
