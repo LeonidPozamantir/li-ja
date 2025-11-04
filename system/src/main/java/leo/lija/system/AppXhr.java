@@ -7,12 +7,13 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.ai.AiService;
 import leo.lija.system.db.GameRepo;
-import leo.lija.system.db.RoomRepo;
 import leo.lija.system.entities.DbGame;
+import leo.lija.system.entities.DbPlayer;
 import leo.lija.system.entities.Pov;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.MoretimeEvent;
+import leo.lija.system.entities.event.ReloadTableEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
@@ -30,7 +31,7 @@ import static leo.lija.chess.Pos.posAt;
 public class AppXhr extends IOTools {
 
     private final Messenger messenger;
-    private final Ai ai;
+    private final AiService ai;
     private final Finisher finisher;
     private final AliveMemo aliveMemo;
     private final int moretimeSeconds;
@@ -38,7 +39,7 @@ public class AppXhr extends IOTools {
     public AppXhr(
             GameRepo gameRepo,
             Messenger messenger,
-            Ai ai,
+            AiService ai,
             Finisher finisher,
             VersionMemo versionMemo,
             AliveMemo aliveMemo,
@@ -68,8 +69,12 @@ public class AppXhr extends IOTools {
             Game newChessGame = newChessGameAndMove.getFirst();
             Move move = newChessGameAndMove.getSecond();
             g1.update(newChessGame, move);
+            aliveMemo.put(g1.getId(), color);
 
-            if (g1.player().isAi() && g1.playable()) {
+            if (g1.finished()) {
+                save(g1);
+                finisher.moveFinish(g1, color);
+            } else if (g1.player().isAi() && g1.playable()) {
                 Pair<Game, Move> aiResult;
                 try {
                     aiResult = ai.apply(g1);
@@ -79,9 +84,9 @@ public class AppXhr extends IOTools {
                 newChessGame = aiResult.getFirst();
                 move = aiResult.getSecond();
                 g1.update(newChessGame, move);
-            }
-            save(g1);
-            aliveMemo.put(g1.getId(), color);
+                save(g1);
+                finisher.moveFinish(g1, color.getOpposite());
+            } else save(g1);
         });
     }
 
@@ -97,16 +102,72 @@ public class AppXhr extends IOTools {
         attempt(fullId, finisher::forceResign);
     }
 
-    public void claimDraw(String fullId) {
-        attempt(fullId, finisher::claimDraw);
+    public void outoftime(String fullId) {
+        attempt(fullId, p -> finisher.outoftime(p.game()));
     }
 
-    public void outoftime(String fullId) {
-        attempt(fullId, finisher::outoftime);
+    public void drawClaim(String fullId) {
+        attempt(fullId, finisher::drawClaim);
     }
 
     public void drawAccept(String fullId) {
         attempt(fullId, finisher::drawAccept);
+    }
+
+    public void drawOffer(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (game.playerCanOfferDraw(color)) {
+                if (game.player(color.getOpposite()).getIsOfferingDraw()) finisher.drawAccept(pov);
+                else {
+                    messenger.systemMessages(game, "Draw offer sent");
+                    game.updatePlayer(color, p -> p.offerDraw(game.getTurns()));
+                    game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                    save(game);
+                }
+            } else {
+                throw new AppException("invalid draw offer " + fullId);
+            }
+        });
+    }
+
+    public void drawCancel(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (pov.player().getIsOfferingDraw()) {
+                messenger.systemMessages(game, "Draw offer cancelled");
+                game.updatePlayer(color, p -> {
+                    DbPlayer res = p.copy();
+                    res.setIsOfferingDraw(false);
+                    return res;
+                });
+                game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                save(game);
+            } else {
+                throw new AppException("no draw offer to cancel " + fullId);
+            }
+        });
+    }
+
+    public void drawDecline(String fullId) {
+        attempt(fullId, pov -> {
+            DbGame game = pov.game();
+            Color color = pov.color();
+            if (game.player(color.getOpposite()).getIsOfferingDraw()) {
+                messenger.systemMessages(game, "Draw offer declined");
+                game.updatePlayer(color.getOpposite(), p -> {
+                    DbPlayer res = p.copy();
+                    res.setIsOfferingDraw(false);
+                    return res;
+                });
+                game.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
+                save(game);
+            } else {
+                throw new AppException("no draw offer to decline " + fullId);
+            }
+        });
     }
 
     public void talk(String fullId, String message) {
@@ -123,6 +184,7 @@ public class AppXhr extends IOTools {
                Clock newClock = clock.giveTime(color, moretimeSeconds);
                pov.game().withEvents(List.of(new MoretimeEvent(color, moretimeSeconds)));
                pov.game().withClock(newClock);
+               messenger.systemMessage(pov.game(), "%s + %d seconds".formatted(color, moretimeSeconds));
                save(pov.game());
                return newClock.remainingTime(color);
            }).orElseThrow(() -> new AppException("cannot add more time"));

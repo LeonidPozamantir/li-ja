@@ -20,7 +20,7 @@ public class PgnDump {
 
         String pgn;
         if (m.castles()) pgn = m.orig().toRight(m.dest()) ? "O-O-O" : "O-O";
-        else if (m.enpassant()) pgn = m.orig().file() + "x" + m.dest().rank();
+        else if (m.enpassant()) pgn = m.orig().file() + "x" + m.dest().key();
         else if (m.promotion().isPresent()) pgn = m.dest().key() + m.promotion().get().pgn();
         else if (m.piece().role().equals(PAWN)) pgn = (m.captures() ? m.orig().file() + "x" : "") + m.dest().key();
         else pgn = m.piece().role().pgn() + disambiguate(situation, m) + (m.captures() ? "x" : "") + m.dest().key();

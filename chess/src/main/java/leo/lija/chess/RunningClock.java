@@ -2,6 +2,9 @@ package leo.lija.chess;
 
 import java.util.Optional;
 
+import static leo.lija.chess.Color.BLACK;
+import static leo.lija.chess.Color.WHITE;
+
 public class RunningClock extends Clock {
 
     public RunningClock(int limit, int increment, Color color, float whiteTime, float blackTime) {
@@ -27,7 +30,13 @@ public class RunningClock extends Clock {
 
     @Override
     public PausedClock stop() {
-        return new PausedClock(limit, increment, color, whiteTime, blackTime);
+        return new PausedClock(
+            limit,
+            increment,
+            color,
+            whiteTime + (color == WHITE ? (float) (now() - timer) : 0),
+            blackTime + (color == BLACK ? (float) (now() - timer) : 0)
+        );
     }
 
     @Override

@@ -115,7 +115,7 @@ class BoardTest {
     @Test
     @DisplayName("allow a pawn to be promoted to a queen")
     void promoteToQueen() {
-        Board b = Board.empty().placeAt(new Piece(WHITE, PAWN), A7).promote(A7, A8).get();
+        Board b = Board.empty().placeAt(new Piece(WHITE, PAWN), A8).promote(A8).get();
         assertThat(b.at(A8)).contains(WHITE.queen());
     }
 

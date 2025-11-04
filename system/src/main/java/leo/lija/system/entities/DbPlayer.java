@@ -81,4 +81,11 @@ public class DbPlayer {
         return res;
     }
 
+    public DbPlayer offerDraw(int turn) {
+        DbPlayer res = copy();
+        res.isOfferingDraw = true;
+        res.lastDrawOffer = Optional.of(turn);
+        return res;
+    }
+
 }

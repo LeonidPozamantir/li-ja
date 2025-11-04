@@ -34,27 +34,29 @@ public class AppSyncer {
     @Value("${sync.sleep}")
     int sleep;
 
-    public Map<String, Object> sync(String gameId, String colorString, Integer version, Optional<String> fullId) {
-        Color color = Color.apply(colorString).orElseThrow(() -> new AppException("Invalid color"));
-        versionWait(gameId, color, version);
-        Pov pov = gameRepo.pov(gameId, color);
-        boolean isPrivate = pov.isPlayerFullId(fullId);
-        versionMemo.put(pov.game());
-        return pov.player().eventStack().eventsSince(version).map(events -> {
-                Map<String, Object> res = new HashMap<>();
-                res.putAll(Map.of(
-                    "v", pov.player().eventStack().lastVersion(),
-                    "e", renderEvents(events, isPrivate),
-                    "p", pov.game().player().getColor().name(),
-                    "t", pov.game().getTurns(),
-                    "oa", aliveMemo.activity(pov.game(), color.getOpposite())
-                ));
-                res.put("c", pov.game().getClock().map(clock -> clock.remainingTimes().entrySet().stream()
-                    .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
-                res.entrySet().removeIf(e -> e.getValue() == null);
-                return res;
-            }
-        ).orElse(Map.of("reload", true));
+    public Optional<Map<String, Object>> sync(String gameId, String colorString, Integer version, Optional<String> fullId) {
+        return Color.apply(colorString).flatMap(color -> {
+            versionWait(gameId, color, version);
+            return gameRepo.povOption(gameId, color)
+                .map(pov -> {
+                    versionMemo.put(pov.game());
+                    return pov.player().eventStack().eventsSince(version).map(events -> {
+                            Map<String, Object> res = new HashMap<>();
+                            res.putAll(Map.of(
+                                "v", pov.player().eventStack().lastVersion(),
+                                "e", renderEvents(events, pov.isPlayerFullId(fullId)),
+                                "p", pov.game().player().getColor().name(),
+                                "t", pov.game().getTurns(),
+                                "oa", aliveMemo.activity(pov.game(), color.getOpposite())
+                            ));
+                            res.put("c", pov.game().getClock().map(clock -> clock.remainingTimes().entrySet().stream()
+                                .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()))).orElse(null));
+                            res.entrySet().removeIf(e -> e.getValue() == null);
+                            return res;
+                        }
+                    ).orElse(Map.of("reload", true));
+                });
+        });
     }
 
     private List<Map<String, Object>> renderEvents(List<Event> events, boolean isPrivate) {

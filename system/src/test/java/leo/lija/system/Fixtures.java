@@ -188,7 +188,7 @@ public class Fixtures {
         return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), promotion, Optional.empty(), false);
     }
 
-    public Move newMoveWithCastle(Piece piece, Pos orig, Pos dest, Optional<Pair<Pos, Pos>> castle) {
+    public Move newMoveWithCastle(Piece piece, Pos orig, Pos dest, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle) {
         return new Move(piece, orig, dest, new Board(), new Board(), Optional.empty(), Optional.empty(), castle, false);
     }
 

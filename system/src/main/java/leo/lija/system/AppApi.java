@@ -12,6 +12,7 @@ import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.VersionMemo;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +30,22 @@ public class AppApi extends IOTools {
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
     private final Starter starter;
+
+    public Map<String, Object> show(String fullId) {
+        Pov pov = gameRepo.pov(fullId);
+        aliveMemo.put(pov.game().getId(), pov.color());
+        List<Room.RoomMessage> roomData = messenger.render(pov.game().getId());
+        Map<String, Object> res = new HashMap<>(Map.of(
+            "stackVersion", pov.player().eventStack().lastVersion(),
+            "roomData", roomData,
+            "opponentActivity", aliveMemo.activity(pov.game().getId(), pov.color().getOpposite())
+        ));
+        if (pov.game().playableBy(pov.player())) {
+            res.put("possibleMoves", pov.game().toChess().situation().destinations().entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::toString).collect(Collectors.joining()))));
+        }
+        return res;
+    }
 
     public void join(String fullId, String url, String messages, String entryData) {
         Pov pov = gameRepo.pov(fullId);
@@ -59,6 +76,8 @@ public class AppApi extends IOTools {
             List.of(new RedirectEvent(whiteRedirect)),
             List.of(new RedirectEvent(blackRedirect))
         );
+        // tell spectators to reload the table
+        g1.withEvents(List.of(new ReloadTableEvent()));
         save(g1);
         messenger.systemMessages(newGame, messageString);
         starter.start(newGame, entryData);
@@ -71,37 +90,25 @@ public class AppApi extends IOTools {
         versionMemo.put(gameRepo.game(gameId));
     }
 
-    public void alive(String gameId, String colorName) {
-        Color color = ioColor(colorName);
-        aliveMemo.put(gameId, color);
-    }
-
-    public void draw(String gameId, String colorName, String messages) {
-        Color color = ioColor(colorName);
-        DbGame g1 = gameRepo.game(gameId);
-        messenger.systemMessages(g1, messages);
-        g1.withEvents(color.getOpposite(), List.of(new ReloadTableEvent()));
-        save(g1);
-    }
-
-    public int activity(String gameId, String colorName) {
-        return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
-    }
-
-    public List<Room.RoomMessage> room(String gameId) {
-        return messenger.render(gameId);
-    }
-
     public void reloadTable(String gameId) {
         DbGame g1 = gameRepo.game(gameId);
         g1.withEvents(List.of(new ReloadTableEvent()));
         save(g1);
     }
 
-    public Map<String, Object> possibleMoves(String gameId, String colorName) {
+    public void alive(String gameId, String colorName) {
         Color color = ioColor(colorName);
-        DbGame game = gameRepo.game(gameId);
-        return game.toChess().situation().destinations().entrySet().stream()
-            .collect(Collectors.toMap(e -> e.getKey().key(), e -> e.getValue().stream().map(Pos::toString).collect(Collectors.joining())));
+        aliveMemo.put(gameId, color);
     }
+
+    public int playerVersion(String gameId, String colorName) {
+        Color color = ioColor(colorName);
+        Pov pov = gameRepo.pov(gameId, color);
+        return pov.player().eventStack().lastVersion();
+    }
+
+    public int activity(String gameId, String colorName) {
+        return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
+    }
+
 }

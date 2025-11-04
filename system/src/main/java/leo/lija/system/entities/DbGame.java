@@ -10,12 +10,10 @@ import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
-import leo.lija.chess.Side;
 import leo.lija.chess.Situation;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.entities.event.EndEvent;
 import leo.lija.system.entities.event.Event;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.entities.event.ReloadTableEvent;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static leo.lija.chess.Color.BLACK;
@@ -54,13 +51,12 @@ public class DbGame {
     private String castles;
     private boolean isRated;
     private Variant variant;
-    private Optional<String> winnerId;
 
     public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD, Optional.empty());
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD);
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant, Optional<String> winnerId) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -75,11 +71,10 @@ public class DbGame {
         this.castles = castles;
         this.isRated = isRated;
         this.variant = variant;
-        this.winnerId = winnerId;
     }
 
     public DbGame copy() {
-        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant, winnerId);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant);
     }
 
     public List<DbPlayer> players() {
@@ -196,8 +191,8 @@ public class DbGame {
         Situation situation = game.situation();
         List<Event> events = new ArrayList<>(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
-        whitePlayer = updatePlayer(game, whitePlayer, events);
-        blackPlayer = updatePlayer(game, blackPlayer, events);
+        whitePlayer = copyPlayer(game, whitePlayer, events);
+        blackPlayer = copyPlayer(game, blackPlayer, events);
         pgn = game.getPgnMoves();
         turns = game.getTurns();
         positionHashes = history.positionHashes().mkString();
@@ -217,7 +212,7 @@ public class DbGame {
         }
     }
 
-    private DbPlayer updatePlayer(Game game, DbPlayer player, List<Event> events) {
+    private DbPlayer copyPlayer(Game game, DbPlayer player, List<Event> events) {
         String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
 
         List<Event> newEvents = new ArrayList<>(events);
@@ -242,8 +237,17 @@ public class DbGame {
         blackPlayer.withEvents(blackEvents);
     }
 
+    public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {
+        if (color == WHITE) whitePlayer = f.apply(whitePlayer);
+        if (color == BLACK) blackPlayer = f.apply(blackPlayer);
+    }
+
     public boolean playable() {
         return status.id() < Status.ABORTED.id();
+    }
+
+    public boolean playableBy(DbPlayer p) {
+        return playable() && player().getUserId().equals(p.getUserId());
     }
 
     public Optional<Integer> aiLevel() {
@@ -280,10 +284,8 @@ public class DbGame {
     public DbGame finish(Status status, Optional<Color> winner) {
         DbGame res = copy();
         res.status = status;
-        res.winnerId = winner.flatMap(c -> player(c).getUserId());
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);
-        res.positionHashes = "";
         res.clock = clock.map(Clock::stop);
         res.withEvents(List.of(new EndEvent()));
         return res;
@@ -304,7 +306,7 @@ public class DbGame {
     public Optional<DbPlayer> outoftimePlayer() {
         return clock
             .filter(c -> playable())
-            .filter(c -> c.outoftime(player().getColor()))
+            .filter(c -> !c.isRunning() || c.outoftime(player().getColor()))
             .map(c -> player());
     }
 

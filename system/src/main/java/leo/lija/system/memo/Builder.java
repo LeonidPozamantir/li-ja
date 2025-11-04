@@ -25,7 +25,7 @@ public class Builder {
 
     public static <K, V> Cache<K, V> expiry(int ttl) {
         return CacheBuilder.newBuilder()
-            .expireAfterWrite(ttl, TimeUnit.MILLISECONDS)
+            .expireAfterWrite(ttl, TimeUnit.SECONDS)
             .build();
     }
 }

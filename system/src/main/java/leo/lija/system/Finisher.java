@@ -5,18 +5,15 @@ import leo.lija.chess.EloCalculator;
 import leo.lija.chess.utils.Pair;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.db.HistoryRepo;
-import leo.lija.system.db.RoomRepo;
 import leo.lija.system.db.UserRepo;
 import leo.lija.system.entities.DbGame;
 import leo.lija.system.entities.Pov;
 import leo.lija.system.entities.Status;
 import leo.lija.system.entities.User;
-import leo.lija.system.entities.event.MessageEvent;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.AliveMemo;
 import leo.lija.system.memo.FinisherLock;
 import leo.lija.system.memo.VersionMemo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,17 +23,23 @@ import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
 @Service
-@RequiredArgsConstructor
-public class Finisher {
+public class Finisher extends IOTools {
 
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
-    private final GameRepo gameRepo;
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
-    private final VersionMemo versionMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
+
+    public Finisher(GameRepo gameRepo, VersionMemo versionMemo, HistoryRepo historyRepo, UserRepo userRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
+        super(gameRepo, versionMemo);
+        this.historyRepo = historyRepo;
+        this.userRepo = userRepo;
+        this.messenger = messenger;
+        this.aliveMemo = aliveMemo;
+        this.finisherLock = finisherLock;
+    }
 
     public void abort(Pov pov) {
         if (pov.game().abortable()) finish(pov.game(), Status.ABORTED);
@@ -54,7 +57,7 @@ public class Finisher {
         } else throw new AppException("game is not force-resignable");
     }
 
-    public void claimDraw(Pov pov) {
+    public void drawClaim(Pov pov) {
         DbGame game = pov.game();
         Color color = pov.color();
         if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition()) {
@@ -67,12 +70,21 @@ public class Finisher {
         else throw new AppException("opponent is not proposing a draw");
     }
 
-    public void outoftime(Pov pov) {
-        pov.game().outoftimePlayer().map(player -> {
-            finish(pov.game(), Status.OUTOFTIME,
-                Optional.of(player.getColor().getOpposite()).filter((c) -> pov.game().toChess().getBoard().hasEnoughMaterialToMate(c)));
+    public void outoftime(DbGame game) {
+        game.outoftimePlayer().map(player -> {
+            finish(game, Status.OUTOFTIME,
+                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)));
             return null;
-        }).orElseThrow(() -> new AppException("no outoftime applicable"));
+        }).orElseThrow(() -> new AppException("no outoftime applicable " + game.getClock()));
+    }
+
+    public void outoftimes(List<DbGame> games) {
+        games.forEach(this::outoftime);
+    }
+
+    public void moveFinish(DbGame game, Color color) {
+        if (game.getStatus() == Status.MATE) finish(game, Status.MATE, Optional.of(color));
+        else if (game.getStatus() == Status.STALEMATE || game.getStatus() == Status.DRAW) finish(game, game.getStatus());
     }
 
     private void finish(DbGame game, Status status) {
@@ -88,8 +100,9 @@ public class Finisher {
         finisherLock.lock(game);
         DbGame g2 = game.finish(status, winner);
         message.ifPresent(m -> messenger.systemMessage(g2, m));
-        gameRepo.save(g2);
-        versionMemo.put(g2);
+        save(g2);
+        Optional<String> winnerId = winner.flatMap(c -> g2.player(c).getUserId());
+        gameRepo.finish(g2.getId(), winnerId);
         updateElo(g2);
         incNbGames(g2, WHITE);
         incNbGames(g2, BLACK);
@@ -116,6 +129,7 @@ public class Finisher {
                     );
                     int whiteElo = elos.getFirst();
                     int blackElo = elos.getSecond();
+                    gameRepo.setEloDiffs(game.getId(), whiteElo - whiteUser.getElo(), blackElo - blackUser.getElo());
                     userRepo.setElo(whiteUserId, whiteElo);
                     userRepo.setElo(blackUserId, blackElo);
                     historyRepo.addEntry(whiteUser.getUserNameCanonical(), whiteElo, game.getId());

@@ -3,9 +3,6 @@ sync:
   sleep: 200
 
 lobby:
-  sync:
-    duration: 10000
-    sleep: 250
   message:
     max: 30
   entry:
@@ -26,9 +23,14 @@ memo:
   finisher-lock:
     timeout: 30
 
-crafty:
-  exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
-  book-path:
+ai:
+  server: false
+  use: remote
+  crafty:
+    exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
+    book-path:
+  remote:
+    url:
 
 moretime:
   seconds: 15

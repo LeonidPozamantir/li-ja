@@ -3,6 +3,7 @@ package leo.lija.system;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
+import leo.lija.system.ai.AiService;
 import leo.lija.system.db.EntryRepo;
 import leo.lija.system.db.GameRepo;
 import leo.lija.system.entities.DbGame;
@@ -11,7 +12,6 @@ import leo.lija.system.entities.entry.Entry;
 import leo.lija.system.exceptions.AppException;
 import leo.lija.system.memo.EntryMemo;
 import leo.lija.system.memo.VersionMemo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,14 +19,14 @@ public class Starter extends IOTools {
 
     private final EntryRepo entryRepo;
     private final EntryMemo entryMemo;
-    private final Ai ai;
+    private final AiService ai;
 
     public Starter(
             GameRepo gameRepo,
             EntryRepo entryRepo,
             VersionMemo versionMemo,
             EntryMemo entryMemo,
-            Ai ai) {
+            AiService ai) {
         super(gameRepo, versionMemo);
         this.entryRepo = entryRepo;
         this.entryMemo = entryMemo;

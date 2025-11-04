@@ -14,8 +14,8 @@ import static leo.lija.chess.Role.ROOK;
 
 @Getter
 public enum Color {
-    WHITE(2, 5, 7, 'w', "white"),
-    BLACK(7, 4, 2, 'b', "black");
+    WHITE(2, 5, 8, 'w', "white"),
+    BLACK(7, 4, 1, 'b', "black");
 
     public Piece of(Role role) {
         return new Piece(this, role);

@@ -111,6 +111,10 @@ public class Pos {
             .toList();
     }
 
+    public boolean nextTo(Pos other) {
+        return Math.abs(x - other.x) == 1;
+    }
+
     public String file() {
         if (cachedFile.isEmpty()) cachedFile = Optional.of(xToString(x));
         return cachedFile.get();

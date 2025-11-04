@@ -31,5 +31,5 @@ public class EntryGame {
     @Column(nullable = false)
     private Boolean rated;
 
-    private List<Integer> clock;
+    private String clock;
 }

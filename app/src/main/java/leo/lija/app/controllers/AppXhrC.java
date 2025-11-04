@@ -6,8 +6,11 @@ import leo.lija.app.forms.TalkForm;
 import leo.lija.system.AppSyncer;
 import leo.lija.system.AppXhr;
 import leo.lija.system.Pinger;
+import leo.lija.system.ai.CraftyServer;
+import leo.lija.system.db.GameRepo;
 import leo.lija.system.memo.AliveMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,15 +33,26 @@ public class AppXhrC extends BaseController {
     private final AppSyncer syncer;
     private final Pinger pinger;
     private final AliveMemo aliveMemo;
+    private final TaskExecutor executor;
+    private final GameRepo gameRepo;
+    private final CraftyServer craftyServer;
 
     @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
-    public Map<String, Object> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
-        return syncer.sync(gameId, color, version, Optional.of(fullId));
+    public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
+        return syncAll(gameId, color, version, Optional.of(fullId));
     }
 
     @GetMapping("/sync/{gameId}/{color}/{version}")
-    public Map<String, Object> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
-        return syncer.sync(gameId, color, version, Optional.empty());
+    public ResponseEntity<Map<String, Object>> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
+        return syncAll(gameId, color, version, Optional.empty());
+    }
+
+    private ResponseEntity<Map<String, Object>> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
+        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId), executor)
+            .thenApply(mapOption -> mapOption
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build())
+            ).join();
     }
 
     @PostMapping("/move/{fullId}")
@@ -45,39 +61,60 @@ public class AppXhrC extends BaseController {
             return ResponseEntity.badRequest().body("Invalid move");
         }
 
-        xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
+        return CompletableFuture.supplyAsync(() -> {
+            xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
+            return ResponseEntity.ok().body("ok");
+        }).join();
 
-        return ResponseEntity.ok().body("ok");
+    }
+
+    @PostMapping("/outoftime/{fullId}")
+    public void outoftime(@PathVariable String fullId) {
+        xhr.outoftime(fullId);
     }
 
     @GetMapping("/abort/{fullId}")
     public ResponseEntity<Void> abort(@PathVariable String fullId) {
-        return validRedir(() -> xhr.abort(fullId), fullId);
-    }
-
-    @PostMapping("/outoftime/{fullId}")
-    public ResponseEntity<Void> outoftime(@PathVariable String fullId) {
-        return validRedir(() -> xhr.outoftime(fullId), fullId);
+        return validAndRedirect(fullId, xhr::abort);
     }
 
     @GetMapping("/resign/{fullId}")
     public ResponseEntity<Void> resign(@PathVariable String fullId) {
-        return validRedir(() -> xhr.resign(fullId), fullId);
+        return validAndRedirect(fullId, xhr::resign);
     }
 
-    @GetMapping("/force-resign/{fullId}")
+    @GetMapping("/resign-force/{fullId}")
     public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
-        return validRedir(() -> xhr.forceResign(fullId), fullId);
+        return validAndRedirect(fullId, xhr::forceResign);
     }
 
-    @GetMapping("/claim-draw/{fullId}")
-    public ResponseEntity<Void> claimDraw(@PathVariable String fullId) {
-        return validRedir(() -> xhr.claimDraw(fullId), fullId);
+    @GetMapping("/draw-claim/{fullId}")
+    public ResponseEntity<Void> drawClaim(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawClaim);
     }
 
     @GetMapping("/draw-accept/{fullId}")
     public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
-        return validRedir(() -> xhr.drawAccept(fullId), fullId);
+        return validAndRedirect(fullId, xhr::drawAccept);
+    }
+
+    @GetMapping("/draw-offer/{fullId}")
+    public ResponseEntity<Void> drawOffer(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawOffer);
+    }
+
+    @GetMapping("/draw-cancel/{fullId}")
+    public ResponseEntity<Void> drawCancel(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawCancel);
+    }
+
+    @GetMapping("/draw-decline/{fullId}")
+    public ResponseEntity<Void> drawDecline(@PathVariable String fullId) {
+        return validAndRedirect(fullId, xhr::drawDecline);
+    }
+
+    private ResponseEntity<Void> validAndRedirect(String fullId, Consumer<String> f) {
+        return validRedir(() -> f.accept(fullId), fullId);
     }
 
     @PostMapping("/talk/{fullId}")
@@ -86,9 +123,8 @@ public class AppXhrC extends BaseController {
     }
 
     @PostMapping("/moretime/{fullId}")
-    public String moretime(@PathVariable String fullId) {
-        float time = xhr.moretime(fullId);
-        return String.valueOf(time);
+    public float moretime(@PathVariable String fullId) {
+        return xhr.moretime(fullId);
     }
 
     @GetMapping("/ping")
@@ -103,8 +139,13 @@ public class AppXhrC extends BaseController {
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
-    public String nbPlayers() {
-        return String.valueOf(aliveMemo.count());
+    public long nbPlayers() {
+        return aliveMemo.count();
+    }
+
+    @GetMapping("/how-many-games-now")
+    public int nbGames() {
+        return gameRepo.countPlaying();
     }
 
 }

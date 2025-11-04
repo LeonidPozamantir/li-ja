@@ -4,24 +4,28 @@ spring:
   datasource:
     generate-unique-name: false
     name: lija
+    hikari:
+      maximum-pool-size: 100
+      connection-timeout: 15000
   mvc:
     throw-exception-if-no-handler-found: true
     static-path-pattern: /assets/**
 
-sync:
+server:
+  tomcat:
+    connection-timeout: 2s
+
+sync: #milliseconds
   duration: 7000
   sleep: 200
 
 lobby:
-  sync:
-    duration: 10000
-    sleep: 250
   message:
     max: 30
   entry:
     max: 12
 
-memo:
+memo: #seconds
   version:
     timeout: 1800
   alive:
@@ -35,18 +39,32 @@ memo:
     timeout: 6
   finisher-lock:
     timeout: 30
-
-crafty:
-  exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
-  book-path:
+ai:
+  server: false
+  use: remote
+  crafty:
+    exec-path: C:\Leo\Arena\Engines\stockfish_14.1_win_x64_avx2\stockfish_14.1_win_x64_avx2.exe
+    book-path:
+  remote:
+    url:
 
 moretime:
   seconds: 15
 
 cron:
-  online-username:
-    frequency: 2000
-  hook-cleanup-dead:
-    frequency: 2000
-  hook-cleanup-old:
-    frequency: 21000
+  frequency:
+    online-username: 2100ms
+    hook-cleanup-dead: 2s
+    hook-cleanup-old: 21s
+    game-cleanup-unplayed: 2h6m36s
+    game-auto-finish: 1h4m12s
+    remote-ai-health: 10s
+
+async:
+  actions:
+    core-size: 16
+    max-size: 2048
+
+socket:
+  host: 0.0.0.0
+  port: 9092

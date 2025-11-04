@@ -46,19 +46,8 @@ public class Actor {
 			case BISHOP -> longRange(BISHOP.dirs);
 			case QUEEN -> longRange(QUEEN.dirs);
 			case KNIGHT -> shortRange(KNIGHT.dirs);
-			case KING -> Stream.concat(preventsCastle(shortRange(KING.dirs)).stream(), castle().stream()).toList();
-			case ROOK -> {
-				Color color = color();
-				yield board.kingPosOf(color)
-					.flatMap(kingPos -> Side.kingRookSide(kingPos, pos))
-					.filter(side -> board.getHistory().canCastle(color, side))
-					.map(side -> {
-						History h = board.getHistory().withoutCastle(color, side);
-						return longRange(ROOK.dirs).stream()
-							.map(m -> m.withHistory(h))
-							.toList();
-					}).orElse(longRange(ROOK.dirs));
-			}
+			case KING -> Stream.concat(shortRange(KING.dirs).stream(), castle().stream()).toList();
+			case ROOK -> longRange(ROOK.dirs);
 			case PAWN -> pawn();
 		};
 
@@ -143,22 +132,21 @@ public class Actor {
 				}
 				if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
 
-				Optional<Board> newBoard = board.take(rookPos)
-					.flatMap(b -> b.move(kingPos, newKingPos.get()))
-					.flatMap(b -> b.place(color.rook(), newRookPos.get()))
-					.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)));
-				return newBoard.map(b -> moveCastle(newKingPos.get(), b, Optional.of(Pair.of(rookPos, newRookPos.get()))));
+				return board.take(rookPos)
+					.flatMap(b1 -> {
+						Pos p = newKingPos.get();
+						if (p.equals(kingPos)) return Optional.of(Pair.of(b1, rookPos));
+						if (p.nextTo(kingPos)) return b1.move(kingPos, p).map(b -> Pair.of(b, rookPos));
+						return b1.move(kingPos, newKingPos.get()).map(b -> Pair.of(b, p));
+					})
+					.flatMap(b2AndTarget -> {
+						Board b2 = b2AndTarget.getFirst();
+						Pos target = b2AndTarget.getSecond();
+						return b2.place(color.rook(), newRookPos.get())
+							.map(b -> b.updateHistory(b1 -> b1.withoutCastles(color)))
+							.map(b -> moveCastle(target, b, Optional.of(Pair.of(Pair.of(kingPos, newKingPos.get()), Pair.of(rookPos, newRookPos.get())))));
+					});
 			});
-	}
-
-	private List<Move> preventsCastle(List<Move> ms) {
-		if (history().canCastle(color())) {
-			History newHistory = history().withoutCastles(color());
-			return ms.stream()
-				.map(m -> m.withHistory(newHistory))
-				.toList();
-		}
-		return ms;
 	}
 
 	private List<Move> shortRange(List<Function<Pos, Optional<Pos>>> dirs) {
@@ -198,7 +186,7 @@ public class Actor {
 		while (optNext.isPresent() && !friends().contains(optNext.get())) {
 			Pos next = optNext.get();
 			if (enemies().contains(next)) {
-				res.add(move(next, board.taking(pos, next).get(), Optional.of(pos))); // mistake?
+				res.add(move(next, board.taking(pos, next).get(), Optional.of(next)));
 				break;
 			}
 			res.add(move(next, board.moveTo(pos, next)));
@@ -226,14 +214,15 @@ public class Actor {
 	}
 
 	private Optional<Move> forward(Pos p) {
-		if (pos.getY() == color().getPromotablePawnY()) return board.promote(pos, p).map(b -> movePromote(p, b, Optional.of(QUEEN)));
-		return board.move(pos, p).map(b -> move(p, b));
+		return board.move(pos, p).map(b -> move(p, b)).flatMap(this::maybePromote);
 	}
 
 	private Optional<Move> capture(Function<Pos, Optional<Pos>> horizontal, Pos next) {
-		Optional<Pos> optPos = horizontal.apply(next).filter(enemies()::contains);
-		Optional<Board> optBoard = optPos.flatMap(p -> board.taking(pos, p));
-		return optBoard.map(b -> move(optPos.get(), b, optPos));
+		return horizontal.apply(next)
+			.filter(enemies()::contains)
+			.flatMap(p -> board.taking(pos, p)
+				.map(b -> move(p, b, Optional.of(p))))
+			.flatMap(this::maybePromote);
 	}
 
 	private Optional<Move> enpassant(Function<Pos, Optional<Pos>> dir, Pos next, Function<Pos, Optional<Pos>> horizontal) {
@@ -245,8 +234,16 @@ public class Actor {
 			Optional<Pos> optVictimFrom = optVictimPos.flatMap(dir).flatMap(dir);
 			if (!board.getHistory().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))) return Optional.empty();
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
-			return Optional.of(moveEnPassant(optTargetPos.get(), b));
+			return Optional.of(moveEnPassant(optTargetPos.get(), b, optVictimPos));
 		});
+	}
+
+	private Optional<Move> maybePromote(Move m) {
+		if (m.dest().getY() == m.color().getPromotablePawnY()) {
+			return m.after().promote(m.dest()).map(b2 ->
+				m.toBuilder().after(b2).promotion(Optional.of(QUEEN)).build());
+		}
+		return Optional.of(m);
 	}
 
 	private Move move(Pos dest, Board after) {
@@ -257,19 +254,15 @@ public class Actor {
 		return move(dest, after, capture, Optional.empty(), Optional.empty(), false);
 	}
 
-	private Move moveEnPassant(Pos dest, Board after) {
-		return move(dest, after, Optional.empty(), Optional.empty(), Optional.empty(), true);
+	private Move moveEnPassant(Pos dest, Board after, Optional<Pos> capture) {
+		return move(dest, after, capture, Optional.empty(), Optional.empty(), true);
 	}
 
-	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pos, Pos>> castle) {
+	private Move moveCastle(Pos dest, Board after, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle) {
 		return move(dest, after, Optional.empty(), castle, Optional.empty(), false);
 	}
 
-	private Move movePromote(Pos dest, Board after, Optional<Role> promotion) {
-		return move(dest, after, Optional.empty(), Optional.empty(), promotion, false);
-	}
-
-	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pos, Pos>> castle, Optional<Role> promotion, boolean enpassant) {
+	private Move move(Pos dest, Board after, Optional<Pos> capture, Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle, Optional<Role> promotion, boolean enpassant) {
 		return new Move(piece, pos, dest, board, after, capture, promotion, castle, enpassant);
 	}
 

@@ -16,9 +16,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +39,6 @@ public class RawDbGame {
     private List<RawDbPlayer> players;
 
     @NotNull
-    @Column(nullable = false)
     private String pgn;
     private int status;
     private int turns;
@@ -51,8 +52,14 @@ public class RawDbGame {
     private String castles;
     private boolean isRated;
     private int variant;                // v
-    private String winnerId;
+    private String winnerUserId;
     private String initialFen;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public Optional<DbGame> decode() {
         if (players.size() < 2) return Optional.empty();
@@ -67,7 +74,8 @@ public class RawDbGame {
                                     id,
                                     whitePlayer,
                                     blackPlayer,
-                                    pgn, trueStatus,
+                                    Optional.ofNullable(pgn).orElse(""),
+                                    trueStatus,
                                     turns,
                                     validClock,
                                     Optional.ofNullable(lastMove),
@@ -76,8 +84,7 @@ public class RawDbGame {
                                     positionHashes,
                                     castles,
                                     isRated,
-                                    trueVariant,
-                                    Optional.ofNullable(winnerId)
+                                    trueVariant
                                 );
                 })))));
     }
@@ -97,8 +104,10 @@ public class RawDbGame {
             dbGame.getCastles(),
             dbGame.isRated(),
             dbGame.getVariant().id(),
-            dbGame.getWinnerId().orElse(null),
-    null
+            null,
+            null,
+            null,
+            null
         );
     }
 }

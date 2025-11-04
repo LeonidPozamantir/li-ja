@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.WHITE;
 
-// all durations are expressed in milliseconds
+// all durations are expressed in seconds
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode
@@ -45,16 +45,12 @@ public abstract class Clock {
         return time(c);
     }
 
-    public int limitInSeconds() {
-        return limit / 1000;
-    }
-
     public int limitInMinutes() {
-        return limitInSeconds() / 60;
+        return limit / 60;
     }
 
-    public int incrementInSeconds() {
-        return increment / 1000;
+    public int estimateTotalTime() {
+        return limit + 30 * increment;
     }
 
     abstract RunningClock step();
@@ -65,8 +61,12 @@ public abstract class Clock {
 
     public abstract <T extends Clock> T giveTime(Color c, float t);
 
-    public int estimateTotalTime() {
-        return limit + 30 * increment;
+    public String show() {
+        return limitInMinutes() + " + " + increment;
+    }
+
+    public boolean isRunning() {
+        return timerOption.isPresent();
     }
 
     protected double now() {

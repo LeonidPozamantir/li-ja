@@ -26,6 +26,7 @@ import static leo.lija.chess.Pos.posAt;
 import static leo.lija.chess.Role.BISHOP;
 import static leo.lija.chess.Role.KING;
 import static leo.lija.chess.Role.KNIGHT;
+import static leo.lija.chess.Role.PAWN;
 import static leo.lija.chess.Role.QUEEN;
 import static leo.lija.chess.Role.ROOK;
 
@@ -153,13 +154,12 @@ public class Board {
         }
     }
 
-    public Optional<Board> promote(Pos orig, Pos dest) {
-        return Optional.ofNullable(pieces.get(orig))
-            .flatMap(pawn -> {
-                Optional<Board> b1 = move(orig, dest);
-                Optional<Board> b2 = b1.flatMap(b -> b.take(dest));
-                return b2.map(b -> b.placeAt(pawn.color().queen(), dest));
-            });
+    public Optional<Board> promote(Pos pos) {
+        return Optional.ofNullable(pieces.get(pos))
+            .filter(pawn -> pawn.is(PAWN))
+            .flatMap(pawn -> take(pos)
+                .map(b -> b.placeAt(pawn.color().queen(), pos))
+            );
     }
 
     public Map<Color, Set<Pos>> occupation() {

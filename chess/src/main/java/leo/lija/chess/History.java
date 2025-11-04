@@ -94,6 +94,10 @@ public record History (
 		return notation.isEmpty() ? "-" : notation;
 	}
 
+	public History withLastMove(Pos orig, Pos dest) {
+		return new History(Optional.of(Pair.of(orig, dest)), positionHashes, whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
+	}
+
 	public static final int HASH_SIZE = 5;
 
 	public static History castle(Color color, boolean kingSide, boolean queenSide) {
