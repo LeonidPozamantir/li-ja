@@ -47,9 +47,7 @@ public class Cron {
 
     @Scheduled(fixedRateString = "${cron.frequency.heart-beat}")
     void heartBeat() {
-        CompletableFuture.supplyAsync(lobbyHub::getCount, actionsExecutor)
-            .thenAccept(lobbyHub::nbPlayers)
-            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
+        lobbyHub.nbPlayers();
     }
 
     @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-dead}")

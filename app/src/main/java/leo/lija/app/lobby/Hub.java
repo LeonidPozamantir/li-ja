@@ -27,10 +27,6 @@ public class Hub {
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
 
-    public int getCount() {
-        return members.size();
-    }
-
     public List<String> getHooks() {
         return members.values().stream()
             .filter(m -> m.hookOwnerId().isPresent())
@@ -88,8 +84,8 @@ public class Hub {
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
     }
 
-    public void nbPlayers(Integer nb) {
-        notifyAll("nbp", nb);
+    public void nbPlayers() {
+        notifyAll("nbp", members.size());
     }
 
     public void quit(String uid) {

@@ -50,7 +50,4 @@ public class Lobby {
         hub.biteHook(hook, game);
     }
 
-    public void nbPlayers(Integer nb) {
-        hub.nbPlayers(nb);
-    }
 }
