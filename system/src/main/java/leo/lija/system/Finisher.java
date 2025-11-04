@@ -118,8 +118,8 @@ public class Finisher {
                     int blackElo = elos.getSecond();
                     userRepo.setElo(whiteUserId, whiteElo);
                     userRepo.setElo(blackUserId, blackElo);
-                    historyRepo.addEntry(whiteUser.getUsername(), whiteElo, game.getId());
-                    historyRepo.addEntry(blackUser.getUsername(), blackElo, game.getId());
+                    historyRepo.addEntry(whiteUser.getUserNameCanonical(), whiteElo, game.getId());
+                    historyRepo.addEntry(blackUser.getUserNameCanonical(), blackElo, game.getId());
                     return null;
                 })
             );
