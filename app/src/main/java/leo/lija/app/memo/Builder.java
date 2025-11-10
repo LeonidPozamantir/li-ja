@@ -15,7 +15,7 @@ public class Builder {
 
     public static <K, V> LoadingCache<K, V> cache(int ttl, Function<K, V> f) {
         return CacheBuilder.newBuilder()
-            .expireAfterWrite(ttl, TimeUnit.MILLISECONDS)
+            .expireAfterWrite(ttl, TimeUnit.SECONDS)
             .build(new CacheLoader<K, V>() {
                 public V load(K key) {
                     return f.apply(key);

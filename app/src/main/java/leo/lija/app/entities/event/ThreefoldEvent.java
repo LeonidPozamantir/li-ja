@@ -7,14 +7,12 @@ import java.util.Map;
 @EqualsAndHashCode
 public class ThreefoldEvent implements Event {
     @Override
-    public String encode() {
-        return "t";
+    public String typ() {
+        return "threefold_repetition";
     }
 
     @Override
-    public Map<String, Object> export() {
-        return Map.of(
-            "type", "threefold_repetition"
-        );
+    public Map<String, Object> data() {
+        return null;
     }
 }

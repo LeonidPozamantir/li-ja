@@ -5,13 +5,11 @@ import leo.lija.chess.Color;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
-import leo.lija.app.entities.event.Event;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,26 +26,13 @@ public class DbPlayer {
     private String ps;
     private Optional<Integer> aiLevel;
     private Optional<Boolean> isWinner;
-    private String evts;
     private Optional<Integer> elo;
     private Boolean isOfferingDraw;
     private Optional<Integer> lastDrawOffer;
     private Optional<String> userId;
 
     public DbPlayer copy() {
-        return new DbPlayer(id, color, ps, aiLevel, isWinner, evts, elo, isOfferingDraw, lastDrawOffer, userId);
-    }
-
-    public EventStack eventStack() {
-        return EventStack.decode(evts);
-    }
-
-    public String newEvts(List<Event> events) {
-        return eventStack().withEvents(events).optimize().encode();
-    }
-
-    public void withEvents(List<Event> events) {
-        evts = newEvts(events);
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId);
     }
 
     public String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
@@ -83,6 +68,12 @@ public class DbPlayer {
         DbPlayer res = copy();
         res.isOfferingDraw = true;
         res.lastDrawOffer = Optional.of(turn);
+        return res;
+    }
+
+    public DbPlayer removeDrawOffer() {
+        DbPlayer res = copy();
+        res.isOfferingDraw = false;
         return res;
     }
 

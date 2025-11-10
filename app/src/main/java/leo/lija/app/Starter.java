@@ -1,39 +1,38 @@
 package leo.lija.app;
 
 import leo.lija.app.ai.AiService;
-import leo.lija.app.lobby.Lobby;
-import leo.lija.chess.Game;
-import leo.lija.chess.Move;
-import leo.lija.chess.utils.Pair;
 import leo.lija.app.db.EntryRepo;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
+import leo.lija.app.entities.Evented;
 import leo.lija.app.entities.Variant;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.memo.VersionMemo;
+import leo.lija.app.lobby.Socket;
+import leo.lija.chess.Game;
+import leo.lija.chess.Move;
+import leo.lija.chess.utils.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
 public class Starter extends IOTools {
 
     private final EntryRepo entryRepo;
-    private final Lobby lobbySocket;
+    private final Socket lobbySocket;
     private final AiService ai;
 
     public Starter(
             GameRepo gameRepo,
             EntryRepo entryRepo,
-            VersionMemo versionMemo,
-            Lobby lobbySocket,
+            Socket lobbySocket,
             AiService ai) {
-        super(gameRepo, versionMemo);
+        super(gameRepo);
         this.entryRepo = entryRepo;
         this.ai = ai;
         this.lobbySocket = lobbySocket;
     }
 
-    public DbGame start(DbGame game, String entryData) {
+    public Evented start(DbGame game, String entryData) {
         if (game.getVariant() != Variant.STANDARD) gameRepo.saveInitialFen(game);
         Entry.apply(game, entryData).ifPresent(entry -> {
             entryRepo.add(entry);
@@ -48,9 +47,9 @@ public class Starter extends IOTools {
             }
             Game newChessGame = aiResult.getFirst();
             Move move = aiResult.getSecond();
-            game.update(newChessGame, move);
+            return game.update(newChessGame, move);
         }
-        return game;
+        return new Evented(game);
     }
 
 }

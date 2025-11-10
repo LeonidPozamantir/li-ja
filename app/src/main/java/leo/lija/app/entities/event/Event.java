@@ -7,11 +7,15 @@ import leo.lija.chess.Situation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface Event {
-    String encode();
-    Map<String, Object> export();
+    String typ();
+    Object data();
+    default Optional<Color> only() {
+        return Optional.empty();
+    }
 
     static List<Event> fromMove(Move move) {
         return Stream.of(
@@ -30,6 +34,9 @@ public interface Event {
     }
 
     static PossibleMovesEvent possibleMoves(Situation situation, Color color) {
-        return new PossibleMovesEvent(color == situation.getColor() ? situation.destinations() : Map.of());
+        return new PossibleMovesEvent(
+            color,
+            color == situation.getColor() ? situation.destinations() : Map.of()
+        );
     }
 }

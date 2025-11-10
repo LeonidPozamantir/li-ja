@@ -16,12 +16,12 @@ public class MoveEvent implements Event {
     private Color color;
 
     @Override
-    public String encode() {
-        return "m" + orig.getPiotr() + dest.getPiotr() + color.getLetter();
+    public String typ() {
+        return "move";
     }
 
     @Override
-    public Map<String, Object> export() {
+    public Map<String, Object> data() {
         return Map.of(
             "type", "move",
             "from", orig.key(),

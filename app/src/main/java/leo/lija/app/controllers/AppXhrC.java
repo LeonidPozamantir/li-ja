@@ -1,13 +1,10 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
-import leo.lija.app.AppSyncer;
 import leo.lija.app.AppXhr;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.forms.MoveForm;
-import leo.lija.app.forms.TalkForm;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -26,27 +22,7 @@ import java.util.function.Consumer;
 public class AppXhrC extends BaseController {
 
     private final AppXhr xhr;
-    private final AppSyncer syncer;
-    private final TaskExecutor executor;
     private final GameRepo gameRepo;
-
-    @GetMapping("/sync/{gameId}/{color}/{version}/{fullId}")
-    public ResponseEntity<Map<String, Object>> sync(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version, @PathVariable String fullId) {
-        return syncAll(gameId, color, version, Optional.of(fullId));
-    }
-
-    @GetMapping("/sync/{gameId}/{color}/{version}")
-    public ResponseEntity<Map<String, Object>> syncPublic(@PathVariable String gameId, @PathVariable String color, @PathVariable Integer version) {
-        return syncAll(gameId, color, version, Optional.empty());
-    }
-
-    private ResponseEntity<Map<String, Object>> syncAll(String gameId, String color, Integer version, Optional<String> fullId) {
-        return CompletableFuture.supplyAsync(() -> syncer.sync(gameId, color, version, fullId), executor)
-            .thenApply(mapOption -> mapOption
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build())
-            ).join();
-    }
 
     @PostMapping("/move/{fullId}")
     public ResponseEntity<String> move(@PathVariable String fullId, @Valid @RequestBody MoveForm move, BindingResult bindingResult) {
@@ -104,11 +80,6 @@ public class AppXhrC extends BaseController {
     @GetMapping("/draw-decline/{fullId}")
     public ResponseEntity<Void> drawDecline(@PathVariable String fullId) {
         return validAndRedirect(fullId, xhr::drawDecline);
-    }
-
-    @PostMapping("/talk/{fullId}")
-    public void talk(@PathVariable String fullId, @Valid @RequestBody TalkForm talkForm) {
-        xhr.talk(fullId, talkForm.message());
     }
 
     @PostMapping("/moretime/{fullId}")

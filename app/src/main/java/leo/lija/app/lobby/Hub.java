@@ -6,7 +6,8 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
-import lombok.RequiredArgsConstructor;
+import leo.lija.app.socket.History;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service
-@RequiredArgsConstructor
 public class Hub {
 
     private final SocketIOService socketService;
@@ -26,6 +26,12 @@ public class Hub {
     private final History history;
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
+
+    public Hub(SocketIOService socketService, MessageRepo messageRepo, @Value("${lobby.message.lifetime}") int timeout) {
+        this.socketService = socketService;
+        this.messageRepo = messageRepo;
+        this.history = new History(timeout);
+    }
 
     public void withHooks(Consumer<Collection<String>> op) {
         op.accept(hookOwnerIds());
@@ -37,7 +43,7 @@ public class Hub {
 
     public void join(String uid, Integer version, Optional<String> username, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
-        history.since(version).forEach(m -> socketService.sendMessage("lobby", m));
+        history.since(version).forEach(m -> socketService.sendMessageToClient(uid, "lobby", m));
         members.put(uid, new Member(uid, username, hookOwnerId));
     }
 
@@ -84,6 +90,7 @@ public class Hub {
 
     public void quit(String uid) {
         members.remove(uid);
+        socketService.removeFromRoom("lobby", uid);
     }
 
     private void notifyMember(String t, Object data, Member member) {
@@ -91,7 +98,7 @@ public class Hub {
                 "t", t,
                 "d", data
         );
-        socketService.sendMessageToClient(member.uid(), msg);
+        socketService.sendMessageToClient(member.uid(), "lobby", msg);
     }
 
     private void notifyAll(String t, Object data) {

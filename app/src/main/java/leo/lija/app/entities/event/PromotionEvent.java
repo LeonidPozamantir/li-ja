@@ -14,14 +14,13 @@ public class PromotionEvent implements Event {
     private Pos pos;
 
     @Override
-    public String encode() {
-        return "P" + pos.getPiotr() + role.fen;
+    public String typ() {
+        return "promotion";
     }
 
     @Override
-    public Map<String, Object> export() {
+    public Map<String, Object> data() {
         return Map.of(
-            "type", "promotion",
             "key", pos.key(),
             "pieceClass", role.toString().toLowerCase()
         );

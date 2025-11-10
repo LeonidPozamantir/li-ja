@@ -1,6 +1,5 @@
 package leo.lija.app;
 
-import leo.lija.app.ai.AiService;
 import leo.lija.app.ai.RemoteAi;
 import leo.lija.app.command.GameFinishCommand;
 import leo.lija.app.db.GameRepo;
@@ -37,45 +36,45 @@ public class Cron {
 
     private final int TIMEOUT = 200;
 
-    @Scheduled(fixedRateString = "${cron.frequency.hook-tick}")
+    @Scheduled(fixedRateString = "1s")
     void hookTick() {
         CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.heart-beat}")
+    @Scheduled(fixedRateString = "2s")
     void heartBeat() {
         lobbyHub.nbPlayers();
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-dead}")
+    @Scheduled(fixedRateString = "2s")
     void hookCleanupDead() {
         lobbyFisherman.cleanup();
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-old}")
+    @Scheduled(fixedRateString = "21s")
     void hookCleanupOld() {
         hookRepo.cleanupOld();
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.online-username}")
+    @Scheduled(fixedRateString = "3s")
     void onlineUsername() {
         CompletableFuture.runAsync(() -> lobbyHub.withUsernames(userRepo::updateOnlineUserNames), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.game-cleanup-unplayed}")
+    @Scheduled(fixedRateString = "2h")
     void gameCleanupUnplayed() {
         System.out.println("[cron] remove old unplayed games");
         gameRepo.cleanupUnplayed();
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.game-auto-finish}")
+    @Scheduled(fixedRateString = "1h")
     void gameAutoFinish() {
         gameFinishCommand.apply();
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.remote-ai-health}")
+    @Scheduled(fixedRateString = "10s")
     void remoteAiHealth() {
         remoteAi.diagnose();
     }

@@ -12,15 +12,12 @@ public class CheckEvent implements Event {
     private Pos pos;
 
     @Override
-    public String encode() {
-        return "C" + pos.getPiotr();
+    public String typ() {
+        return "check";
     }
 
     @Override
-    public Map<String, Object> export() {
-        return Map.of(
-            "type", "check",
-            "key", pos.key()
-        );
+    public String data() {
+        return pos.key();
     }
 }

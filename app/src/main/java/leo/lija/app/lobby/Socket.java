@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
+@Service("lobbySocket")
 @RequiredArgsConstructor
-public class Lobby {
+public class Socket {
 
     private final Hub hub;
     private final SocketIOService socketIOService;
 
     @PostConstruct
     private void init() {
-        socketIOService.setLobby(this);
+        socketIOService.setLobbySocket(this);
     }
 
     public void join(String uid, Integer version, Optional<String> username, Optional<String> hook) {
@@ -27,7 +27,7 @@ public class Lobby {
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
-        hub.talk(event.d().txt(), event.d().u());
+        if (event.t().equals("talk")) hub.talk(event.d().txt(), event.d().u());
     }
 
     public void addEntry(Entry entry) {

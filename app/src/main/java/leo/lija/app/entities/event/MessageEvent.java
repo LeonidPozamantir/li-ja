@@ -14,12 +14,12 @@ public class MessageEvent implements Event {
     private String message;
 
     @Override
-    public String encode() {
-        return "M" + author + " " + message.replace("|", "(pipe)");
+    public String typ() {
+        return "message";
     }
 
     @Override
-    public Map<String, Object> export() {
-        return Map.of();
+    public Map<String, Object> data() {
+        return null;
     }
 }

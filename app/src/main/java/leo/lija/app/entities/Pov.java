@@ -21,4 +21,8 @@ public record Pov(DbGame game, Color color) {
     public static Pov apply(DbGame game, DbPlayer player) {
         return new Pov(game, player.getColor());
     }
+
+    public static Optional<Pov> apply(DbGame game, String playerId) {
+        return game.player(playerId).map(p -> new Pov(game, p.getColor()));
+    }
 }

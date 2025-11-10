@@ -1,19 +1,19 @@
 package leo.lija.app;
 
-import leo.lija.chess.Color;
-import leo.lija.chess.EloCalculator;
-import leo.lija.chess.utils.Pair;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HistoryRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.entities.DbGame;
+import leo.lija.app.entities.Evented;
 import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.Status;
 import leo.lija.app.entities.User;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.memo.AliveMemo;
 import leo.lija.app.memo.FinisherLock;
-import leo.lija.app.memo.VersionMemo;
+import leo.lija.chess.Color;
+import leo.lija.chess.EloCalculator;
+import leo.lija.chess.utils.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +32,8 @@ public class Finisher extends IOTools {
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public Finisher(GameRepo gameRepo, VersionMemo versionMemo, HistoryRepo historyRepo, UserRepo userRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
-        super(gameRepo, versionMemo);
+    public Finisher(GameRepo gameRepo, HistoryRepo historyRepo, UserRepo userRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
+        super(gameRepo);
         this.historyRepo = historyRepo;
         this.userRepo = userRepo;
         this.messenger = messenger;
@@ -71,11 +71,12 @@ public class Finisher extends IOTools {
     }
 
     public void outoftime(DbGame game) {
-        game.outoftimePlayer().map(player -> {
+        game.outoftimePlayer().ifPresentOrElse(player ->
             finish(game, Status.OUTOFTIME,
-                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)));
-            return null;
-        }).orElseThrow(() -> new AppException("no outoftime applicable " + game.getClock()));
+                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c))),
+            () -> {
+                throw new AppException("no outoftime applicable " + game.getClock());
+            });
     }
 
     public void outoftimes(List<DbGame> games) {
@@ -98,14 +99,14 @@ public class Finisher extends IOTools {
     private void finish(DbGame game, Status status, Optional<Color> winner, Optional<String> message) {
         if (finisherLock.isLocked(game)) throw new AppException("game finish is locked");
         finisherLock.lock(game);
-        DbGame g2 = game.finish(status, winner);
-        message.ifPresent(m -> messenger.systemMessage(g2, m));
-        save(g2);
-        Optional<String> winnerId = winner.flatMap(c -> g2.player(c).getUserId());
-        gameRepo.finish(g2.getId(), winnerId);
-        updateElo(g2);
-        incNbGames(g2, WHITE);
-        incNbGames(g2, BLACK);
+        Evented e1 = game.finish(status, winner);
+        message.ifPresent(m -> e1.addAll(messenger.systemMessage(e1.game(), m)));
+        save(e1);
+        Optional<String> winnerId = winner.flatMap(c -> e1.game().player(c).getUserId());
+        gameRepo.finish(e1.game().getId(), winnerId);
+        updateElo(e1.game());
+        incNbGames(e1.game(), WHITE);
+        incNbGames(e1.game(), BLACK);
     }
 
     private void incNbGames(DbGame game, Color color) {

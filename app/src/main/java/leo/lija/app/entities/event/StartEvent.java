@@ -7,14 +7,12 @@ import java.util.Map;
 @EqualsAndHashCode
 public class StartEvent implements Event {
     @Override
-    public String encode() {
-        return "s";
+    public String typ() {
+        return "start";
     }
 
     @Override
-    public Map<String, Object> export() {
-        return Map.of(
-            "type", "start"
-        );
+    public Map<String, Object> data() {
+        return null;
     }
 }

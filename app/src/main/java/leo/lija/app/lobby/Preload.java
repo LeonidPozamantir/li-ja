@@ -7,7 +7,10 @@ import leo.lija.app.db.MessageRepo;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
+import leo.lija.app.socket.History;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +19,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
-@RequiredArgsConstructor
 public class Preload {
 
     private final Fisherman fisherman;
@@ -25,6 +27,15 @@ public class Preload {
     private final GameRepo gameRepo;
     private final MessageRepo messageRepo;
     private final EntryRepo entryRepo;
+
+    public Preload(Fisherman fisherman, @Value("${lobby.message.lifetime}") int timeout, HookRepo hookRepo, GameRepo gameRepo, MessageRepo messageRepo, EntryRepo entryRepo) {
+        this.fisherman = fisherman;
+        this.history = new History(timeout);
+        this.hookRepo = hookRepo;
+        this.gameRepo = gameRepo;
+        this.messageRepo = messageRepo;
+        this.entryRepo = entryRepo;
+    }
 
     public Map<String, Object> apply(boolean auth, boolean chat, Optional<String> myHookId) {
         List<Hook> hooks = auth ? hookRepo.allOpen() : hookRepo.allOpenCasual();

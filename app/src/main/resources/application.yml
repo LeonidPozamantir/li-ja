@@ -24,16 +24,18 @@ lobby:
     max: 30
   entry:
     max: 12
-  history.timeout: 20
+  message.lifetime: 20
   hook-pool.tick.frequency: 1s
+
+game:
+  socket-timeout: 60
+  message.lifetime: 20
 
 socket:
   host: 0.0.0.0
   port: 9092
 
 memo: #seconds
-  version:
-    timeout: 1800
   alive:
     hard-timeout: 100
     soft-timeout: 6
@@ -45,7 +47,7 @@ memo: #seconds
     timeout: 6
   finisher-lock:
     timeout: 30
-  socket.timeout: 5
+  game-hub.timeout: 60
 ai:
   server: false
   use: remote

@@ -18,26 +18,29 @@ public class Messenger {
 
     private final RoomRepo roomRepo;
 
-    public void playerMessage(DbGame game, Color color, String message) {
-        if (game.invited().isHuman() && message.length() <= 140 && !message.isEmpty()) {
-            roomRepo.addMessage(game.getId(), color.getName(), message);
-            game.withEvents(List.of(new MessageEvent(color.getName(), message)));
+    public List<Event> playerMessage(String gameId, Color color, String message) {
+        if (message.length() <= 140 && !message.isEmpty()) {
+            roomRepo.addMessage(gameId, color.getName(), message);
+            return List.of(new MessageEvent(color.getName(), message));
         }
+        return List.of();
     }
 
-    public void systemMessages(DbGame game, String encodedMessages) {
+    public List<Event> systemMessages(DbGame game, String encodedMessages) {
         if (game.invited().isHuman()) {
             List<String> messages = Arrays.asList(encodedMessages.split("\\$"));
             roomRepo.addSystemMessages(game.getId(), messages);
-            game.withEvents(messages.stream().map(msg -> (Event) new MessageEvent("system", msg)).toList());
+            return messages.stream().map(msg -> (Event) new MessageEvent("system", msg)).toList();
         }
+        return List.of();
     }
 
-    public void systemMessage(DbGame game, String message) {
+    public List<Event> systemMessage(DbGame game, String message) {
         if (game.invited().isHuman()) {
             roomRepo.addSystemMessage(game.getId(), message);
-            game.withEvents(List.of(new MessageEvent("system", message)));
+            return List.of(new MessageEvent("system", message));
         }
+        return List.of();
     }
 
     public List<Room.RoomMessage> render(String roomId) {

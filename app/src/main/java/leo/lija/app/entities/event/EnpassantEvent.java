@@ -12,15 +12,12 @@ public class EnpassantEvent implements Event {
     private Pos killed;
 
     @Override
-    public String encode() {
-        return "E" + killed.getPiotr();
+    public String typ() {
+        return "enpassant";
     }
 
     @Override
-    public Map<String, Object> export() {
-        return Map.of(
-            "type", "enpassant",
-            "killed", killed.key()
-        );
+    public String data() {
+        return killed.key();
     }
 }

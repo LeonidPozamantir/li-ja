@@ -2,7 +2,6 @@ package leo.lija.app;
 
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
-import leo.lija.app.entities.EventStack;
 import leo.lija.app.entities.event.CastlingEvent;
 import leo.lija.app.entities.event.CheckEvent;
 import leo.lija.app.entities.event.EndEvent;

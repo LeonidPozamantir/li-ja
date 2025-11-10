@@ -13,7 +13,7 @@ public class Fisherman {
 
     private final HookRepo hookRepo;
     private final HookMemo hookMemo;
-    private final Lobby socket;
+    private final Socket socket;
 
     // DO delete in db
     public void delete(Hook hook) {

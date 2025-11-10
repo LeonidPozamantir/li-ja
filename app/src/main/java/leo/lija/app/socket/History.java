@@ -1,26 +1,22 @@
-package leo.lija.app.lobby;
+package leo.lija.app.socket;
 
 import com.google.common.cache.Cache;
 import leo.lija.app.memo.Builder;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-@Service
 public class History {
 
     private int privateVersion = 0;
 
     private final Cache<@NonNull Integer, @NonNull Map<String, Object>> messages;
 
-    History(@Value("${lobby.history.timeout}") int timeout) {
+    public History(int timeout) {
         this.messages = Builder.expiry(timeout);
     }
 

@@ -17,14 +17,13 @@ public class CastlingEvent implements Event {
     private Color color;
 
     @Override
-    public String encode() {
-        return "c" + king.getFirst().getPiotr() + king.getSecond().getPiotr() + rook.getFirst().getPiotr() + rook.getSecond().getPiotr() + color.getLetter();
+    public String typ() {
+        return "castling";
     }
 
     @Override
-    public Map<String, Object> export() {
+    public Map<String, Object> data() {
         return Map.of(
-            "type", "castling",
             "king", List.of(king.getFirst().key(), king.getSecond().key()),
             "rook", List.of(rook.getFirst().key(), rook.getSecond().key()),
             "color", color.name()

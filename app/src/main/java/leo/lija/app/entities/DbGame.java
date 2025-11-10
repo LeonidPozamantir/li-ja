@@ -182,17 +182,22 @@ public class DbGame {
         return new History(historyLastMove, historyPositionHashes, whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
     }
 
-    public void update(Game game, Move move) {
+    public Evented update(Game game, Move move) {
         boolean abortableBefore = abortable();
         boolean whiteCanOfferDrawBefore = playerCanOfferDraw(WHITE);
         boolean blackCanOfferDrawBefore = playerCanOfferDraw(BLACK);
 
         History history = game.getBoard().getHistory();
         Situation situation = game.situation();
-        List<Event> events = new ArrayList<>(Event.fromMove(move));
+        List<Event> events = new ArrayList<>(List.of(
+            Event.possibleMoves(situation, WHITE),
+            Event.possibleMoves(situation, BLACK)
+        ));
+        events.addAll(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
-        whitePlayer = copyPlayer(game, whitePlayer, events);
-        blackPlayer = copyPlayer(game, blackPlayer, events);
+        whitePlayer = copyPlayer(game, whitePlayer);
+        blackPlayer = copyPlayer(game, blackPlayer);
+
         pgn = game.getPgnMoves();
         turns = game.getTurns();
         positionHashes = history.positionHashes().mkString();
@@ -208,33 +213,14 @@ public class DbGame {
         if (playable() && (abortableBefore != abortable()
                 || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE)
                 || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK))) {
-            withEvents(List.of(new ReloadTableEvent()));
+            events.addAll(Color.all.stream().map(ReloadTableEvent::new).toList());
         }
+        return new Evented(this, events);
     }
 
-    private DbPlayer copyPlayer(Game game, DbPlayer player, List<Event> events) {
+    private DbPlayer copyPlayer(Game game, DbPlayer player) {
         String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
-
-        List<Event> newEvents = new ArrayList<>(events);
-        newEvents.add(Event.possibleMoves(game.situation(), player.getColor()));
-        String newEvts = player.newEvts(newEvents);
-
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), newEvts, player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId());
-    }
-
-    public void withEvents(List<Event> events) {
-        whitePlayer.withEvents(events);
-        blackPlayer.withEvents(events);
-    }
-
-    public void withEvents(Color color, List<Event> events) {
-        if (color == WHITE) withEvents(events, List.of());
-        else if (color == BLACK) withEvents(List.of(), events);
-    }
-
-    public void withEvents(List<Event> whiteEvents, List<Event> blackEvents) {
-        whitePlayer.withEvents(whiteEvents);
-        blackPlayer.withEvents(blackEvents);
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId());
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {
@@ -281,14 +267,12 @@ public class DbGame {
         return playable() && abortable();
     }
 
-    public DbGame finish(Status status, Optional<Color> winner) {
-        DbGame res = copy();
-        res.status = status;
-        res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
-        res.whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == BLACK);
-        res.clock = clock.map(Clock::stop);
-        res.withEvents(List.of(new EndEvent()));
-        return res;
+    public Evented finish(Status status, Optional<Color> winner) {
+        this.status = status;
+        whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
+        blackPlayer = blackPlayer.finish(winner.isPresent() && winner.get() == BLACK);
+        clock = clock.map(Clock::stop);
+        return new Evented(this, List.of(new EndEvent()));
     }
 
     public boolean rated() {
@@ -325,5 +309,9 @@ public class DbGame {
     public static final int GAME_ID_SIZE = 8;
     public static final int PLAYER_ID_SIZE = 4;
     public static final int FULL_ID_SIZE = 12;
+
+    public static String takeGameId(String fullId) {
+        return fullId.substring(0, Math.min(GAME_ID_SIZE, fullId.length()));
+    }
 
 }

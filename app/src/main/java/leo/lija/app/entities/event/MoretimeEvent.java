@@ -13,12 +13,12 @@ public class MoretimeEvent implements Event {
     private int seconds;
 
     @Override
-    public String encode() {
-        return "T" + color.getLetter() + seconds;
+    public String typ() {
+        return "moretime";
     }
 
     @Override
-    public Map<String, Object> export() {
+    public Map<String, Object> data() {
         return Map.of(
             "type", "moretime",
             "color", color.name(),
