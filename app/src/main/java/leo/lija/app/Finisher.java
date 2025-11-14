@@ -4,18 +4,17 @@ import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HistoryRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.entities.DbGame;
-import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Pov;
+import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Status;
 import leo.lija.app.entities.User;
+import leo.lija.app.entities.event.Event;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.game.Socket;
 import leo.lija.app.memo.AliveMemo;
 import leo.lija.app.memo.FinisherLock;
 import leo.lija.chess.Color;
 import leo.lija.chess.EloCalculator;
 import leo.lija.chess.utils.Pair;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,17 +29,15 @@ public class Finisher {
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
-    private final Socket gameSocket;
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
+    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
         this.historyRepo = historyRepo;
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
-        this.gameSocket = gameSocket;
         this.messenger = messenger;
         this.aliveMemo = aliveMemo;
         this.finisherLock = finisherLock;
@@ -70,8 +67,8 @@ public class Finisher {
         } else throw new AppException("game is not threefold repetition");
     }
 
-    public void drawAccept(Pov pov) {
-        if (pov.opponent().getIsOfferingDraw()) finish(pov.game(), Status.DRAW, Optional.empty(), Optional.of("Draw offer accepted"));
+    public List<Event> drawAccept(Pov pov) {
+        if (pov.opponent().getIsOfferingDraw()) return finish(pov.game(), Status.DRAW, Optional.empty(), Optional.of("Draw offer accepted"));
         else throw new AppException("opponent is not proposing a draw");
     }
 
@@ -88,31 +85,32 @@ public class Finisher {
         games.forEach(this::outoftime);
     }
 
-    public void moveFinish(DbGame game, Color color) {
-        if (game.getStatus() == Status.MATE) finish(game, Status.MATE, Optional.of(color));
-        else if (game.getStatus() == Status.STALEMATE || game.getStatus() == Status.DRAW) finish(game, game.getStatus());
+    public List<Event> moveFinish(DbGame game, Color color) {
+        if (game.getStatus() == Status.MATE) return finish(game, Status.MATE, Optional.of(color));
+        if (game.getStatus() == Status.STALEMATE || game.getStatus() == Status.DRAW) return finish(game, game.getStatus());
+        return List.of();
     }
 
-    private void finish(DbGame game, Status status) {
-        finish(game, status, Optional.empty(), Optional.empty());
+    private List<Event> finish(DbGame game, Status status) {
+        return finish(game, status, Optional.empty(), Optional.empty());
     }
 
-    private void finish(DbGame game, Status status, Optional<Color> winner) {
-        finish(game, status, winner, Optional.empty());
+    private List<Event> finish(DbGame game, Status status, Optional<Color> winner) {
+        return finish(game, status, winner, Optional.empty());
     }
 
-    private void finish(DbGame game, Status status, Optional<Color> winner, Optional<String> message) {
+    private List<Event> finish(DbGame game, Status status, Optional<Color> winner, Optional<String> message) {
         if (finisherLock.isLocked(game)) throw new AppException("game finish is locked");
         finisherLock.lock(game);
         Progress p1 = game.finish(status, winner);
         message.ifPresent(m -> p1.addAll(messenger.systemMessage(p1.game(), m)));
         gameRepo.save(p1);
-        gameSocket.send(p1);
         Optional<String> winnerId = winner.flatMap(c -> p1.game().player(c).getUserId());
         gameRepo.finish(p1.game().getId(), winnerId);
         updateElo(p1.game());
         incNbGames(p1.game(), WHITE);
         incNbGames(p1.game(), BLACK);
+        return p1.events();
     }
 
     private void incNbGames(DbGame game, Color color) {

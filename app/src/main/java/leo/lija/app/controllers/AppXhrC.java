@@ -1,20 +1,14 @@
 package leo.lija.app.controllers;
 
-import jakarta.validation.Valid;
 import leo.lija.app.AppXhr;
 import leo.lija.app.db.GameRepo;
-import leo.lija.app.forms.MoveForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @RestController
@@ -23,19 +17,6 @@ public class AppXhrC extends BaseController {
 
     private final AppXhr xhr;
     private final GameRepo gameRepo;
-
-    @PostMapping("/move/{fullId}")
-    public ResponseEntity<String> move(@PathVariable String fullId, @Valid @RequestBody MoveForm move, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid move");
-        }
-
-        return CompletableFuture.supplyAsync(() -> {
-            xhr.play(fullId, move.from(), move.to(), Optional.ofNullable(move.promotion()));
-            return ResponseEntity.ok().body("ok");
-        }).join();
-
-    }
 
     @PostMapping("/outoftime/{fullId}")
     public void outoftime(@PathVariable String fullId) {

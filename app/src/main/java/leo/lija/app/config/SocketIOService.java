@@ -50,11 +50,11 @@ public class SocketIOService extends BaseController {
             );
         });
 
-        server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) -> {
-            lobbySocket.talk(event);
-        });
+        server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) ->
+            lobbySocket.talk(event)
+        );
 
-        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) -> {
+        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) ->
             gameSocket.join(
                 event.gameId,
                 event.color,
@@ -62,14 +62,18 @@ public class SocketIOService extends BaseController {
                 Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
                 get(Optional.ofNullable(event.playerId)),
                 get(Optional.ofNullable(event.username))
-            );
-        });
+            )
+        );
 
         server.addEventListener("game/talk", GameTalkForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
             String uid = sessionToUid.get(sessionId);
             gameSocket.talk(uid, event);
         });
+
+        server.addEventListener("game/move", GameMoveForm.class, (client, event, ackSender) ->
+            gameSocket.move(event)
+        );
 
         server.start();
 
@@ -84,6 +88,10 @@ public class SocketIOService extends BaseController {
     public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId, String username) {}
 
     public record GameTalkForm(String gameId, String t, String d) {}
+
+    public record GameMoveForm(Data d) {
+        public record Data(String from, String to) {}
+    }
 
     @PreDestroy
     public void destroy() {
