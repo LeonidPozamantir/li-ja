@@ -1,5 +1,6 @@
 package leo.lija.app.entities.event;
 
+import leo.lija.app.entities.Room;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,8 +20,8 @@ public class MessageEvent implements Event {
     }
 
     @Override
-    public Map<String, Object> data() {
-        return null;
+    public Room.RoomMessage data() {
+        return new Room.RoomMessage(author, message);
     }
 
     @Override
