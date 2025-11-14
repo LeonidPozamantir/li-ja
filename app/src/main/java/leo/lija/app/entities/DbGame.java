@@ -182,7 +182,7 @@ public class DbGame {
         return new History(historyLastMove, historyPositionHashes, whiteCastleKingSide, whiteCastleQueenSide, blackCastleKingSide, blackCastleQueenSide);
     }
 
-    public Evented update(Game game, Move move) {
+    public Progress update(Game game, Move move) {
         boolean abortableBefore = abortable();
         boolean whiteCanOfferDrawBefore = playerCanOfferDraw(WHITE);
         boolean blackCanOfferDrawBefore = playerCanOfferDraw(BLACK);
@@ -215,7 +215,7 @@ public class DbGame {
                 || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK))) {
             events.addAll(Color.all.stream().map(ReloadTableEvent::new).toList());
         }
-        return new Evented(this, events);
+        return new Progress(this, events);
     }
 
     private DbPlayer copyPlayer(Game game, DbPlayer player) {
@@ -267,12 +267,12 @@ public class DbGame {
         return playable() && abortable();
     }
 
-    public Evented finish(Status status, Optional<Color> winner) {
+    public Progress finish(Status status, Optional<Color> winner) {
         this.status = status;
         whitePlayer = whitePlayer.finish(winner.isPresent() && winner.get() == WHITE);
         blackPlayer = blackPlayer.finish(winner.isPresent() && winner.get() == BLACK);
         clock = clock.map(Clock::stop);
-        return new Evented(this, List.of(new EndEvent()));
+        return new Progress(this, List.of(new EndEvent()));
     }
 
     public boolean rated() {

@@ -22,4 +22,9 @@ public class MessageEvent implements Event {
     public Map<String, Object> data() {
         return null;
     }
+
+    @Override
+    public boolean owner() {
+        return true;
+    }
 }

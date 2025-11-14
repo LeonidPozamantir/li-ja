@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public record Evented(DbGame game, List<Event> events) {
+public record Progress(DbGame game, List<Event> events) {
 
-    public Evented(DbGame game) {
+    public Progress(DbGame game) {
         this(game, new ArrayList<>());
     }
 
@@ -21,13 +21,13 @@ public record Evented(DbGame game, List<Event> events) {
         events.addAll(es);
     }
 
-    public Evented map(UnaryOperator<DbGame> f) {
-        return new Evented(f.apply(game), events);
+    public Progress map(UnaryOperator<DbGame> f) {
+        return new Progress(f.apply(game), events);
     }
 
-    public Evented flatMap(Function<DbGame, Evented> f) {
-        Evented ev = f.apply(game);
-        Evented res = new Evented(ev.game, events);
+    public Progress flatMap(Function<DbGame, Progress> f) {
+        Progress ev = f.apply(game);
+        Progress res = new Progress(ev.game, events);
         res.addAll(ev.events);
         return res;
     }

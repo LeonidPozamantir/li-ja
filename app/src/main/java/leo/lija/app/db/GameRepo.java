@@ -1,5 +1,6 @@
 package leo.lija.app.db;
 
+import leo.lija.app.entities.Progress;
 import leo.lija.chess.Color;
 import leo.lija.chess.format.Fen;
 import leo.lija.app.entities.DbGame;
@@ -64,6 +65,10 @@ public class GameRepo {
 
     public void save(DbGame game) {
         repo.save(encode(game));
+    }
+
+    public void save(Progress progress) {
+        this.save(progress.game());
     }
 
     public Optional<String> insert(DbGame game) {

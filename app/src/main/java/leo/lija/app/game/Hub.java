@@ -5,6 +5,7 @@ import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.History;
 import leo.lija.chess.Color;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,25 +49,10 @@ public class Hub {
     }
 
     public void notifyEvent(Event e) {
-        notifyVersion(e.typ(), e.data());
-    }
-
-    private void notifyMember(String t, Object data, Member member) {
-        Map<String, Object> msg = Map.of(
-                "t", t,
-                "d", data
-        );
-        socketService.sendMessageToClient(member.getUid(), gameId, msg);
-    }
-
-    private void notifyAll(String t, Object data) {
-        Map<String, Object> msg = makeMessage(t, data);
-        socketService.sendMessage(gameId, msg);
-    }
-
-    private void notifyVersion(String t, Object data) {
-        Map<String, Object> vmsg = history.add(makeMessage(t, data));
-        socketService.sendMessage(gameId, vmsg);
+        Map<String, Object> vmsg = history.add(makeMessage(e.typ(), e.data()));
+        Collection<Member> m1 = e.owner() ? members.values().stream().filter(Member::isOwner).toList() : members.values();
+        Collection<Member> m2 = e.only().map(color -> (Collection<Member>) m1.stream().filter(m -> m.color == color).toList()).orElse(m1);
+        m2.forEach(m -> socketService.sendMessageToClient(m.getUid(), gameId, vmsg));
     }
 
     private Map<String, Object> makeMessage(String t, Object data) {

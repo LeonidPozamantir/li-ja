@@ -4,16 +4,18 @@ import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HistoryRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.entities.DbGame;
-import leo.lija.app.entities.Evented;
+import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.Status;
 import leo.lija.app.entities.User;
 import leo.lija.app.exceptions.AppException;
+import leo.lija.app.game.Socket;
 import leo.lija.app.memo.AliveMemo;
 import leo.lija.app.memo.FinisherLock;
 import leo.lija.chess.Color;
 import leo.lija.chess.EloCalculator;
 import leo.lija.chess.utils.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,19 +25,22 @@ import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
 @Service
-public class Finisher extends IOTools {
+public class Finisher {
 
     private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
+    private final GameRepo gameRepo;
+    private final Socket gameSocket;
     private final Messenger messenger;
     private final AliveMemo aliveMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public Finisher(GameRepo gameRepo, HistoryRepo historyRepo, UserRepo userRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
-        super(gameRepo);
+    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
         this.historyRepo = historyRepo;
         this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
+        this.gameSocket = gameSocket;
         this.messenger = messenger;
         this.aliveMemo = aliveMemo;
         this.finisherLock = finisherLock;
@@ -99,14 +104,15 @@ public class Finisher extends IOTools {
     private void finish(DbGame game, Status status, Optional<Color> winner, Optional<String> message) {
         if (finisherLock.isLocked(game)) throw new AppException("game finish is locked");
         finisherLock.lock(game);
-        Evented e1 = game.finish(status, winner);
-        message.ifPresent(m -> e1.addAll(messenger.systemMessage(e1.game(), m)));
-        save(e1);
-        Optional<String> winnerId = winner.flatMap(c -> e1.game().player(c).getUserId());
-        gameRepo.finish(e1.game().getId(), winnerId);
-        updateElo(e1.game());
-        incNbGames(e1.game(), WHITE);
-        incNbGames(e1.game(), BLACK);
+        Progress p1 = game.finish(status, winner);
+        message.ifPresent(m -> p1.addAll(messenger.systemMessage(p1.game(), m)));
+        gameRepo.save(p1);
+        gameSocket.send(p1);
+        Optional<String> winnerId = winner.flatMap(c -> p1.game().player(c).getUserId());
+        gameRepo.finish(p1.game().getId(), winnerId);
+        updateElo(p1.game());
+        incNbGames(p1.game(), WHITE);
+        incNbGames(p1.game(), BLACK);
     }
 
     private void incNbGames(DbGame game, Color color) {

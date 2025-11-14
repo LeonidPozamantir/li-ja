@@ -5,34 +5,27 @@ import leo.lija.app.db.EntryRepo;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
-import leo.lija.app.entities.Evented;
+import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Variant;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.lobby.Socket;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Starter extends IOTools {
+@RequiredArgsConstructor
+public class Starter {
 
+    private final GameRepo gameRepo;
     private final EntryRepo entryRepo;
     private final Socket lobbySocket;
     private final AiService ai;
 
-    public Starter(
-            GameRepo gameRepo,
-            EntryRepo entryRepo,
-            Socket lobbySocket,
-            AiService ai) {
-        super(gameRepo);
-        this.entryRepo = entryRepo;
-        this.ai = ai;
-        this.lobbySocket = lobbySocket;
-    }
 
-    public Evented start(DbGame game, String entryData) {
+    public Progress start(DbGame game, String entryData) {
         if (game.getVariant() != Variant.STANDARD) gameRepo.saveInitialFen(game);
         Entry.apply(game, entryData).ifPresent(entry -> {
             entryRepo.add(entry);
@@ -49,7 +42,7 @@ public class Starter extends IOTools {
             Move move = aiResult.getSecond();
             return game.update(newChessGame, move);
         }
-        return new Evented(game);
+        return new Progress(game);
     }
 
 }

@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import leo.lija.app.Messenger;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.db.GameRepo;
+import leo.lija.app.entities.Progress;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,10 @@ public class Socket {
     @PostConstruct
     private void init() {
         socketIOService.setGameSocket(this);
+    }
+
+    public void send(Progress progress) {
+        hubMemo.get(progress.game().getId()).events(progress.events());
     }
 
     public void join(

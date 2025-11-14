@@ -16,6 +16,9 @@ public interface Event {
     default Optional<Color> only() {
         return Optional.empty();
     }
+    default boolean owner() {
+        return false;
+    }
 
     static List<Event> fromMove(Move move) {
         return Stream.of(

@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public class Watcher extends Member {
     public Watcher(String uid, Color color, Optional<String> username) {
-        super(uid, color, username);
+        super(uid, color, username, false);
     }
 }

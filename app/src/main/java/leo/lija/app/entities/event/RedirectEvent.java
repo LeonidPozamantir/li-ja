@@ -4,7 +4,6 @@ import leo.lija.chess.Color;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -26,5 +25,10 @@ public class RedirectEvent implements Event {
     @Override
     public Optional<Color> only() {
         return Optional.of(color);
+    }
+
+    @Override
+    public boolean owner() {
+        return true;
     }
 }
