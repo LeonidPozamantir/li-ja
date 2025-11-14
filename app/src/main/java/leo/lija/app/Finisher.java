@@ -43,42 +43,40 @@ public class Finisher {
         this.finisherLock = finisherLock;
     }
 
-    public void abort(Pov pov) {
-        if (pov.game().abortable()) finish(pov.game(), Status.ABORTED);
-        else throw new AppException("game is not abortable");
+    public List<Event> abort(Pov pov) {
+        if (pov.game().abortable()) return finish(pov.game(), Status.ABORTED);
+        throw new AppException("game is not abortable");
     }
 
-    public void resign(Pov pov) {
-        if (pov.game().resignable()) finish(pov.game(), Status.RESIGN, Optional.of(pov.color().getOpposite()));
-        else throw new AppException("game is not resignable");
+    public List<Event> resign(Pov pov) {
+        if (pov.game().resignable()) return finish(pov.game(), Status.RESIGN, Optional.of(pov.color().getOpposite()));
+        throw new AppException("game is not resignable");
     }
 
-    public void forceResign(Pov pov) {
-        if (pov.game().playable() && aliveMemo.inactive(pov.game().getId(), pov.color().getOpposite())) {
-            finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
-        } else throw new AppException("game is not force-resignable");
+    public List<Event> forceResign(Pov pov) {
+        if (pov.game().playable() && aliveMemo.inactive(pov.game().getId(), pov.color().getOpposite()))
+            return finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
+        throw new AppException("game is not force-resignable");
     }
 
-    public void drawClaim(Pov pov) {
+    public List<Event> drawClaim(Pov pov) {
         DbGame game = pov.game();
         Color color = pov.color();
-        if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition()) {
+        if (game.playable() && game.player().getColor() == color && game.toChessHistory().threefoldRepetition())
             finish(game, Status.DRAW);
-        } else throw new AppException("game is not threefold repetition");
+        throw new AppException("game is not threefold repetition");
     }
 
     public List<Event> drawAccept(Pov pov) {
         if (pov.opponent().getIsOfferingDraw()) return finish(pov.game(), Status.DRAW, Optional.empty(), Optional.of("Draw offer accepted"));
-        else throw new AppException("opponent is not proposing a draw");
+        throw new AppException("opponent is not proposing a draw");
     }
 
-    public void outoftime(DbGame game) {
-        game.outoftimePlayer().ifPresentOrElse(player ->
+    public List<Event> outoftime(DbGame game) {
+        return game.outoftimePlayer().map(player ->
             finish(game, Status.OUTOFTIME,
-                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c))),
-            () -> {
-                throw new AppException("no outoftime applicable " + game.getClock());
-            });
+                Optional.of(player.getColor().getOpposite()).filter((c) -> game.toChess().getBoard().hasEnoughMaterialToMate(c)))
+        ).orElseThrow(() -> new AppException("no outoftime applicable " + game.getClock()));
     }
 
     public void outoftimes(List<DbGame> games) {

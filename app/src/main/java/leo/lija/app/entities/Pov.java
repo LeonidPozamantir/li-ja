@@ -18,6 +18,10 @@ public record Pov(DbGame game, Color color) {
         return fullId.map(fid -> game.isPlayerFullId(player(), fid)).orElse(false);
     }
 
+    public PovRef ref() {
+        return new PovRef(game.getId(), color);
+    }
+
     public static Pov apply(DbGame game, DbPlayer player) {
         return new Pov(game, player.getColor());
     }

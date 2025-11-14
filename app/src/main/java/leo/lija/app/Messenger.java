@@ -1,8 +1,8 @@
 package leo.lija.app;
 
-import leo.lija.chess.Color;
 import leo.lija.app.db.RoomRepo;
 import leo.lija.app.entities.DbGame;
+import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Room;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.MessageEvent;
@@ -18,10 +18,10 @@ public class Messenger {
 
     private final RoomRepo roomRepo;
 
-    public List<Event> playerMessage(String gameId, Color color, String message) {
+    public List<Event> playerMessage(PovRef ref, String message) {
         if (message.length() <= 140 && !message.isEmpty()) {
-            roomRepo.addMessage(gameId, color.getName(), message);
-            return List.of(new MessageEvent(color.getName(), message));
+            roomRepo.addMessage(ref.gameId(), ref.color().getName(), message);
+            return List.of(new MessageEvent(ref.color().getName(), message));
         }
         return List.of();
     }

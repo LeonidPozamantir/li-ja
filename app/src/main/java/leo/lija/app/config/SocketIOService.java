@@ -6,6 +6,7 @@ import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import leo.lija.app.controllers.BaseController;
+import leo.lija.app.entities.PovRef;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.lobby.Socket;
 import lombok.RequiredArgsConstructor;
@@ -87,10 +88,10 @@ public class SocketIOService extends BaseController {
 
     public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId, String username) {}
 
-    public record GameTalkForm(String gameId, String t, String d) {}
+    public record GameTalkForm(PovRef povRef, String t, String d) {}
 
-    public record GameMoveForm(Data d) {
-        public record Data(String from, String to) {}
+    public record GameMoveForm(PovRef povRef, Data d) {
+        public record Data(String from, String to, String promotion) {}
     }
 
     @PreDestroy

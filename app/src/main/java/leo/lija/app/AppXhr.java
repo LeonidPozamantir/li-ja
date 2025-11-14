@@ -5,6 +5,7 @@ import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.DbPlayer;
 import leo.lija.app.entities.Pov;
+import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.MoretimeEvent;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static leo.lija.chess.Pos.posAt;
@@ -54,12 +54,12 @@ public class AppXhr {
         this.moretimeSeconds = moretimeSeconds;
     }
 
-    public List<Event> play(String fullId, String fromString, String toString) {
-        return play(fullId, fromString, toString, Optional.empty());
+    public List<Event> play(PovRef povRef, String fromString, String toString) {
+        return play(povRef, fromString, toString, Optional.empty());
     }
 
-    public List<Event> play(String fullId, String origString, String destString, Optional<String> promString) {
-        return fromPov(fullId, pov -> {
+    public List<Event> play(PovRef povRef, String origString, String destString, Optional<String> promString) {
+        return fromPov(povRef, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
 
@@ -101,28 +101,28 @@ public class AppXhr {
         });
     }
 
-    public void abort(String fullId) {
-        attempt(fullId, finisher::abort);
+    public List<Event> abort(String fullId) {
+        return attempt(fullId, finisher::abort);
     }
 
-    public void resign(String fullId) {
-        attempt(fullId, finisher::resign);
+    public List<Event> resign(String fullId) {
+        return attempt(fullId, finisher::resign);
     }
 
-    public void forceResign(String fullId) {
-        attempt(fullId, finisher::forceResign);
+    public List<Event> forceResign(String fullId) {
+        return attempt(fullId, finisher::forceResign);
     }
 
-    public void outoftime(String fullId) {
-        attempt(fullId, p -> finisher.outoftime(p.game()));
+    public List<Event> outoftime(String fullId) {
+        return attempt(fullId, p -> finisher.outoftime(p.game()));
     }
 
-    public void drawClaim(String fullId) {
-        attempt(fullId, finisher::drawClaim);
+    public List<Event> drawClaim(String fullId) {
+        return attempt(fullId, finisher::drawClaim);
     }
 
-    public void drawAccept(String fullId) {
-        attempt(fullId, finisher::drawAccept);
+    public List<Event> drawAccept(String fullId) {
+        return attempt(fullId, finisher::drawAccept);
     }
 
     public List<Event> drawOffer(String fullId) {
@@ -192,13 +192,17 @@ public class AppXhr {
         }).orElseThrow(() -> new AppException("cannot add more time")));
     }
 
-    private void attempt(String fullId, Consumer<Pov> action) {
-        Pov pov = gameRepo.pov(fullId);
-        action.accept(pov);
+    private <A> A attempt(String fullId, Function<Pov, A> op) {
+        return fromPov(fullId, op);
     }
 
     private <A> A fromPov(String fullId, Function<Pov, A> op) {
         Pov pov = gameRepo.pov(fullId);
+        return op.apply(pov);
+    }
+
+    private <A> A fromPov(PovRef ref, Function<Pov, A> op) {
+        Pov pov = gameRepo.pov(ref);
         return op.apply(pov);
     }
 

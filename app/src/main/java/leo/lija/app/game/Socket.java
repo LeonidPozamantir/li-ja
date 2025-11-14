@@ -6,10 +6,12 @@ import leo.lija.app.Messenger;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.Progress;
+import leo.lija.app.entities.event.Event;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service("gameSocket")
@@ -28,7 +30,11 @@ public class Socket {
     }
 
     public void send(Progress progress) {
-        hubMemo.get(progress.game().getId()).events(progress.events());
+        send(progress.game().getId(), progress.events());
+    }
+
+    public void send(String gameId, List<Event> events) {
+        hubMemo.get(gameId).events(events);
     }
 
     public void join(
@@ -46,18 +52,19 @@ public class Socket {
     }
 
     public void talk(String uid, SocketIOService.GameTalkForm event) {
-        String gameId = event.gameId();
+        String gameId = event.povRef().gameId();
         Hub hub = hubMemo.get(gameId);
         Member member = hub.getMember(uid);
         if (member instanceof Owner && event.t().equals("talk")) hub.events(
-            messenger.playerMessage(gameId, member.color, event.d())
+            messenger.playerMessage(event.povRef(), event.d())
         );
     }
 
     public void move(SocketIOService.GameMoveForm event) {
         String orig = event.d().from();
         String dest = event.d().to();
-        xhr.play("", orig, dest, Optional.empty());
+        Optional<String> promotion = Optional.ofNullable(event.d().promotion());
+        send(event.povRef().gameId(), xhr.play(event.povRef(), orig, dest, promotion));
     }
 
 }

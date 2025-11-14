@@ -1,5 +1,6 @@
 package leo.lija.app.db;
 
+import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
 import leo.lija.chess.Color;
 import leo.lija.chess.format.Fen;
@@ -34,6 +35,10 @@ public class GameRepo {
             throw new AppException("Invalid game id " + gameId);
         }
         return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
+    }
+
+    public Pov pov(PovRef ref) {
+        return pov(ref.gameId(), ref.color());
     }
 
     public Pov pov(String gameId, Color color) {
