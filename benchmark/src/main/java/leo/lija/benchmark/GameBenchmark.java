@@ -6,7 +6,7 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.utils.Pair;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.AppApplication;
-import leo.lija.app.AppXhr;
+import leo.lija.app.Hand;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.DbPlayer;
 import leo.lija.app.entities.Status;
@@ -75,14 +75,14 @@ import static leo.lija.chess.Pos.H3;
 public class GameBenchmark {
 
     private static GameRepo repo;
-    private static AppXhr appXhr;
+    private static Hand appXhr;
     private static ConfigurableApplicationContext context;
 
     @Setup(Level.Trial)
     public static void setContext() {
         context = SpringApplication.run(AppApplication.class);
         repo = context.getBean(GameRepo.class);
-        appXhr = context.getBean(AppXhr.class);
+        appXhr = context.getBean(Hand.class);
     }
 
     @TearDown(Level.Trial)

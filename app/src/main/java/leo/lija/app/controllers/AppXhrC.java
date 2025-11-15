@@ -1,6 +1,6 @@
 package leo.lija.app.controllers;
 
-import leo.lija.app.AppXhr;
+import leo.lija.app.Hand;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.event.Event;
@@ -20,64 +20,64 @@ import java.util.function.Function;
 @RestController
 public class AppXhrC extends BaseController {
 
-    private final AppXhr xhr;
+    private final Hand hand;
     private final GameRepo gameRepo;
     private final Socket gameSocket;
 
-    public AppXhrC(AppXhr xhr, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket) {
-        this.xhr = xhr;
+    public AppXhrC(Hand hand, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket) {
+        this.hand = hand;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
     }
 
     @PostMapping("/outoftime/{fullId}")
     public void outoftime(@PathVariable String fullId) {
-        perform(fullId, xhr::outoftime);
+        perform(fullId, hand::outoftime);
     }
 
     @GetMapping("/abort/{fullId}")
     public ResponseEntity<Void> abort(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::abort);
+        return performAndRedirect(fullId, hand::abort);
     }
 
     @GetMapping("/resign/{fullId}")
     public ResponseEntity<Void> resign(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::resign);
+        return performAndRedirect(fullId, hand::resign);
     }
 
     @GetMapping("/resign-force/{fullId}")
     public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::forceResign);
+        return performAndRedirect(fullId, hand::forceResign);
     }
 
     @GetMapping("/draw-claim/{fullId}")
     public ResponseEntity<Void> drawClaim(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::drawClaim);
+        return performAndRedirect(fullId, hand::drawClaim);
     }
 
     @GetMapping("/draw-accept/{fullId}")
     public ResponseEntity<Void> drawAccept(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::drawAccept);
+        return performAndRedirect(fullId, hand::drawAccept);
     }
 
     @GetMapping("/draw-offer/{fullId}")
     public ResponseEntity<Void> drawOffer(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::drawOffer);
+        return performAndRedirect(fullId, hand::drawOffer);
     }
 
     @GetMapping("/draw-cancel/{fullId}")
     public ResponseEntity<Void> drawCancel(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::drawCancel);
+        return performAndRedirect(fullId, hand::drawCancel);
     }
 
     @GetMapping("/draw-decline/{fullId}")
     public ResponseEntity<Void> drawDecline(@PathVariable String fullId) {
-        return performAndRedirect(fullId, xhr::drawDecline);
+        return performAndRedirect(fullId, hand::drawDecline);
     }
 
     @PostMapping("/moretime/{fullId}")
     public float moretime(@PathVariable String fullId) {
-        return xhr.moretime(fullId);
+        return hand.moretime(fullId);
     }
 
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})

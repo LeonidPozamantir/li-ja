@@ -47,7 +47,7 @@ memo: #seconds
     timeout: 6
   finisher-lock:
     timeout: 30
-  game-hub.timeout: 60
+  game-hub.timeout: 10
 ai:
   server: false
   use: remote
@@ -59,17 +59,6 @@ ai:
 
 moretime:
   seconds: 15
-
-cron:
-  frequency:
-    online-username: 2700ms
-    hook-tick: 1s
-    hook-cleanup-dead: 2100ms
-    hook-cleanup-old: 21s
-    game-cleanup-unplayed: 2h6m36s
-    game-auto-finish: 1h4m12s
-    remote-ai-health: 10s
-    heart-beat: 2200ms
 
 async:
   actions:

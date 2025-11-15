@@ -1,7 +1,7 @@
 package leo.lija.app.game;
 
 import jakarta.annotation.PostConstruct;
-import leo.lija.app.AppXhr;
+import leo.lija.app.Hand;
 import leo.lija.app.Messenger;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.db.GameRepo;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class Socket {
 
     private final GameRepo gameRepo;
-    private final AppXhr xhr;
+    private final Hand hand;
     private final HubMemo hubMemo;
     private final Messenger messenger;
     private final SocketIOService socketIOService;
@@ -64,7 +64,7 @@ public class Socket {
         String orig = event.d().from();
         String dest = event.d().to();
         Optional<String> promotion = Optional.ofNullable(event.d().promotion());
-        send(event.povRef().gameId(), xhr.play(event.povRef(), orig, dest, promotion));
+        send(event.povRef().gameId(), hand.play(event.povRef(), orig, dest, promotion));
     }
 
 }

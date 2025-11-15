@@ -84,8 +84,12 @@ public class Hub {
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
     }
 
-    public void nbPlayers() {
-        notifyAll("nbp", members.size());
+    public int getNbMembers() {
+        return members.size();
+    }
+
+    public void nbPlayers(int nb) {
+        notifyAll("nbp", nb);
     }
 
     public void quit(String uid) {

@@ -30,7 +30,7 @@ import java.util.function.Function;
 import static leo.lija.chess.Pos.posAt;
 
 @Service
-public class AppXhr {
+public class Hand {
 
     private final GameRepo gameRepo;
     private final Messenger messenger;
@@ -39,7 +39,7 @@ public class AppXhr {
     private final AliveMemo aliveMemo;
     private final int moretimeSeconds;
 
-    public AppXhr(
+    public Hand(
             GameRepo gameRepo,
             Messenger messenger,
             AiService ai,

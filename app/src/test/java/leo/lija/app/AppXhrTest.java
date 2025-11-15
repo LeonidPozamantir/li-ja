@@ -26,7 +26,7 @@ class AppXhrTest extends Fixtures {
     @Autowired
     private GameRepo repo;
     @Autowired
-    private AppXhr xhr;
+    private Hand xhr;
 
     private VisualFormat visualFormat = new VisualFormat();
 

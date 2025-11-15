@@ -5,6 +5,7 @@ import leo.lija.app.command.GameFinishCommand;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
+import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.lobby.Hub;
 import leo.lija.app.memo.HookMemo;
@@ -33,8 +34,23 @@ public class Cron {
     private final Hub lobbyHub;
     private final TaskExecutor actionsExecutor;
     private final HookMemo hookMemo;
+    private final HubMaster gameHubMaster;
 
     private final int TIMEOUT = 200;
+
+    @Scheduled(fixedRateString = "2s")
+    void gameHubCleanup() {
+        gameHubMaster.cleanup()
+            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+            .join();
+    }
+
+    @Scheduled(fixedRateString = "2s")
+    void gameNbPlayers() {
+        gameHubMaster.nbPlayers(1)
+            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+            .join();
+    }
 
     @Scheduled(fixedRateString = "1s")
     void hookTick() {
@@ -43,8 +59,11 @@ public class Cron {
     }
 
     @Scheduled(fixedRateString = "2s")
-    void heartBeat() {
-        lobbyHub.nbPlayers();
+    void nbPlayers() {
+        int lobbyNb = lobbyHub.getNbMembers();
+        int gameNb = gameHubMaster.getNbMembers().join();
+        lobbyHub.nbPlayers(lobbyNb + gameNb);
+        gameHubMaster.nbPlayers(lobbyNb + gameNb).join();
     }
 
     @Scheduled(fixedRateString = "2s")
