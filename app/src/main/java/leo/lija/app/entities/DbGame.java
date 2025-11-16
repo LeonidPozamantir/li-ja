@@ -1,6 +1,7 @@
 package leo.lija.app.entities;
 
 
+import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.chess.Board;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
@@ -210,6 +211,7 @@ public class DbGame {
         clock = game.getClock();
         check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
 
+        clock.ifPresent(c -> events.addLast(ClockEvent.apply(c)));
         if (playable() && (abortableBefore != abortable()
                 || whiteCanOfferDrawBefore != playerCanOfferDraw(WHITE)
                 || blackCanOfferDrawBefore != playerCanOfferDraw(BLACK))) {

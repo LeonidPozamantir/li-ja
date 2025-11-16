@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -76,6 +77,10 @@ public class SocketIOService extends BaseController {
             gameSocket.move(event)
         );
 
+        server.addEventListener("game/moretime", GameMoretimeForm.class, (client, event, ackSender) ->
+            gameSocket.moretime(event)
+        );
+
         server.start();
 
     }
@@ -94,6 +99,8 @@ public class SocketIOService extends BaseController {
         public record Data(String from, String to, String promotion) {}
     }
 
+    public record GameMoretimeForm(PovRef povRef) {}
+
     @PreDestroy
     public void destroy() {
         server.stop();
@@ -104,6 +111,9 @@ public class SocketIOService extends BaseController {
             String sessionId = client.getSessionId().toString();
             String uid = sessionToUid.get(sessionId);
             lobbySocket.quit(uid);
+            Set<String> gameRooms = client.getAllRooms();
+            gameRooms.remove("lobby");
+            gameSocket.quit(uid, gameRooms);
             uidToClient.remove(uid);
             sessionToUid.remove(sessionId);
             uidToHook.remove(uid);

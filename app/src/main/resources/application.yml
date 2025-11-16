@@ -46,7 +46,6 @@ memo: #seconds
     timeout: 6
   finisher-lock:
     timeout: 30
-  game-hub.timeout: 10
 ai:
   server: false
   use: remote

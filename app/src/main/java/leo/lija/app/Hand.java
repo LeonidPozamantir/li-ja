@@ -8,7 +8,7 @@ import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
-import leo.lija.app.entities.event.MoretimeEvent;
+import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.memo.AliveMemo;
@@ -178,22 +178,26 @@ public class Hand {
         });
     }
 
-    public float moretime(String fullId) {
-        return fromPov(fullId, pov ->
+    public List<Event> moretime(PovRef ref) {
+        return attemptRef(ref, pov ->
             pov.game().getClock().filter(c -> pov.game().playable()).map(clock -> {
                 Color color = pov.color().getOpposite();
                 Clock newClock = clock.giveTime(color, moretimeSeconds);
                 pov.game().withClock(newClock);
-                List<Event> events = new ArrayList<>(List.of(new MoretimeEvent(color, moretimeSeconds)));
+                List<Event> events = new ArrayList<>(List.of(ClockEvent.apply(newClock)));
                 events.addAll(messenger.systemMessage(pov.game(), "%s + %d seconds".formatted(color, moretimeSeconds)));
-                Progress p1 = new Progress(pov.game(), events);
-                gameRepo.save(p1);
-                return newClock.remainingTime(color);
+                Progress progress = new Progress(pov.game(), events);
+                gameRepo.save(progress);
+                return progress.events();
         }).orElseThrow(() -> new AppException("cannot add more time")));
     }
 
-    private <A> A attempt(String fullId, Function<Pov, A> op) {
-        return fromPov(fullId, op);
+    private <A> A attempt(String fullId, Function<Pov, A> action) {
+        return fromPov(fullId, action);
+    }
+
+    private <A> A attemptRef(PovRef ref, Function<Pov, A> action) {
+        return fromPov(ref, action);
     }
 
     private <A> A fromPov(String fullId, Function<Pov, A> op) {

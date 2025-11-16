@@ -4,15 +4,10 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 
-@EqualsAndHashCode
-public class StartEvent implements Event {
+@EqualsAndHashCode(callSuper = false)
+public class StartEvent extends EmptyEvent {
     @Override
     public String typ() {
         return "start";
-    }
-
-    @Override
-    public Map<String, Object> data() {
-        return null;
     }
 }

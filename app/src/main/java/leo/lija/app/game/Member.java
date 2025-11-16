@@ -16,6 +16,10 @@ public abstract class Member {
     protected final Optional<String> username;
     protected final boolean owner;
 
+    public boolean watcher() {
+        return !owner;
+    }
+
     public String gameId() {
         return ref.gameId();
     }

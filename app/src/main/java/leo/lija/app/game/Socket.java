@@ -9,14 +9,19 @@ import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service("gameSocket")
 @RequiredArgsConstructor
 public class Socket {
+
+    private final TaskScheduler taskScheduler;
 
     private final GameRepo gameRepo;
     private final Hand hand;
@@ -65,6 +70,27 @@ public class Socket {
         String dest = event.d().to();
         Optional<String> promotion = Optional.ofNullable(event.d().promotion());
         send(event.povRef().gameId(), hand.play(event.povRef(), orig, dest, promotion));
+    }
+
+    public void moretime(SocketIOService.GameMoretimeForm event) {
+        List<Event> events = hand.moretime(event.povRef());
+        String gameId = event.povRef().gameId();
+        Hub hub = hubMemo.get(gameId);
+        hub.events(events);
+    }
+
+    public void quit(String uid, Set<String> games) {
+        games.forEach(gameId -> {
+            Hub hub = hubMemo.get(gameId);
+            hub.quit(uid);
+            scheduleForDeletion(hub, gameId);
+        });
+    }
+
+    private void scheduleForDeletion(Hub hub, String gameId) {
+        taskScheduler.schedule(() ->
+            hub.ifEmpty(() -> hubMemo.remove(gameId)), Instant.now().plusSeconds(60)
+        );
     }
 
 }

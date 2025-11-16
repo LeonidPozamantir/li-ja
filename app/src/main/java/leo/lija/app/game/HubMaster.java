@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -15,12 +16,6 @@ public class HubMaster {
 
     private final HubMemo hubMemo;
     private final TaskExecutor executor;
-
-    public CompletableFuture<Void> keepAlive() {
-        return CompletableFuture.runAsync(() -> hubMemo.all().forEach((id, hub) -> hub.withMembers(members -> {
-            if (!members.isEmpty()) hubMemo.shake(id);
-        })), executor);
-    }
 
     public CompletableFuture<Integer> getNbMembers() {
 
@@ -31,6 +26,10 @@ public class HubMaster {
                 .mapToInt(Integer::intValue)
                 .sum()
             );
+    }
+
+    public void withHubs(Consumer<Map<String, Hub>> op) {
+        op.accept(hubMemo.all());
     }
 
     public CompletableFuture<Void> nbPlayers(int nb) {

@@ -8,7 +8,7 @@ import leo.lija.app.entities.event.EndEvent;
 import leo.lija.app.entities.event.EnpassantEvent;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.MessageEvent;
-import leo.lija.app.entities.event.MoretimeEvent;
+import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.app.entities.event.MoveEvent;
 import leo.lija.app.entities.event.PossibleMovesEvent;
 import leo.lija.app.entities.event.PromotionEvent;
@@ -88,7 +88,7 @@ class EventStackTest extends Fixtures {
             new MessageEvent("0x1", "я слишком красив, чтобы ты это видела=)"),
             new ThreefoldEvent(),
             new ReloadTableEvent(),
-            new MoretimeEvent(WHITE, 15),
+            new ClockEvent(WHITE, 15),
             new EndEvent()
         );
         assertThat(EventStack.decode(stack.encode())).isEqualTo(stack);
@@ -117,7 +117,7 @@ class EventStackTest extends Fixtures {
                 new PossibleMovesEvent(Map.of(A2, List.of(A3, A4), F3, List.of(F5, G3, D4, E8))),
                 new MoveEvent(G4, C3, BLACK),
                 new PossibleMovesEvent(Map.of(A5, List.of(A8, B8))),
-                new MoretimeEvent(WHITE, 15),
+                new ClockEvent(WHITE, 15),
                 new EndEvent()
             ).optimize()).isEqualTo(EventStack.build(
                 new StartEvent(),
@@ -127,7 +127,7 @@ class EventStackTest extends Fixtures {
                 new PossibleMovesEvent(Map.of()),
                 new MoveEvent( G4,  C3,  BLACK),
                 new PossibleMovesEvent(Map.of(A5, List.of(A8, B8))),
-                new MoretimeEvent(WHITE, 15),
+                new ClockEvent(WHITE, 15),
                 new EndEvent()
             ));
         }

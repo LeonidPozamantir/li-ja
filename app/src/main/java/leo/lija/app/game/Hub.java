@@ -14,6 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import static leo.lija.chess.Color.BLACK;
+import static leo.lija.chess.Color.WHITE;
+
 public class Hub {
 
     private final SocketIOService socketService;
@@ -36,6 +39,10 @@ public class Hub {
         op.accept(members.values());
     }
 
+    public void ifEmpty(Runnable op) {
+        if (members.isEmpty()) op.run();
+    }
+
     public int getVersion() {
         return history.version();
     }
@@ -48,10 +55,15 @@ public class Hub {
         notifyAll("nbp", nb);
     }
 
+    public boolean isConnected(Color color) {
+        return member(color).isPresent();
+    }
+
     public void join(String uid, Integer version, Color color, boolean owner, Optional<String> username) {
         socketService.addToRoom(gameId, uid);
         history.since(version).forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
         members.put(uid, Member.apply(uid, new PovRef(gameId, color), owner, username));
+        notifyCrowd();
     }
 
     public void events(List<Event> events) {
@@ -61,6 +73,19 @@ public class Hub {
     public void quit(String uid) {
         members.remove(uid);
         socketService.removeFromRoom(gameId, uid);
+        notifyCrowd();
+    }
+
+    private void notifyCrowd() {
+        notifyVersion("crowd", Map.of(
+            "white", member(WHITE).isPresent(),
+            "black", member(BLACK).isPresent(),
+            "watchers", members.values().stream().filter(Member::watcher).count()
+        ));
+    }
+
+    private Optional<Member> member(Color color) {
+        return members.values().stream().filter(m -> m.isOwner() && m.color() == color).findAny();
     }
 
     public void notifyVersion(Event e) {
@@ -68,6 +93,20 @@ public class Hub {
         Collection<Member> m1 = e.owner() ? members.values().stream().filter(Member::isOwner).toList() : members.values();
         Collection<Member> m2 = e.only().map(color -> (Collection<Member>) m1.stream().filter(m -> m.color() == color).toList()).orElse(m1);
         m2.forEach(m -> socketService.sendMessageToClient(m.getUid(), gameId, vmsg));
+    }
+
+    public void notifyVersion(String t, Object d) {
+        notifyVersion(new Event() {
+            @Override
+            public String typ() {
+                return t;
+            }
+
+            @Override
+            public Object data() {
+                return d;
+            }
+        });
     }
 
     private void notifyAll(String t, Object data) {

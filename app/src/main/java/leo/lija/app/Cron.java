@@ -39,13 +39,6 @@ public class Cron {
     private final int TIMEOUT = 200;
 
     @Scheduled(fixedRateString = "2s")
-    void gameHubKeepAlive() {
-        gameHubMaster.keepAlive()
-            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-            .join();
-    }
-
-    @Scheduled(fixedRateString = "2s")
     void gameNbPlayers() {
         gameHubMaster.nbPlayers(1)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -58,7 +51,7 @@ public class Cron {
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
-    @Scheduled(fixedRateString = "2s")
+    @Scheduled(fixedRateString = "5s")
     void nbPlayers() {
         int lobbyNb = lobbyHub.getNbMembers();
         int gameNb = gameHubMaster.getNbMembers().join();

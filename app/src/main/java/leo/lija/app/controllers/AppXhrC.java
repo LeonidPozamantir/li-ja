@@ -75,11 +75,6 @@ public class AppXhrC extends BaseController {
         return performAndRedirect(fullId, hand::drawDecline);
     }
 
-    @PostMapping("/moretime/{fullId}")
-    public float moretime(@PathVariable String fullId) {
-        return hand.moretime(fullId);
-    }
-
     @GetMapping({"/how-many-players-now", "/internal/nb-players"})
     public long nbPlayers() {
         return 0;

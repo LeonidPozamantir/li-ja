@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.BLACK;
@@ -121,8 +122,10 @@ public class AppApi {
         return gameHubMemo.get(gameId).getVersion();
     }
 
-    public int activity(String gameId, String colorName) {
-        return Color.apply(colorName).map(color -> aliveMemo.activity(gameId, color)).orElse(0);
+    public boolean isConnected(String gameId, String colorName) {
+        return Color.apply(colorName).map(c ->
+            gameHubMemo.get(gameId).isConnected(c)
+        ).orElse(false);
     }
 
     private Color ioColor(String colorName) {

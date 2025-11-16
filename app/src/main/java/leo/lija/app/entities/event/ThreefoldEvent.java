@@ -4,15 +4,10 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 
-@EqualsAndHashCode
-public class ThreefoldEvent implements Event {
+@EqualsAndHashCode(callSuper = false)
+public class ThreefoldEvent extends EmptyEvent {
     @Override
     public String typ() {
         return "threefold_repetition";
-    }
-
-    @Override
-    public Map<String, Object> data() {
-        return null;
     }
 }

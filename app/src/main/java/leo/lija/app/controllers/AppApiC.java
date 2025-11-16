@@ -54,7 +54,7 @@ public class AppApiC {
 
     @GetMapping("/activity/{gameId}/{color}")
     public int activity(@PathVariable String gameId, @PathVariable String color) {
-        return api.activity(gameId, color);
+        return api.isConnected(gameId, color) ? 1 : 0;
     }
 
     @GetMapping("/game-version/{gameId}")
