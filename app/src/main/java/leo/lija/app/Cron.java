@@ -39,8 +39,8 @@ public class Cron {
     private final int TIMEOUT = 200;
 
     @Scheduled(fixedRateString = "2s")
-    void gameHubCleanup() {
-        gameHubMaster.cleanup()
+    void gameHubKeepAlive() {
+        gameHubMaster.keepAlive()
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
             .join();
     }

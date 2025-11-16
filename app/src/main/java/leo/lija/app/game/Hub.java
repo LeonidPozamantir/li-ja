@@ -1,6 +1,7 @@
 package leo.lija.app.game;
 
 import leo.lija.app.config.SocketIOService;
+import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.History;
 import leo.lija.chess.Color;
@@ -50,7 +51,7 @@ public class Hub {
     public void join(String uid, Integer version, Color color, boolean owner, Optional<String> username) {
         socketService.addToRoom(gameId, uid);
         history.since(version).forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
-        members.put(uid, Member.apply(uid, color, owner, username));
+        members.put(uid, Member.apply(uid, new PovRef(gameId, color), owner, username));
     }
 
     public void events(List<Event> events) {
@@ -65,7 +66,7 @@ public class Hub {
     public void notifyVersion(Event e) {
         Map<String, Object> vmsg = history.add(makeMessage(e.typ(), e.data()));
         Collection<Member> m1 = e.owner() ? members.values().stream().filter(Member::isOwner).toList() : members.values();
-        Collection<Member> m2 = e.only().map(color -> (Collection<Member>) m1.stream().filter(m -> m.color == color).toList()).orElse(m1);
+        Collection<Member> m2 = e.only().map(color -> (Collection<Member>) m1.stream().filter(m -> m.color() == color).toList()).orElse(m1);
         m2.forEach(m -> socketService.sendMessageToClient(m.getUid(), gameId, vmsg));
     }
 

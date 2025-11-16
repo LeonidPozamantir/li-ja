@@ -28,7 +28,6 @@ lobby:
   hook-pool.tick.frequency: 1s
 
 game:
-  socket-timeout: 60
   message.lifetime: 20
 
 socket:

@@ -16,7 +16,7 @@ public class HubMaster {
     private final HubMemo hubMemo;
     private final TaskExecutor executor;
 
-    public CompletableFuture<Void> cleanup() {
+    public CompletableFuture<Void> keepAlive() {
         return CompletableFuture.runAsync(() -> hubMemo.all().forEach((id, hub) -> hub.withMembers(members -> {
             if (!members.isEmpty()) hubMemo.shake(id);
         })), executor);
@@ -37,11 +37,12 @@ public class HubMaster {
         return CompletableFuture.runAsync(() -> hubActors().forEach(actor -> actor.nbPlayers(nb)), executor);
     }
 
+    private Collection<Hub> hubActors() {
+        return hubMemo.all().values();
+    }
+
     private Map<String, Hub> hubs() {
         return hubMemo.all();
     }
 
-    private Collection<Hub> hubActors() {
-        return hubMemo.all().values();
-    }
 }
