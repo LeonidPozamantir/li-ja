@@ -7,11 +7,10 @@ import leo.lija.app.entities.DbPlayer;
 import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
-import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.ClockEvent;
+import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.memo.AliveMemo;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
@@ -36,7 +35,6 @@ public class Hand {
     private final Messenger messenger;
     private final AiService ai;
     private final Finisher finisher;
-    private final AliveMemo aliveMemo;
     private final int moretimeSeconds;
 
     public Hand(
@@ -44,13 +42,11 @@ public class Hand {
             Messenger messenger,
             AiService ai,
             Finisher finisher,
-            AliveMemo aliveMemo,
             @Value("${moretime.seconds}") int moretimeSeconds) {
         this.gameRepo = gameRepo;
         this.messenger = messenger;
         this.ai = ai;
         this.finisher = finisher;
-        this.aliveMemo = aliveMemo;
         this.moretimeSeconds = moretimeSeconds;
     }
 
@@ -71,7 +67,6 @@ public class Hand {
             Game newChessGame = newChessGameAndMove.getFirst();
             Move move = newChessGameAndMove.getSecond();
             Progress progress = g1.update(newChessGame, move);
-            aliveMemo.put(progress.game().getId(), color);
 
             List<Event> events = new ArrayList<>();
             if (progress.game().finished()) {
@@ -107,10 +102,6 @@ public class Hand {
 
     public List<Event> resign(String fullId) {
         return attempt(fullId, finisher::resign);
-    }
-
-    public List<Event> forceResign(String fullId) {
-        return attempt(fullId, finisher::forceResign);
     }
 
     public List<Event> outoftime(String fullId) {

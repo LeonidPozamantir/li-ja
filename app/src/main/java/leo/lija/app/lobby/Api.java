@@ -8,7 +8,6 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.memo.AliveMemo;
 import leo.lija.chess.Color;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,18 +23,14 @@ public class Api {
     private final leo.lija.app.game.Socket gameSocket;
     private final Messenger messenger;
     private final Starter starter;
-    private final Socket lobbySocket;
-    private final AliveMemo aliveMemo;
 
-    public Api(HookRepo hookRepo, Fisherman fisherman, GameRepo gameRepo, @Qualifier("gameSocket") leo.lija.app.game.Socket gameSocket, Messenger messenger, Starter starter, Socket lobbySocket, AliveMemo aliveMemo) {
+    public Api(HookRepo hookRepo, Fisherman fisherman, GameRepo gameRepo, @Qualifier("gameSocket") leo.lija.app.game.Socket gameSocket, Messenger messenger, Starter starter) {
         this.hookRepo = hookRepo;
         this.fisherman = fisherman;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
         this.messenger = messenger;
         this.starter = starter;
-        this.lobbySocket = lobbySocket;
-        this.aliveMemo = aliveMemo;
     }
 
 
@@ -59,8 +54,6 @@ public class Api {
         p1.addAll(messenger.systemMessages(game, messageString));
         gameRepo.save(p1);
         gameSocket.send(p1);
-        aliveMemo.put(gameId, color);
-        aliveMemo.put(gameId, color.getOpposite());
         hook.ifPresent(h -> fisherman.bite(h, p1.game()));
         myHookOwnerId.ifPresent(ownerId -> hookRepo.findByOwnerId(ownerId)
                 .ifPresent(fisherman::delete));

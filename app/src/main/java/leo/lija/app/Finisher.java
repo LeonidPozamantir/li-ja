@@ -10,7 +10,6 @@ import leo.lija.app.entities.Status;
 import leo.lija.app.entities.User;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.memo.AliveMemo;
 import leo.lija.app.memo.FinisherLock;
 import leo.lija.chess.Color;
 import leo.lija.chess.EloCalculator;
@@ -30,16 +29,14 @@ public class Finisher {
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
     private final Messenger messenger;
-    private final AliveMemo aliveMemo;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, Messenger messenger, AliveMemo aliveMemo, FinisherLock finisherLock) {
+    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, Messenger messenger, FinisherLock finisherLock) {
         this.historyRepo = historyRepo;
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.messenger = messenger;
-        this.aliveMemo = aliveMemo;
         this.finisherLock = finisherLock;
     }
 
@@ -51,12 +48,6 @@ public class Finisher {
     public List<Event> resign(Pov pov) {
         if (pov.game().resignable()) return finish(pov.game(), Status.RESIGN, Optional.of(pov.color().getOpposite()));
         throw new AppException("game is not resignable");
-    }
-
-    public List<Event> forceResign(Pov pov) {
-        if (pov.game().playable() && aliveMemo.inactive(pov.game().getId(), pov.color().getOpposite()))
-            return finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
-        throw new AppException("game is not force-resignable");
     }
 
     public List<Event> drawClaim(Pov pov) {

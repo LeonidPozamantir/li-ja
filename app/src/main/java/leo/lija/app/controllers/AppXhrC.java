@@ -45,11 +45,6 @@ public class AppXhrC extends BaseController {
         return performAndRedirect(fullId, hand::resign);
     }
 
-    @GetMapping("/resign-force/{fullId}")
-    public ResponseEntity<Void> forceResign(@PathVariable String fullId) {
-        return performAndRedirect(fullId, hand::forceResign);
-    }
-
     @GetMapping("/draw-claim/{fullId}")
     public ResponseEntity<Void> drawClaim(@PathVariable String fullId) {
         return performAndRedirect(fullId, hand::drawClaim);

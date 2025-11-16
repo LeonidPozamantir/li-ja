@@ -35,9 +35,6 @@ socket:
   port: 9092
 
 memo: #seconds
-  alive:
-    hard-timeout: 100
-    soft-timeout: 6
   watcher:
     timeout: 6
   username:

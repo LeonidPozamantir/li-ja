@@ -36,11 +36,6 @@ public class AppApiC {
         api.reloadTable(gameId);
     }
 
-    @PostMapping("/alive/{gameId}/{color}")
-    public void alive(@PathVariable String gameId, @PathVariable String color) {
-        api.alive(gameId, color);
-    }
-
     @PostMapping("/start/{gameId}")
     public void start(@PathVariable String gameId, @Valid @RequestBody EntryForm entryData) {
         api.start(gameId, entryData.entry());

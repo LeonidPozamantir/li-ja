@@ -2,8 +2,8 @@ package leo.lija.app;
 
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
-import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Pov;
+import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Room;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.RedirectEvent;
@@ -11,7 +11,6 @@ import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.game.HubMemo;
 import leo.lija.app.game.Socket;
-import leo.lija.app.memo.AliveMemo;
 import leo.lija.chess.Color;
 import leo.lija.chess.Pos;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static leo.lija.chess.Color.BLACK;
@@ -31,15 +29,13 @@ public class AppApi {
 
     private final GameRepo gameRepo;
     private final Socket gameSocket;
-    private final AliveMemo aliveMemo;
     private final HubMemo gameHubMemo;
     private final Messenger messenger;
     private final Starter starter;
 
-    AppApi(GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, AliveMemo aliveMemo, HubMemo gameHubMemo, Messenger messenger, Starter starter) {
+    AppApi(GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMemo gameHubMemo, Messenger messenger, Starter starter) {
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
-        this.aliveMemo = aliveMemo;
         this.gameHubMemo = gameHubMemo;
         this.messenger = messenger;
         this.starter = starter;
@@ -48,12 +44,10 @@ public class AppApi {
     public Map<String, Object> show(String fullId) {
         int version = gameHubMemo.getFromFullId(fullId).getVersion();
         Pov pov = gameRepo.pov(fullId);
-        aliveMemo.put(pov.game().getId(), pov.color());
         List<Room.RoomMessage> roomData = messenger.render(pov.game().getId());
         Map<String, Object> res = new HashMap<>(Map.of(
             "version", version,
-            "roomData", roomData,
-            "opponentActivity", aliveMemo.activity(pov.game().getId(), pov.color().getOpposite())
+            "roomData", roomData
         ));
         if (pov.game().playableBy(pov.player())) {
             res.put("possibleMoves", pov.game().toChess().situation().destinations().entrySet().stream()
@@ -102,8 +96,6 @@ public class AppApi {
         newProgress.addAll(messenger.systemMessages(newProgress.game(), messageString));
         gameRepo.save(newProgress);
         gameSocket.send(newProgress);
-        aliveMemo.put(newGameId, color.getOpposite());
-        aliveMemo.transfer(gameId, color.getOpposite(), newGameId, color);
     }
 
     public void reloadTable(String gameId) {
@@ -111,11 +103,6 @@ public class AppApi {
         Progress progress = new Progress(g1, Color.all.stream().map(c -> (Event) new ReloadTableEvent(c)).toList());
         gameRepo.save(progress);
         gameSocket.send(progress);
-    }
-
-    public void alive(String gameId, String colorName) {
-        Color color = ioColor(colorName);
-        aliveMemo.put(gameId, color);
     }
 
     public int gameVersion(String gameId) {
