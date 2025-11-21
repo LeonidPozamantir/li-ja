@@ -1,5 +1,6 @@
 package leo.lija.app;
 
+import jakarta.annotation.PostConstruct;
 import leo.lija.app.ai.RemoteAi;
 import leo.lija.app.command.GameFinishCommand;
 import leo.lija.app.db.GameRepo;
@@ -7,15 +8,17 @@ import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
-import leo.lija.app.lobby.Hub;
 import leo.lija.app.memo.HookMemo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -25,69 +28,90 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class Cron {
 
+    private final TaskScheduler taskScheduler;
+    private final TaskExecutor actionsExecutor;
+    private final TaskExecutor futuresExecutor;
+
     private final UserRepo userRepo;
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;
     private final GameFinishCommand gameFinishCommand;
     private final RemoteAi remoteAi;
     private final Fisherman lobbyFisherman;
-    private final Hub lobbyHub;
-    private final TaskExecutor actionsExecutor;
+    private final leo.lija.app.site.Hub siteHub;
+    private final leo.lija.app.lobby.Hub lobbyHub;
     private final HookMemo hookMemo;
     private final HubMaster gameHubMaster;
 
     private final int TIMEOUT = 200;
 
-    @Scheduled(fixedRateString = "2s")
-    void gameNbPlayers() {
-        gameHubMaster.nbPlayers(1)
-            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-            .join();
-    }
-
-    @Scheduled(fixedRateString = "1s")
+    @PostConstruct
     void hookTick() {
-        CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
-            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
+        spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
+            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
-    @Scheduled(fixedRateString = "5s")
+    @PostConstruct
     void nbPlayers() {
-        int lobbyNb = lobbyHub.getNbMembers();
-        int gameNb = gameHubMaster.getNbMembers().join();
-        lobbyHub.nbPlayers(lobbyNb + gameNb);
-        gameHubMaster.nbPlayers(lobbyNb + gameNb).join();
+        spawn(Duration.ofSeconds(1), () -> {
+            @SuppressWarnings("unchecked")
+            CompletableFuture<Integer>[] futures = hubs().stream().map(Hub::getNbMembers).toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(futures).thenAccept(v -> {
+                    int sum = Arrays.stream(futures).map(CompletableFuture::join)
+                        .mapToInt(Integer::intValue)
+                        .sum();
+                    hubs().forEach(h -> h.nbPlayers(sum).join());
+                }
+            );
+        });
     }
 
-    @Scheduled(fixedRateString = "2s")
+    @PostConstruct
     void hookCleanupDead() {
-        lobbyFisherman.cleanup();
+        spawn(Duration.ofSeconds(2), lobbyFisherman::cleanup);
     }
 
-    @Scheduled(fixedRateString = "21s")
+    @PostConstruct
     void hookCleanupOld() {
-        hookRepo.cleanupOld();
+        spawn(Duration.ofSeconds(21), hookRepo::cleanupOld);
     }
 
-    @Scheduled(fixedRateString = "3s")
+    @PostConstruct
     void onlineUsername() {
-        CompletableFuture.runAsync(() -> lobbyHub.withUsernames(userRepo::updateOnlineUserNames), actionsExecutor)
-            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS);
+        spawn(Duration.ofSeconds(3), () -> {
+            @SuppressWarnings("unchecked")
+            CompletableFuture<List<String>>[] futures = hubs().stream().map(Hub::getUsernames).toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(futures)
+                .thenApplyAsync(v -> Arrays.stream(futures).map(CompletableFuture::join)
+                    .flatMap(List::stream)
+                    .toList(), futuresExecutor)
+                .thenAccept(userRepo::updateOnlineUserNames);
+        });
     }
 
-    @Scheduled(fixedRateString = "2h")
+    @PostConstruct
     void gameCleanupUnplayed() {
-        System.out.println("[cron] remove old unplayed games");
-        gameRepo.cleanupUnplayed();
+        spawn(Duration.ofHours(2), () -> {
+            System.out.println("[cron] remove old unplayed games");
+            gameRepo.cleanupUnplayed();
+        });
     }
 
-    @Scheduled(fixedRateString = "1h")
+    @PostConstruct
     void gameAutoFinish() {
-        gameFinishCommand.apply();
+        spawn(Duration.ofHours(1), gameFinishCommand::apply);
     }
 
-    @Scheduled(fixedRateString = "10s")
+    @PostConstruct
     void remoteAiHealth() {
-        remoteAi.diagnose();
+        spawn(Duration.ofSeconds(10), remoteAi::diagnose);
+    }
+
+    private void spawn(Duration freq, Runnable op) {
+        taskScheduler.scheduleWithFixedDelay(op, RichDuration.randomize(freq));
+    }
+
+    private List<leo.lija.app.Hub> hubs() {
+        return List.of(siteHub, lobbyHub, gameHubMaster);
     }
 }

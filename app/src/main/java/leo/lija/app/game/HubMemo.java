@@ -5,19 +5,22 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.DbGame;
-import leo.lija.app.socket.History;
 import lombok.NonNull;
+import org.springframework.core.task.TaskExecutor;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class HubMemo {
 
+    private final TaskExecutor executor;
+
     private final SocketIOService socketIOService;
     private final Supplier<History> makeHistory;
     private final LoadingCache<@NonNull String, @NonNull Hub> cache;
 
-    public HubMemo(SocketIOService socketIOService, Supplier<History> makeHistory) {
+    public HubMemo(TaskExecutor executor, SocketIOService socketIOService, Supplier<History> makeHistory) {
+        this.executor = executor;
         this.socketIOService = socketIOService;
         this.makeHistory = makeHistory;
         this.cache = CacheBuilder.newBuilder()
@@ -46,6 +49,6 @@ public class HubMemo {
 
     private Hub compute(String gameId) {
         System.out.println("create actor game " + gameId);
-        return new Hub(socketIOService, gameId, makeHistory.get());
+        return new Hub(executor, socketIOService, gameId, makeHistory.get());
     }
 }

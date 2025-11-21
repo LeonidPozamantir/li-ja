@@ -6,7 +6,6 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
-import leo.lija.app.socket.History;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@Service
-public class Hub {
+@Service("lobbyHub")
+public class Hub implements leo.lija.app.Hub {
 
     private final SocketIOService socketService;
     private final MessageRepo messageRepo;
@@ -37,8 +37,9 @@ public class Hub {
         op.accept(hookOwnerIds());
     }
 
-    public void withUsernames(Consumer<Collection<String>> op) {
-        op.accept(usernames());
+    @Override
+    public CompletableFuture<List<String>> getUsernames() {
+        return CompletableFuture.completedFuture(usernames());
     }
 
     public void join(String uid, Integer version, Optional<String> username, Optional<String> hookOwnerId) {
@@ -84,12 +85,14 @@ public class Hub {
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
     }
 
-    public int getNbMembers() {
-        return members.size();
+    @Override
+    public CompletableFuture<Integer> getNbMembers() {
+        return CompletableFuture.completedFuture(members.size());
     }
 
-    public void nbPlayers(int nb) {
-        notifyAll("nbp", nb);
+    @Override
+    public CompletableFuture<Void> nbPlayers(int nb) {
+        return CompletableFuture.runAsync(() -> notifyAll("nbp", nb));
     }
 
     public void quit(String uid) {

@@ -29,6 +29,8 @@ public class SocketIOService extends BaseController {
     @Setter
     private Socket lobbySocket;
     @Setter
+    private leo.lija.app.site.Socket siteSocket;
+    @Setter
     private leo.lija.app.game.Socket gameSocket;
 
     private final Map<String, String> sessionToUid = new ConcurrentHashMap<>();
@@ -51,6 +53,12 @@ public class SocketIOService extends BaseController {
                 get(Optional.ofNullable(event.hook))
             );
         });
+
+        server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) ->
+            siteSocket.join(
+                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                get(Optional.ofNullable(event.username))
+        ));
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) ->
             lobbySocket.talk(event)
@@ -81,6 +89,10 @@ public class SocketIOService extends BaseController {
             gameSocket.moretime(event)
         );
 
+        server.addEventListener("game/outoftime", GameOutoftimeForm.class, (client, event, ackSender) ->
+            gameSocket.outoftime(event)
+        );
+
         server.start();
 
     }
@@ -90,6 +102,8 @@ public class SocketIOService extends BaseController {
     public record LobbyTalkForm(String t, Data d) {
         public record Data(String txt, String u) {}
     }
+
+    public record SiteJoinForm(String uid, String username) {}
 
     public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId, String username) {}
 
@@ -101,6 +115,8 @@ public class SocketIOService extends BaseController {
 
     public record GameMoretimeForm(PovRef povRef) {}
 
+    public record GameOutoftimeForm(PovRef povRef) {}
+
     @PreDestroy
     public void destroy() {
         server.stop();
@@ -111,8 +127,10 @@ public class SocketIOService extends BaseController {
             String sessionId = client.getSessionId().toString();
             String uid = sessionToUid.get(sessionId);
             lobbySocket.quit(uid);
+            siteSocket.quit(uid);
             Set<String> gameRooms = client.getAllRooms();
             gameRooms.remove("lobby");
+            gameRooms.remove("site");
             gameSocket.quit(uid, gameRooms);
             uidToClient.remove(uid);
             sessionToUid.remove(sessionId);

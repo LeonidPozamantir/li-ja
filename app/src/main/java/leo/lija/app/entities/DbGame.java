@@ -2,6 +2,7 @@ package leo.lija.app.entities;
 
 
 import leo.lija.app.entities.event.ClockEvent;
+import leo.lija.app.entities.event.StateEvent;
 import leo.lija.chess.Board;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
@@ -192,7 +193,8 @@ public class DbGame {
         Situation situation = game.situation();
         List<Event> events = new ArrayList<>(List.of(
             Event.possibleMoves(situation, WHITE),
-            Event.possibleMoves(situation, BLACK)
+            Event.possibleMoves(situation, BLACK),
+            new StateEvent(game.situation().getColor(), game.getTurns())
         ));
         events.addAll(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
@@ -296,8 +298,9 @@ public class DbGame {
             .map(c -> player());
     }
 
-    public void withClock(Clock c) {
+    public Progress withClock(Clock c) {
         clock = Optional.of(c);
+        return new Progress(this);
     }
 
     public DbPlayer creator() {

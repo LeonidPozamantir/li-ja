@@ -1,4 +1,4 @@
-package leo.lija.app.socket;
+package leo.lija.app.lobby;
 
 import com.google.common.cache.Cache;
 import leo.lija.app.memo.Builder;

@@ -1,7 +1,6 @@
 package leo.lija.app.controllers;
 
 import leo.lija.app.Hand;
-import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.game.Socket;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -18,21 +16,14 @@ import java.util.List;
 import java.util.function.Function;
 
 @RestController
-public class AppXhrC extends BaseController {
+public class AppC extends BaseController {
 
     private final Hand hand;
-    private final GameRepo gameRepo;
     private final Socket gameSocket;
 
-    public AppXhrC(Hand hand, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket) {
+    public AppC(Hand hand, @Qualifier("gameSocket") Socket gameSocket) {
         this.hand = hand;
-        this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
-    }
-
-    @PostMapping("/outoftime/{fullId}")
-    public void outoftime(@PathVariable String fullId) {
-        perform(fullId, hand::outoftime);
     }
 
     @GetMapping("/abort/{fullId}")
@@ -68,16 +59,6 @@ public class AppXhrC extends BaseController {
     @GetMapping("/draw-decline/{fullId}")
     public ResponseEntity<Void> drawDecline(@PathVariable String fullId) {
         return performAndRedirect(fullId, hand::drawDecline);
-    }
-
-    @GetMapping({"/how-many-players-now", "/internal/nb-players"})
-    public long nbPlayers() {
-        return 0;
-    }
-
-    @GetMapping("/how-many-games-now")
-    public int nbGames() {
-        return gameRepo.countPlaying();
     }
 
     private void perform(String fullId, Function<String, List<Event>> op) {

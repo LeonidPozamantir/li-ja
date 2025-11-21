@@ -32,6 +32,10 @@ public abstract class Member {
         return owner ? "Owner" : "Watcher";
     }
 
+    public String show() {
+        return username.orElse("Anonymous");
+    }
+
     @Override
     public String toString() {
         return "%s(%s-%s,%s)".formatted(className(), gameId(), color(), username);

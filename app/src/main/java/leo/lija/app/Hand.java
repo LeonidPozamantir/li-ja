@@ -104,8 +104,8 @@ public class Hand {
         return attempt(fullId, finisher::resign);
     }
 
-    public List<Event> outoftime(String fullId) {
-        return attempt(fullId, p -> finisher.outoftime(p.game()));
+    public List<Event> outoftime(PovRef ref) {
+        return attemptRef(ref, p -> finisher.outoftime(p.game()));
     }
 
     public List<Event> drawClaim(String fullId) {
@@ -174,10 +174,10 @@ public class Hand {
             pov.game().getClock().filter(c -> pov.game().playable()).map(clock -> {
                 Color color = pov.color().getOpposite();
                 Clock newClock = clock.giveTime(color, moretimeSeconds);
-                pov.game().withClock(newClock);
-                List<Event> events = new ArrayList<>(List.of(ClockEvent.apply(newClock)));
-                events.addAll(messenger.systemMessage(pov.game(), "%s + %d seconds".formatted(color, moretimeSeconds)));
-                Progress progress = new Progress(pov.game(), events);
+                Progress progress = pov.game().withClock(newClock);
+                List<Event> events = messenger.systemMessage(pov.game(), "%s + %d seconds".formatted(color, moretimeSeconds));
+                progress.add(ClockEvent.apply(newClock));
+                progress.addAll(events);
                 gameRepo.save(progress);
                 return progress.events();
         }).orElseThrow(() -> new AppException("cannot add more time")));

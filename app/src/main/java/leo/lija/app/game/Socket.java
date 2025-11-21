@@ -79,6 +79,13 @@ public class Socket {
         hub.events(events);
     }
 
+    public void outoftime(SocketIOService.GameOutoftimeForm event) {
+        List<Event> events = hand.outoftime(event.povRef());
+        String gameId = event.povRef().gameId();
+        Hub hub = hubMemo.get(gameId);
+        hub.events(events);
+    }
+
     public void quit(String uid, Set<String> games) {
         games.forEach(gameId -> {
             Hub hub = hubMemo.get(gameId);

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -15,8 +16,9 @@ public class UserRepo {
     private final UserRepoJpa repo;
 
     public void updateOnlineUserNames(Collection<String> usernames) {
-        repo.updateOnlineUsernamesFalse(usernames);
-        repo.updateOnlineUsernamesTrue(usernames);
+        List<String> names = usernames.stream().map(String::toLowerCase).distinct().toList();
+        repo.updateOnlineUsernamesFalse(names);
+        repo.updateOnlineUsernamesTrue(names);
     }
 
     public User user(String userId) {
