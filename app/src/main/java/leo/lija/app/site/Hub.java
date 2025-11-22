@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @Service("siteHub")
 @RequiredArgsConstructor
@@ -17,9 +18,9 @@ public class Hub {
     private final SocketIOService socketService;
 
     private Map<String, Member> members = new ConcurrentHashMap<>();
-    
-    public CompletableFuture<List<String>> getUsernames() {
-        return CompletableFuture.completedFuture(usernames());
+
+    public void withUsernames(Consumer<List<String>> op) {
+        op.accept(usernames());
     }
 
     public void join(String uid, Optional<String> username) {

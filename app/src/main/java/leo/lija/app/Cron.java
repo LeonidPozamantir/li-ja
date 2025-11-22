@@ -66,18 +66,13 @@ public class Cron {
     @PostConstruct
     void onlineUsername() {
         spawn(Duration.ofSeconds(3), () ->
-            siteHub.getUsernames()
-                .thenAccept(userRepo::updateOnlineUserNames)
-                .join()
+            siteHub.withUsernames(userRepo::updateOnlineUserNames)
         );
     }
 
     @PostConstruct
     void gameCleanupUnplayed() {
-        spawn(Duration.ofHours(2), () -> {
-            System.out.println("[cron] remove old unplayed games");
-            gameRepo.cleanupUnplayed();
-        });
+        spawn(Duration.ofHours(2), gameRepo::cleanupUnplayed);
     }
 
     @PostConstruct
