@@ -27,7 +27,10 @@ public class Socket {
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
-        if (event.t().equals("talk")) hub.talk(event.d().txt(), event.d().u());
+        SocketIOService.LobbyTalkForm.Data data = event.d();
+        String txt = data.txt();
+        String username = data.u();
+        hub.talk(txt, username);
     }
 
     public void addEntry(Entry entry) {

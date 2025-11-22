@@ -103,7 +103,7 @@ public class SocketIOService extends BaseController {
 
     public record LobbyJoinForm(String uid, Integer version, String hook) {}
 
-    public record LobbyTalkForm(String t, Data d) {
+    public record LobbyTalkForm(Data d) {
         public record Data(String txt, String u) {}
     }
 

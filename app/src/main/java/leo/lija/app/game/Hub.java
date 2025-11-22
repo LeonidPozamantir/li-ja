@@ -89,19 +89,8 @@ public class Hub {
             )));
     }
 
-    private void notifyAll(String t, Object data) {
-        Map<String, Object> msg = makeMessage(t, data);
-        socketService.sendMessage(gameId, msg);
-    }
-
     private Optional<Member> member(Color color) {
         return members.values().stream().filter(m -> m.isOwner() && m.color() == color).findAny();
     }
 
-    private Map<String, Object> makeMessage(String t, Object data) {
-        return Map.of(
-                "t", t,
-                "d", data
-        );
-    }
 }
