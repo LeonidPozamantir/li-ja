@@ -79,17 +79,23 @@ public class SocketIOService extends BaseController {
             gameSocket.talk(uid, event);
         });
 
-        server.addEventListener("game/move", GameMoveForm.class, (client, event, ackSender) ->
-            gameSocket.move(event)
-        );
+        server.addEventListener("game/move", GameMoveForm.class, (client, event, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
+            gameSocket.move(uid, event);
+        });
 
-        server.addEventListener("game/moretime", GameMoretimeForm.class, (client, event, ackSender) ->
-            gameSocket.moretime(event)
-        );
+        server.addEventListener("game/moretime", GameMoretimeForm.class, (client, event, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
+            gameSocket.moretime(uid, event);
+        });
 
-        server.addEventListener("game/outoftime", GameOutoftimeForm.class, (client, event, ackSender) ->
-            gameSocket.outoftime(event)
-        );
+        server.addEventListener("game/outoftime", GameOutoftimeForm.class, (client, event, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
+            gameSocket.outoftime(uid, event);
+        });
 
         server.start();
 
@@ -105,7 +111,7 @@ public class SocketIOService extends BaseController {
 
     public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
 
-    public record GameTalkForm(PovRef povRef, String t, String d) {}
+    public record GameTalkForm(PovRef povRef, String d) {}
 
     public record GameMoveForm(PovRef povRef, Data d) {
         public record Data(String from, String to, String promotion) {}

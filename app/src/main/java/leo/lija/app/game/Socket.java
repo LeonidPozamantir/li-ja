@@ -5,10 +5,10 @@ import leo.lija.app.Hand;
 import leo.lija.app.Messenger;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.db.GameRepo;
+import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.chess.Color;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +16,27 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 @Service("gameSocket")
-@RequiredArgsConstructor
 public class Socket {
 
     private final TaskScheduler taskScheduler;
 
-    private final GameRepo gameRepo;
+    private final Function<String, Optional<DbGame>> getGame;
     private final Hand hand;
     private final HubMemo hubMemo;
     private final Messenger messenger;
     private final SocketIOService socketIOService;
+
+    public Socket(TaskScheduler taskScheduler, GameRepo gameRepo, Hand hand, HubMemo hubMemo, Messenger messenger, SocketIOService socketIOService) {
+        this.taskScheduler = taskScheduler;
+        this.getGame = gameRepo::gameOption;
+        this.hand = hand;
+        this.hubMemo = hubMemo;
+        this.messenger = messenger;
+        this.socketIOService = socketIOService;
+    }
 
     @PostConstruct
     private void init() {
@@ -49,7 +58,7 @@ public class Socket {
         Integer version,
         Optional<String> playerId
     ) {
-        gameRepo.gameOption(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
+        getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
             Hub hub = hubMemo.get(gameId);
             hub.join(uid, version, color, playerId.flatMap(gameOption::player).isPresent());
         }));
@@ -59,29 +68,40 @@ public class Socket {
         String gameId = event.povRef().gameId();
         Hub hub = hubMemo.get(gameId);
         Member member = hub.getMember(uid);
-        if (member instanceof Owner && event.t().equals("talk")) hub.events(
+        if (member instanceof Owner) hub.events(
             messenger.playerMessage(event.povRef(), event.d())
         );
     }
 
-    public void move(SocketIOService.GameMoveForm event) {
+    public void move(String uid, SocketIOService.GameMoveForm event) {
+        String gameId = event.povRef().gameId();
+        Hub hub = hubMemo.get(gameId);
+        Member member = hub.getMember(uid);
+        if (!(member instanceof Owner)) return;
+
         String orig = event.d().from();
         String dest = event.d().to();
         Optional<String> promotion = Optional.ofNullable(event.d().promotion());
-        send(event.povRef().gameId(), hand.play(event.povRef(), orig, dest, promotion));
+        send(gameId, hand.play(event.povRef(), orig, dest, promotion));
     }
 
-    public void moretime(SocketIOService.GameMoretimeForm event) {
-        List<Event> events = hand.moretime(event.povRef());
+    public void moretime(String uid, SocketIOService.GameMoretimeForm event) {
         String gameId = event.povRef().gameId();
         Hub hub = hubMemo.get(gameId);
+        Member member = hub.getMember(uid);
+        if (!(member instanceof Owner)) return;
+
+        List<Event> events = hand.moretime(event.povRef());
         hub.events(events);
     }
 
-    public void outoftime(SocketIOService.GameOutoftimeForm event) {
-        List<Event> events = hand.outoftime(event.povRef());
+    public void outoftime(String uid, SocketIOService.GameOutoftimeForm event) {
         String gameId = event.povRef().gameId();
         Hub hub = hubMemo.get(gameId);
+        Member member = hub.getMember(uid);
+        if (!(member instanceof Owner)) return;
+
+        List<Event> events = hand.outoftime(event.povRef());
         hub.events(events);
     }
 
