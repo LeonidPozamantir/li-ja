@@ -6,7 +6,6 @@ import leo.lija.app.command.GameFinishCommand;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
-import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.memo.HookMemo;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +27,6 @@ public class Cron {
 
     private final TaskScheduler taskScheduler;
     private final TaskExecutor actionsExecutor;
-    private final TaskExecutor futuresExecutor;
 
     private final UserRepo userRepo;
     private final HookRepo hookRepo;
@@ -41,7 +37,6 @@ public class Cron {
     private final leo.lija.app.site.Hub siteHub;
     private final leo.lija.app.lobby.Hub lobbyHub;
     private final HookMemo hookMemo;
-    private final HubMaster gameHubMaster;
 
     private final int TIMEOUT = 200;
 
@@ -53,17 +48,9 @@ public class Cron {
 
     @PostConstruct
     void nbPlayers() {
-        spawn(Duration.ofSeconds(1), () -> {
-            @SuppressWarnings("unchecked")
-            CompletableFuture<Integer>[] futures = hubs().stream().map(Hub::getNbMembers).toArray(CompletableFuture[]::new);
-            CompletableFuture.allOf(futures).thenAccept(v -> {
-                    int sum = Arrays.stream(futures).map(CompletableFuture::join)
-                        .mapToInt(Integer::intValue)
-                        .sum();
-                    hubs().forEach(h -> h.nbPlayers(sum).join());
-                }
-            );
-        });
+        spawn(Duration.ofSeconds(1), () ->
+            siteHub.nbPlayers().join()
+        );
     }
 
     @PostConstruct
@@ -78,15 +65,11 @@ public class Cron {
 
     @PostConstruct
     void onlineUsername() {
-        spawn(Duration.ofSeconds(3), () -> {
-            @SuppressWarnings("unchecked")
-            CompletableFuture<List<String>>[] futures = hubs().stream().map(Hub::getUsernames).toArray(CompletableFuture[]::new);
-            CompletableFuture.allOf(futures)
-                .thenApplyAsync(v -> Arrays.stream(futures).map(CompletableFuture::join)
-                    .flatMap(List::stream)
-                    .toList(), futuresExecutor)
-                .thenAccept(userRepo::updateOnlineUserNames);
-        });
+        spawn(Duration.ofSeconds(3), () ->
+            siteHub.getUsernames()
+                .thenAccept(userRepo::updateOnlineUserNames)
+                .join()
+        );
     }
 
     @PostConstruct
@@ -111,7 +94,4 @@ public class Cron {
         taskScheduler.scheduleWithFixedDelay(op, RichDuration.randomize(freq));
     }
 
-    private List<leo.lija.app.Hub> hubs() {
-        return List.of(siteHub, lobbyHub, gameHubMaster);
-    }
 }

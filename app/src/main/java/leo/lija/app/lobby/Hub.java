@@ -14,12 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service("lobbyHub")
-public class Hub implements leo.lija.app.Hub {
+public class Hub {
 
     private final SocketIOService socketService;
     private final MessageRepo messageRepo;
@@ -37,15 +36,10 @@ public class Hub implements leo.lija.app.Hub {
         op.accept(hookOwnerIds());
     }
 
-    @Override
-    public CompletableFuture<List<String>> getUsernames() {
-        return CompletableFuture.completedFuture(usernames());
-    }
-
-    public void join(String uid, Integer version, Optional<String> username, Optional<String> hookOwnerId) {
+    public void join(String uid, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom("lobby", uid);
         history.since(version).forEach(m -> socketService.sendMessageToClient(uid, "lobby", m));
-        members.put(uid, new Member(uid, username, hookOwnerId));
+        members.put(uid, new Member(uid, hookOwnerId));
     }
 
     public void talk(String txt, String u) {
@@ -85,16 +79,6 @@ public class Hub implements leo.lija.app.Hub {
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
     }
 
-    @Override
-    public CompletableFuture<Integer> getNbMembers() {
-        return CompletableFuture.completedFuture(members.size());
-    }
-
-    @Override
-    public CompletableFuture<Void> nbPlayers(int nb) {
-        return CompletableFuture.runAsync(() -> notifyAll("nbp", nb));
-    }
-
     public void quit(String uid) {
         members.remove(uid);
         socketService.removeFromRoom("lobby", uid);
@@ -122,13 +106,6 @@ public class Hub implements leo.lija.app.Hub {
         return members.values().stream()
                 .filter(m -> m.hookOwnerId().isPresent())
                 .map(m -> m.hookOwnerId().get())
-                .toList();
-    }
-
-    private List<String> usernames() {
-        return members.values().stream()
-                .filter(m -> m.username().isPresent())
-                .map(m -> m.username().get())
                 .toList();
     }
 

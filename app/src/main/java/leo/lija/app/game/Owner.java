@@ -6,7 +6,7 @@ import leo.lija.chess.Color;
 import java.util.Optional;
 
 public class Owner extends Member {
-    public Owner(String uid, PovRef ref, Optional<String> username) {
-        super(uid, ref, username, true);
+    public Owner(String uid, PovRef ref) {
+        super(uid, ref, true);
     }
 }

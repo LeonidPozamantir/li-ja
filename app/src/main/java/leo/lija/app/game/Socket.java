@@ -47,12 +47,11 @@ public class Socket {
         String colorName,
         String uid,
         Integer version,
-        Optional<String> playerId,
-        Optional<String> username
+        Optional<String> playerId
     ) {
         gameRepo.gameOption(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
             Hub hub = hubMemo.get(gameId);
-            hub.join(uid, version, color, playerId.flatMap(gameOption::player).isPresent(), username);
+            hub.join(uid, version, color, playerId.flatMap(gameOption::player).isPresent());
         }));
     }
 

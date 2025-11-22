@@ -49,7 +49,6 @@ public class SocketIOService extends BaseController {
             lobbySocket.join(
                 get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
                 Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
-                get(Optional.ofNullable(event.username)),
                 get(Optional.ofNullable(event.hook))
             );
         });
@@ -70,8 +69,7 @@ public class SocketIOService extends BaseController {
                 event.color,
                 get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
                 Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
-                get(Optional.ofNullable(event.playerId)),
-                get(Optional.ofNullable(event.username))
+                get(Optional.ofNullable(event.playerId))
             )
         );
 
@@ -97,7 +95,7 @@ public class SocketIOService extends BaseController {
 
     }
 
-    public record LobbyJoinForm(String uid, Integer version, String username, String hook) {}
+    public record LobbyJoinForm(String uid, Integer version, String hook) {}
 
     public record LobbyTalkForm(String t, Data d) {
         public record Data(String txt, String u) {}
@@ -105,7 +103,7 @@ public class SocketIOService extends BaseController {
 
     public record SiteJoinForm(String uid, String username) {}
 
-    public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId, String username) {}
+    public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
 
     public record GameTalkForm(PovRef povRef, String t, String d) {}
 

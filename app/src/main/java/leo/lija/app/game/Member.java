@@ -5,15 +5,12 @@ import leo.lija.chess.Color;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Getter
 public abstract class Member {
 
     protected final String uid;
     protected final PovRef ref;
-    protected final Optional<String> username;
     protected final boolean owner;
 
     public boolean watcher() {
@@ -32,17 +29,13 @@ public abstract class Member {
         return owner ? "Owner" : "Watcher";
     }
 
-    public String show() {
-        return username.orElse("Anonymous");
-    }
-
     @Override
     public String toString() {
-        return "%s(%s-%s,%s)".formatted(className(), gameId(), color(), username);
+        return "%s(%s-%s)".formatted(className(), gameId(), color());
     }
 
-    public static Member apply(String uid, PovRef ref, boolean owner, Optional<String> username) {
-        if (owner) return new Owner(uid, ref, username);
-        return new Watcher(uid, ref, username);
+    public static Member apply(String uid, PovRef ref, boolean owner) {
+        if (owner) return new Owner(uid, ref);
+        return new Watcher(uid, ref);
     }
 }

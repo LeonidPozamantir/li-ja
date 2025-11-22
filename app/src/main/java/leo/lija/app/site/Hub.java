@@ -12,13 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service("siteHub")
 @RequiredArgsConstructor
-public class Hub implements leo.lija.app.Hub {
+public class Hub {
 
     private final SocketIOService socketService;
 
     private Map<String, Member> members = new ConcurrentHashMap<>();
-
-    @Override
+    
     public CompletableFuture<List<String>> getUsernames() {
         return CompletableFuture.completedFuture(usernames());
     }
@@ -28,12 +27,8 @@ public class Hub implements leo.lija.app.Hub {
         members.put(uid, new Member(uid, username));
     }
 
-    public CompletableFuture<Integer> getNbMembers() {
-        return CompletableFuture.completedFuture(members.size());
-    }
-
-    public CompletableFuture<Void> nbPlayers(int nb) {
-        return CompletableFuture.runAsync(() -> notifyAll("nbp", nb));
+    public CompletableFuture<Void> nbPlayers() {
+        return CompletableFuture.runAsync(() -> notifyAll("nbp", members.size()));
     }
 
     public void quit(String uid) {

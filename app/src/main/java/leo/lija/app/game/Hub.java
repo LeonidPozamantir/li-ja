@@ -7,18 +7,15 @@ import leo.lija.app.entities.event.Event;
 import leo.lija.chess.Color;
 import org.springframework.core.task.TaskExecutor;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
-public class Hub implements leo.lija.app.Hub {
+public class Hub {
 
     private final TaskExecutor executor;
 
@@ -39,15 +36,6 @@ public class Hub implements leo.lija.app.Hub {
         this.history = history;
     }
 
-    public void withMembers(Consumer<Collection<Member>> op) {
-        op.accept(members.values());
-    }
-
-    @Override
-    public CompletableFuture<List<String>> getUsernames() {
-        return CompletableFuture.completedFuture(usernames());
-    }
-
     public void ifEmpty(Runnable op) {
         if (members.isEmpty()) op.run();
     }
@@ -56,24 +44,15 @@ public class Hub implements leo.lija.app.Hub {
         return history.version();
     }
 
-    public CompletableFuture<Integer> getNbMembers() {
-        return CompletableFuture.supplyAsync(members::size, executor);
-    }
-
-    @Override
-    public CompletableFuture<Void> nbPlayers(int nb) {
-        return CompletableFuture.runAsync(() -> notifyAll("nbp", nb), executor);
-    }
-
     public boolean isConnected(Color color) {
         return member(color).isPresent();
     }
 
-    public void join(String uid, Integer version, Color color, boolean owner, Optional<String> username) {
+    public void join(String uid, Integer version, Color color, boolean owner) {
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
         msgs.forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
-        members.put(uid, Member.apply(uid, new PovRef(gameId, color), owner, username));
+        members.put(uid, Member.apply(uid, new PovRef(gameId, color), owner));
         notify(crowdEvent());
     }
 
@@ -117,13 +96,6 @@ public class Hub implements leo.lija.app.Hub {
 
     private Optional<Member> member(Color color) {
         return members.values().stream().filter(m -> m.isOwner() && m.color() == color).findAny();
-    }
-
-    private List<String> usernames() {
-        return members.values().stream()
-            .filter(m -> m.getUsername().isPresent())
-            .map(m -> m.getUsername().get())
-            .toList();
     }
 
     private Map<String, Object> makeMessage(String t, Object data) {
