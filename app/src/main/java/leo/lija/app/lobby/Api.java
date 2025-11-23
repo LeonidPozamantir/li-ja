@@ -2,6 +2,7 @@ package leo.lija.app.lobby;
 
 import leo.lija.app.Messenger;
 import leo.lija.app.Starter;
+import leo.lija.app.Utils;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.entities.DbGame;
@@ -49,14 +50,18 @@ public class Api {
     ) {
         Optional<Hook> hook = hookRepo.findByOwnerId(hookOwnerId);
         Color color = ioColor(colorName);
-        DbGame game = gameRepo.game(gameId);
-        Progress p1 = starter.start(game, entryData);
-        p1.addAll(messenger.systemMessages(game, messageString));
-        gameRepo.save(p1);
-        gameSocket.send(p1);
-        hook.ifPresent(h -> fisherman.bite(h, p1.game()));
-        myHookOwnerId.ifPresent(ownerId -> hookRepo.findByOwnerId(ownerId)
+        Optional<DbGame> gameOption = gameRepo.game(gameId);
+        gameOption.ifPresentOrElse(game -> {
+            Progress p1 = starter.start(game, entryData);
+            p1.addAll(messenger.systemMessages(game, messageString));
+            gameRepo.save(p1);
+            gameSocket.send(p1);
+            hook.ifPresent(h -> fisherman.bite(h, p1.game()));
+            myHookOwnerId.ifPresent(ownerId -> hookRepo.findByOwnerId(ownerId)
                 .ifPresent(fisherman::delete));
+        }, () -> {
+            throw Utils.gameNotFound();
+        });
     }
 
     public void create(String hookOwnerId) {

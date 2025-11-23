@@ -1,15 +1,14 @@
 package leo.lija.app.db;
 
-import leo.lija.app.entities.PovRef;
-import leo.lija.app.entities.Progress;
-import leo.lija.chess.Color;
-import leo.lija.chess.format.Fen;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.DbPlayer;
 import leo.lija.app.entities.Pov;
+import leo.lija.app.entities.PovRef;
+import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.RawDbGame;
 import leo.lija.app.entities.Status;
-import leo.lija.app.exceptions.AppException;
+import leo.lija.chess.Color;
+import leo.lija.chess.format.Fen;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -26,46 +25,29 @@ public class GameRepo {
 
     private final GameRepoJpa repo;
 
-    public Optional<RawDbGame> findById(String id) {
-        return repo.findById(id);
-    }
 
-    public DbGame game(String gameId) {
-        if (gameId.length() != GAME_ID_SIZE) {
-            throw new AppException("Invalid game id " + gameId);
-        }
-        return findById(gameId).flatMap(this::decode).orElseThrow(() -> new AppException("No game found for id " + gameId));
-    }
-
-    public Pov pov(PovRef ref) {
-        return pov(ref.gameId(), ref.color());
-    }
-
-    public Pov pov(String gameId, Color color) {
-        DbGame g = game(gameId);
-        return Pov.apply(g, g.player(color));
-    }
-
-    public DbPlayer player(String gameId, Color color) {
-        DbGame validGame = game(gameId);
-        return validGame.player(color);
-    }
-
-    public Optional<DbGame> gameOption(String gameId) {
+    public Optional<DbGame> game(String gameId) {
         if (gameId.length() != GAME_ID_SIZE) return Optional.empty();
         return repo.findById(gameId).flatMap(RawDbGame::decode);
     }
 
-    public Pov pov(String fullId) {
-        DbGame g = game(fullId.substring(0, GAME_ID_SIZE));
-        String playerId = fullId.substring(GAME_ID_SIZE);
-        DbPlayer player = g.player(playerId).orElseThrow(() -> new AppException("No player found for id " + fullId));
-        return Pov.apply(g, player);
+
+    public Optional<DbPlayer> player(String gameId, Color color) {
+        return game(gameId).map(g -> g.player(color));
     }
 
-    public Optional<Pov> povOption(String gameId, Color color) {
-        return gameOption(gameId)
-            .map(g -> new Pov(g, g.player().getColor()));
+    public Optional<Pov> pov(String gameId, Color color) {
+        return game(gameId).map(g -> Pov.apply(g, g.player(color)));
+    }
+
+    public Optional<Pov> pov(String fullId) {
+        return game(fullId.substring(0, GAME_ID_SIZE)).flatMap(g ->
+            g.player(fullId.substring(GAME_ID_SIZE)).map(p -> Pov.apply(g, p))
+        );
+    }
+
+    public Optional<Pov> pov(PovRef ref) {
+        return pov(ref.gameId(), ref.color());
     }
 
     public void save(DbGame game) {
@@ -97,7 +79,7 @@ public class GameRepo {
         Optional<RawDbGame> game = repo.findById(id);
         game.ifPresent(g -> {
             g.setPositionHashes("");
-            winnerId.ifPresent(userId -> g.setWinnerUserId(userId));
+            winnerId.ifPresent(g::setWinnerUserId);
             g.getPlayers().get(0).setLastDrawOffer(null);
             g.getPlayers().get(1).setLastDrawOffer(null);
             g.getPlayers().get(0).setIsOfferingDraw(null);

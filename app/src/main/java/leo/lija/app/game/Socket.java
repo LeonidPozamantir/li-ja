@@ -31,7 +31,7 @@ public class Socket {
 
     public Socket(TaskScheduler taskScheduler, GameRepo gameRepo, Hand hand, HubMemo hubMemo, Messenger messenger, SocketIOService socketIOService) {
         this.taskScheduler = taskScheduler;
-        this.getGame = gameRepo::gameOption;
+        this.getGame = gameRepo::game;
         this.hand = hand;
         this.hubMemo = hubMemo;
         this.messenger = messenger;

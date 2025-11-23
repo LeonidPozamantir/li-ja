@@ -45,7 +45,7 @@ public class Preload {
     private Map<String, Object> hookResponse(Optional<Hook> myHook, Supplier<Map<String, Object>> std) {
         return myHook
             .map(h -> h.gameId()
-                .map(gameId -> gameRepo.gameOption(gameId)
+                .map(gameId -> gameRepo.game(gameId)
                     .map(g -> redirect(g.fullIdOf(g.getCreatorColor())))
                     .orElse(redirect(null)))
                 .orElseGet(() -> {

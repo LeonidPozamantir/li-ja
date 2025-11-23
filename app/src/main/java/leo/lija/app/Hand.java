@@ -191,14 +191,17 @@ public class Hand {
         return fromPov(ref, action);
     }
 
-    private <A> A fromPov(String fullId, Function<Pov, A> op) {
-        Pov pov = gameRepo.pov(fullId);
-        return op.apply(pov);
+    private <A> A fromPov(PovRef ref, Function<Pov, A> op) {
+        return fromPov(gameRepo.pov(ref), op);
     }
 
-    private <A> A fromPov(PovRef ref, Function<Pov, A> op) {
-        Pov pov = gameRepo.pov(ref);
-        return op.apply(pov);
+    private <A> A fromPov(String fullId, Function<Pov, A> op) {
+        return fromPov(gameRepo.pov(fullId), op);
+    }
+
+    private <A> A fromPov(Optional<Pov> pov, Function<Pov, A> op) {
+        return pov.map(op)
+            .orElseThrow(() -> new AppException("No such game"));
     }
 
 }

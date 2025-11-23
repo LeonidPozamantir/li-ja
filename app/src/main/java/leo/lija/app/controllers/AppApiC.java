@@ -1,10 +1,10 @@
 package leo.lija.app.controllers;
 
 import jakarta.validation.Valid;
+import leo.lija.app.AppApi;
 import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
-import leo.lija.app.AppApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +27,8 @@ public class AppApiC {
     private final TaskExecutor executor;
 
     @GetMapping("/show/{fullId}")
-    public Map<String, Object> show(@PathVariable String fullId) {
-        return CompletableFuture.supplyAsync(() -> api.show(fullId), executor).join();
+    public CompletableFuture<Map<String, Object>> show(@PathVariable String fullId) {
+        return CompletableFuture.supplyAsync(() -> api.show(fullId), executor);
     }
 
     @PostMapping("/reload-table/{gameId}")

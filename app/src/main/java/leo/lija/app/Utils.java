@@ -1,5 +1,6 @@
 package leo.lija.app;
 
+import leo.lija.app.exceptions.AppException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -18,5 +19,9 @@ public class Utils {
     }
 
     public static final Pattern MOVE_STRING = Pattern.compile("^([a-h][1-8]) ([a-h][1-8])$");
+
+    public static AppException gameNotFound() {
+        return new AppException("Game not found");
+    }
 
 }
