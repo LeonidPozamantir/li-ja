@@ -73,5 +73,5 @@ public abstract class Clock {
         return System.currentTimeMillis() / 1000d;
     }
 
-    protected static final float HTTP_DELAY = 0.5f;
+    protected static final float HTTP_DELAY = 0.4f;
 }

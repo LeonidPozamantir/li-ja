@@ -28,8 +28,12 @@ public class Hub {
         members.put(uid, new Member(uid, username));
     }
 
-    public CompletableFuture<Void> nbPlayers() {
+    public CompletableFuture<Void> nbMembers() {
         return CompletableFuture.runAsync(() -> notifyAll("nbp", members.size()));
+    }
+
+    public int getNbMembers() {
+        return members.size();
     }
 
     public void quit(String uid) {

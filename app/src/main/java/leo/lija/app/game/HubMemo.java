@@ -47,6 +47,10 @@ public class HubMemo {
         cache.invalidate(gameId);
     }
 
+    public long count() {
+        return cache.size();
+    }
+
     private Hub compute(String gameId) {
         System.out.println("create actor game " + gameId);
         return new Hub(executor, socketIOService, gameId, makeHistory.get());

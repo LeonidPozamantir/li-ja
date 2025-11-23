@@ -8,6 +8,7 @@ import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.memo.HookMemo;
+import leo.lija.app.reporting.Reporting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -37,8 +39,14 @@ public class Cron {
     private final leo.lija.app.site.Hub siteHub;
     private final leo.lija.app.lobby.Hub lobbyHub;
     private final HookMemo hookMemo;
+    private final Reporting reporting;
 
     private final int TIMEOUT = 200;
+
+    @PostConstruct
+    void reportingUpdate() {
+        spawn(Duration.ofSeconds(2), reporting::update);
+    }
 
     @PostConstruct
     void hookTick() {
@@ -47,9 +55,9 @@ public class Cron {
     }
 
     @PostConstruct
-    void nbPlayers() {
-        spawn(Duration.ofSeconds(1), () ->
-            siteHub.nbPlayers().join()
+    void nbMembers() {
+        spawn(Duration.ofSeconds(2), () ->
+            siteHub.nbMembers().join()
         );
     }
 
@@ -82,11 +90,11 @@ public class Cron {
 
     @PostConstruct
     void remoteAiHealth() {
-        spawn(Duration.ofSeconds(10), remoteAi::diagnose);
+        spawn(Duration.ofMinutes(1), remoteAi::diagnose);
     }
 
     private void spawn(Duration freq, Runnable op) {
-        taskScheduler.scheduleWithFixedDelay(op, RichDuration.randomize(freq));
+        taskScheduler.scheduleWithFixedDelay(op, Instant.now().plus(freq), RichDuration.randomize(freq));
     }
 
 }

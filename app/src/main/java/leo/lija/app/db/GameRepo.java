@@ -130,7 +130,7 @@ public class GameRepo {
             .toList();
     }
 
-    public int countPlaying() {
-        return repo.countPlaying(LocalDateTime.now().minusSeconds(15));
+    public long countAll() {
+        return repo.count();
     }
 }
