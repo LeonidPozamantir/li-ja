@@ -24,7 +24,7 @@ public class RunningClock extends Clock {
     @Override
     public RunningClock step() {
         double t = now();
-        RunningClock addedTime = addTime(color, Math.max(0, (float) (t - timer) - HTTP_DELAY - increment));
+        RunningClock addedTime = addTime(color, Math.max(0, (float) (t - timer) - HTTP_DELAY) - increment);
         return new RunningClock(limit, increment, color.getOpposite(), addedTime.whiteTime, addedTime.blackTime, t);
     }
 
