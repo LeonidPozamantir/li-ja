@@ -36,10 +36,11 @@ public class RawDbPlayer {
     private Integer lastDrawOffer;
     private String userId;
     private Integer eloDiff;
+    private String mts;
     private Integer blurs;
 
     public RawDbPlayer copy() {
-        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId, eloDiff, blurs);
+        return new RawDbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId, eloDiff, mts, blurs);
     }
 
     public Optional<DbPlayer> decode() {
@@ -53,6 +54,7 @@ public class RawDbPlayer {
             isOfferingDraw,
             Optional.ofNullable(lastDrawOffer),
             Optional.ofNullable(userId),
+            Optional.ofNullable(mts).orElse(""),
             Optional.ofNullable(blurs).orElse(0)
         ));
     }
@@ -69,6 +71,7 @@ public class RawDbPlayer {
             dbPlayer.getLastDrawOffer().orElse(null),
             dbPlayer.getUserId().orElse(null),
             null,
+            dbPlayer.getMoveTimes().isEmpty() ? null : dbPlayer.getMoveTimes(),
             dbPlayer.getBlurs() == 0 ? null : dbPlayer.getBlurs()
         );
     }

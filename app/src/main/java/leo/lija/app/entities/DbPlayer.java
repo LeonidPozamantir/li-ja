@@ -30,10 +30,11 @@ public class DbPlayer {
     private Boolean isOfferingDraw;
     private Optional<Integer> lastDrawOffer;
     private Optional<String> userId;
+    private String moveTimes;
     private Integer blurs;
 
     public DbPlayer copy() {
-        return new DbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId, blurs);
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId, moveTimes, blurs);
     }
 
     public String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
