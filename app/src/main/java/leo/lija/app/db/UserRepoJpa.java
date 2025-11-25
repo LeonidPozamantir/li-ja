@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepoJpa extends JpaRepository<User, UUID> {
+
+    public Optional<User> findById(UUID id);
 
     @Modifying
     @Query("update User set isOnline = true where username in :usernames and isOnline = false")

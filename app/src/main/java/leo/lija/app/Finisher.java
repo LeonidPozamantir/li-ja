@@ -114,8 +114,11 @@ public class Finisher {
             .flatMap(whiteUserId -> game.player(BLACK).getUserId()
                 .filter(blackUserId -> !whiteUserId.equals(blackUserId))
                 .map(blackUserId -> {
-                    User whiteUser = userRepo.user(whiteUserId);
-                    User blackUser = userRepo.user(blackUserId);
+                    Optional<User> whiteUserOption = userRepo.user(whiteUserId);
+                    Optional<User> blackUserOption = userRepo.user(blackUserId);
+                    if (whiteUserOption.isEmpty() || blackUserOption.isEmpty()) return null;
+                    User whiteUser = whiteUserOption.get();
+                    User blackUser = blackUserOption.get();
                     Pair<Integer, Integer> elos = eloCalculator.calculate(
                         new EloCalculator.User(whiteUser.getElo(), whiteUser.getNbRatedGames()),
                         new EloCalculator.User(blackUser.getElo(), blackUser.getNbRatedGames()),
