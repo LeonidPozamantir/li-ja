@@ -112,7 +112,9 @@ public class SocketIOService extends BaseController {
 
     public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
 
-    public record GameTalkForm(PovRef povRef, String d) {}
+    public record GameTalkForm(PovRef povRef, Data d) {
+        public record Data(String txt) {}
+    }
 
     public record GameMoveForm(PovRef povRef, Data d) {
         public record Data(String orig, String dest, @Nullable String promotion, @Nullable Integer b) {}

@@ -69,7 +69,7 @@ public class Socket {
         Hub hub = hubMemo.get(gameId);
         Member member = hub.getMember(uid);
         if (member instanceof Owner) hub.events(
-            messenger.playerMessage(event.povRef(), event.d())
+            messenger.playerMessage(event.povRef(), event.d().txt())
         );
     }
 
