@@ -3,6 +3,7 @@ package leo.lija.app.config;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import leo.lija.app.controllers.BaseController;
@@ -114,7 +115,7 @@ public class SocketIOService extends BaseController {
     public record GameTalkForm(PovRef povRef, String d) {}
 
     public record GameMoveForm(PovRef povRef, Data d) {
-        public record Data(String from, String to, String promotion) {}
+        public record Data(String orig, String dest, @Nullable String promotion, @Nullable Integer b) {}
     }
 
     public record GameMoretimeForm(PovRef povRef) {}

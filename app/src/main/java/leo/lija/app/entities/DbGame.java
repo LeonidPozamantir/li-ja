@@ -185,6 +185,10 @@ public class DbGame {
     }
 
     public Progress update(Game game, Move move) {
+        return update(game, move, false);
+    }
+
+    public Progress update(Game game, Move move, boolean blur) {
         boolean abortableBefore = abortable();
         boolean whiteCanOfferDrawBefore = playerCanOfferDraw(WHITE);
         boolean blackCanOfferDrawBefore = playerCanOfferDraw(BLACK);
@@ -198,8 +202,8 @@ public class DbGame {
         ));
         events.addAll(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
-        whitePlayer = copyPlayer(game, whitePlayer);
-        blackPlayer = copyPlayer(game, blackPlayer);
+        whitePlayer = copyPlayer(game, whitePlayer, move, blur);
+        blackPlayer = copyPlayer(game, blackPlayer, move, blur);
 
         pgn = game.getPgnMoves();
         turns = game.getTurns();
@@ -222,9 +226,10 @@ public class DbGame {
         return new Progress(this, events);
     }
 
-    private DbPlayer copyPlayer(Game game, DbPlayer player) {
+    private DbPlayer copyPlayer(Game game, DbPlayer player, Move move, boolean blur) {
         String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId());
+        Integer newBlurs = player.getBlurs() + (blur && move.color() == player.getColor() ? 1 : 0);
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId(), newBlurs);
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {

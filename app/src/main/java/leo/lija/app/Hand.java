@@ -51,10 +51,10 @@ public class Hand {
     }
 
     public List<Event> play(PovRef povRef, String fromString, String toString) {
-        return play(povRef, fromString, toString, Optional.empty());
+        return play(povRef, fromString, toString, Optional.empty(), false);
     }
 
-    public List<Event> play(PovRef povRef, String origString, String destString, Optional<String> promString) {
+    public List<Event> play(PovRef povRef, String origString, String destString, Optional<String> promString, boolean blur) {
         return fromPov(povRef, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
@@ -66,7 +66,7 @@ public class Hand {
             Pair<Game, Move> newChessGameAndMove = g1.toChess().apply(orig, dest, promotion);
             Game newChessGame = newChessGameAndMove.getFirst();
             Move move = newChessGameAndMove.getSecond();
-            Progress progress = g1.update(newChessGame, move);
+            Progress progress = g1.update(newChessGame, move, blur);
 
             List<Event> events = new ArrayList<>();
             if (progress.game().finished()) {
