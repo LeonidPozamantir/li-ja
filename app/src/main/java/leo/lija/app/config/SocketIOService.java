@@ -117,7 +117,7 @@ public class SocketIOService extends BaseController {
     }
 
     public record GameMoveForm(PovRef povRef, Data d) {
-        public record Data(String orig, String dest, @Nullable String promotion, @Nullable Integer b) {}
+        public record Data(String from, String to, @Nullable String promotion, @Nullable Integer b) {}
     }
 
     public record GameMoretimeForm(PovRef povRef) {}

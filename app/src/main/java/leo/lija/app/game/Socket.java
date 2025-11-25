@@ -79,8 +79,8 @@ public class Socket {
         Member member = hub.getMember(uid);
         if (!(member instanceof Owner)) return;
 
-        String orig = event.d().orig();
-        String dest = event.d().dest();
+        String orig = event.d().from();
+        String dest = event.d().to();
         Optional<String> promotion = Optional.ofNullable(event.d().promotion());
         boolean blur = event.d().b() != null && event.d().b() == 1;
         send(gameId, hand.play(event.povRef(), orig, dest, promotion, blur));
