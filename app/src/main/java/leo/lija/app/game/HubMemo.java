@@ -52,7 +52,6 @@ public class HubMemo {
     }
 
     private Hub compute(String gameId) {
-        System.out.println("create actor game " + gameId);
         return new Hub(executor, socketIOService, gameId, makeHistory.get());
     }
 }
