@@ -24,5 +24,8 @@ public class User {
     private int elo;
     private int nbGames;
     private int nbRatedGames;
+    private boolean engine;
+
+    public static final int STARTING_ELO = 1200;
 
 }

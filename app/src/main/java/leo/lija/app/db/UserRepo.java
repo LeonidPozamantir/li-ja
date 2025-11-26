@@ -26,8 +26,12 @@ public class UserRepo {
         return repo.findById(UUID.fromString(userId));
     }
 
-    public void setElo(String userId, int elo) {
-        repo.setElo(UUID.fromString(userId), elo);
+    public void setElo(UUID userId, int elo) {
+        repo.setElo(userId, elo);
+    }
+
+    public void setEngine(UUID userId) {
+        repo.setEngine(userId);
     }
 
     public void incNbGames(String userId, boolean rated) {

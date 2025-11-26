@@ -1,10 +1,12 @@
 package leo.lija.app;
 
 import leo.lija.app.db.GameRepo;
+import leo.lija.app.db.UserRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Room;
+import leo.lija.app.entities.User;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.RedirectEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
@@ -28,18 +30,22 @@ import static leo.lija.chess.Color.WHITE;
 @Service
 public class AppApi {
 
+    private final UserRepo userRepo;
     private final GameRepo gameRepo;
     private final Socket gameSocket;
     private final HubMemo gameHubMemo;
     private final Messenger messenger;
     private final Starter starter;
+    private final EloUpdater eloUpdater;
 
-    AppApi(GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMemo gameHubMemo, Messenger messenger, Starter starter) {
+    AppApi(UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMemo gameHubMemo, Messenger messenger, Starter starter, EloUpdater eloUpdater) {
+        this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
         this.gameHubMemo = gameHubMemo;
         this.messenger = messenger;
         this.starter = starter;
+        this.eloUpdater = eloUpdater;
     }
 
     public Map<String, Object> show(String fullId) {
@@ -136,6 +142,14 @@ public class AppApi {
         return Color.apply(colorName).map(c ->
             gameHubMemo.get(gameId).isConnected(c)
         ).orElse(false);
+    }
+
+    public void adjust(String username) {
+        Optional<User> userOption = userRepo.user(username);
+        userOption.ifPresent(user -> {
+            if (user.getElo() > User.STARTING_ELO) eloUpdater.adjust(user, User.STARTING_ELO);
+            userRepo.setEngine(user.getId());
+        });
     }
 
     private Color ioColor(String colorName) {

@@ -1,7 +1,6 @@
 package leo.lija.app;
 
 import leo.lija.app.db.GameRepo;
-import leo.lija.app.db.HistoryRepo;
 import leo.lija.app.db.UserRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Pov;
@@ -25,18 +24,18 @@ import static leo.lija.chess.Color.WHITE;
 @Service
 public class Finisher {
 
-    private final HistoryRepo historyRepo;
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
     private final Messenger messenger;
+    private final EloUpdater eloUpdater;
     private final EloCalculator eloCalculator = new EloCalculator();
     private final FinisherLock finisherLock;
 
-    public Finisher(HistoryRepo historyRepo, UserRepo userRepo, GameRepo gameRepo, Messenger messenger, FinisherLock finisherLock) {
-        this.historyRepo = historyRepo;
+    public Finisher(UserRepo userRepo, GameRepo gameRepo, Messenger messenger, EloUpdater eloUpdater, FinisherLock finisherLock) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.messenger = messenger;
+        this.eloUpdater = eloUpdater;
         this.finisherLock = finisherLock;
     }
 
@@ -127,10 +126,8 @@ public class Finisher {
                     int whiteElo = elos.getFirst();
                     int blackElo = elos.getSecond();
                     gameRepo.setEloDiffs(game.getId(), whiteElo - whiteUser.getElo(), blackElo - blackUser.getElo());
-                    userRepo.setElo(whiteUserId, whiteElo);
-                    userRepo.setElo(blackUserId, blackElo);
-                    historyRepo.addEntry(whiteUser.getUserNameCanonical(), whiteElo, game.getId());
-                    historyRepo.addEntry(blackUser.getUserNameCanonical(), blackElo, game.getId());
+                    eloUpdater.game(whiteUser, whiteElo, game.getId());
+                    eloUpdater.game(blackUser, blackElo, game.getId());
                     return null;
                 })
             );

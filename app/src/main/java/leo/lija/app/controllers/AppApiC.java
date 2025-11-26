@@ -62,4 +62,8 @@ public class AppApiC {
         api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry(), r.messages());
     }
 
+    @PostMapping("/adjust/{username}")
+    public void adjust(@PathVariable String username) {
+        api.adjust(username);
+    }
 }

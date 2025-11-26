@@ -30,6 +30,11 @@ public interface UserRepoJpa extends JpaRepository<User, UUID> {
     public void setElo(UUID id, int elo);
 
     @Modifying
+    @Query("update User set engine = true where id = :id")
+    @Transactional
+    public void setEngine(UUID id);
+
+    @Modifying
     @Query("update User set nbGames = nbGames + 1, nbRatedGames = nbRatedGames + 1 where id = :id")
     @Transactional
     public void incRated(UUID id);
