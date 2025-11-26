@@ -24,6 +24,8 @@ public interface UserRepoJpa extends JpaRepository<User, UUID> {
     @Transactional
     public void updateOnlineUsernamesFalse(Collection<String> usernames);
 
+    public Optional<User> findByUsernameCanonical(String username);
+
     @Modifying
     @Query("update User set elo = :elo where id = :id")
     @Transactional

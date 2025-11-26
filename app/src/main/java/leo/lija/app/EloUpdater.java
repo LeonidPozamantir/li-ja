@@ -17,11 +17,11 @@ public class EloUpdater {
 
     public void game(User user, int elo, String gameId) {
         userRepo.setElo(user.getId(), elo);
-        historyRepo.addEntry(user.getUserNameCanonical(), elo, Optional.of(gameId));
+        historyRepo.addEntry(user.getUsernameCanonical(), elo, Optional.of(gameId));
     }
 
     public void adjust(User user, int elo) {
         userRepo.setElo(user.getId(), elo);
-        historyRepo.addEntry(user.getUserNameCanonical(), elo, HistoryRepo.TYPE_ADJUST);
+        historyRepo.addEntry(user.getUsernameCanonical(), elo, HistoryRepo.TYPE_ADJUST);
     }
 }

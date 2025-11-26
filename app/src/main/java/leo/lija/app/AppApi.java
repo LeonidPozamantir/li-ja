@@ -148,7 +148,7 @@ public class AppApi {
     }
 
     public void adjust(String username) {
-        Optional<User> userOption = userRepo.user(username);
+        Optional<User> userOption = userRepo.byUsername(username);
         userOption.ifPresent(user -> {
             if (user.getElo() > User.STARTING_ELO) eloUpdater.adjust(user, User.STARTING_ELO);
             userRepo.setEngine(user.getId());

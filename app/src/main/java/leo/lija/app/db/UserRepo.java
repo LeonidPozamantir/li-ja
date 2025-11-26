@@ -26,6 +26,10 @@ public class UserRepo {
         return repo.findById(UUID.fromString(userId));
     }
 
+    public Optional<User> byUsername(String username) {
+        return repo.findByUsernameCanonical(username.toLowerCase());
+    }
+
     public void setElo(UUID userId, int elo) {
         repo.setElo(userId, elo);
     }

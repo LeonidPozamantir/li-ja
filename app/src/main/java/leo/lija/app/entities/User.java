@@ -19,7 +19,7 @@ public class User {
     private UUID id;
 
     private String username;
-    private String userNameCanonical;
+    private String usernameCanonical;
     private boolean isOnline;
     private int elo;
     private int nbGames;
