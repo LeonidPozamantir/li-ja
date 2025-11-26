@@ -59,10 +59,6 @@ public class DbGame {
         this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD, Optional.empty());
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant, Optional.empty());
-    }
-
     public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant, Optional<Long> lastMoveTime) {
         this.id = id;
         this.whitePlayer = whitePlayer;
@@ -209,10 +205,8 @@ public class DbGame {
         events.addAll(Event.fromMove(move));
         events.addAll(Event.fromSituation(game.situation()));
 
-        long nowSeconds = Math.round(System.currentTimeMillis() / 1000d);
-
-        whitePlayer = copyPlayer(game, whitePlayer, move, blur, nowSeconds);
-        blackPlayer = copyPlayer(game, blackPlayer, move, blur, nowSeconds);
+        blackPlayer = copyPlayer(game, blackPlayer, move, blur);
+        whitePlayer = copyPlayer(game, whitePlayer, move, blur);
 
         pgn = game.getPgnMoves();
         turns = game.getTurns();
@@ -225,7 +219,7 @@ public class DbGame {
         else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
         check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
-        lastMoveTime = recordMoveTimes() ? Optional.of(nowSeconds) : Optional.empty();
+        lastMoveTime = recordMoveTimes() ? Optional.of(nowSeconds()) : Optional.empty();
 
         clock.ifPresent(c -> events.addLast(ClockEvent.apply(c)));
         if (playable() && (abortableBefore != abortable()
@@ -236,13 +230,13 @@ public class DbGame {
         return new Progress(this, events);
     }
 
-    private DbPlayer copyPlayer(Game game, DbPlayer player, Move move, boolean blur, long nowSeconds) {
+    private DbPlayer copyPlayer(Game game, DbPlayer player, Move move, boolean blur) {
         String newPs = player.encodePieces(game.getBoard().getPieces(), game.getDeads());
         Integer newBlurs = player.getBlurs() + (blur && move.color() == player.getColor() ? 1 : 0);
         String newMoveTimes = recordMoveTimes() && move.color() == player.getColor()
             ? lastMoveTime.map(
                     lmt -> {
-                        long mt = nowSeconds - lmt;
+                        long mt = nowSeconds() - lmt;
                         return player.getMoveTimes().isEmpty()
                             ? String.valueOf(mt)
                             : player.getMoveTimes() + " " + mt;
@@ -250,6 +244,10 @@ public class DbGame {
                 ).orElse("")
             : player.getMoveTimes();
         return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId(), newMoveTimes, newBlurs);
+    }
+
+    private long nowSeconds() {
+        return System.currentTimeMillis() / 1000;
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {

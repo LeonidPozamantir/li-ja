@@ -52,6 +52,7 @@ public class RawDbGame {
     private String castles;
     private boolean isRated;
     private int variant;                // v
+    private Long lmt;
     private String winnerUserId;
     private String initialFen;
 
@@ -84,7 +85,8 @@ public class RawDbGame {
                                     positionHashes,
                                     castles,
                                     isRated,
-                                    trueVariant
+                                    trueVariant,
+                                    Optional.ofNullable(lmt)
                                 );
                 })))));
     }
@@ -104,6 +106,7 @@ public class RawDbGame {
             dbGame.getCastles(),
             dbGame.isRated(),
             dbGame.getVariant().id(),
+            dbGame.getLastMoveTime().orElse(null),
             null,
             null,
             null,
