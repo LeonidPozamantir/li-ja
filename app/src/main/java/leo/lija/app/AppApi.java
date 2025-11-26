@@ -96,31 +96,34 @@ public class AppApi {
             String blackRedirect,
             String entryData,
             String messageString) {
-        Color color = ioColor(colorName);
-        Optional<DbGame> newGameOption = gameRepo.game(newGameId);
-        Optional<DbGame> g1Option = gameRepo.game(gameId);
-        newGameOption.ifPresentOrElse(newGame ->
-            g1Option.ifPresentOrElse(g1 -> {
-                Progress progress = new Progress(g1, List.of(
-                    new RedirectEvent(WHITE, whiteRedirect),
-                    new RedirectEvent(BLACK, blackRedirect),
-                    // tell spectators to reload the table
-                    new ReloadTableEvent(WHITE),
-                    new ReloadTableEvent(BLACK)
-                ));
-                gameRepo.save(progress);
-                gameSocket.send(progress);
-                Progress newProgress = starter.start(newGame, entryData);
-                newProgress.addAll(messenger.systemMessages(newProgress.game(), messageString));
-                gameRepo.save(newProgress);
-                gameSocket.send(newProgress);
-                }, () -> {
+        Color.apply(colorName).ifPresentOrElse((color) -> {
+            Optional<DbGame> newGameOption = gameRepo.game(newGameId);
+            Optional<DbGame> g1Option = gameRepo.game(gameId);
+            newGameOption.ifPresentOrElse(newGame ->
+                    g1Option.ifPresentOrElse(g1 -> {
+                            Progress progress = new Progress(g1, List.of(
+                                new RedirectEvent(WHITE, whiteRedirect),
+                                new RedirectEvent(BLACK, blackRedirect),
+                                // tell spectators to reload the table
+                                new ReloadTableEvent(WHITE),
+                                new ReloadTableEvent(BLACK)
+                            ));
+                            gameRepo.save(progress);
+                            gameSocket.send(progress);
+                            Progress newProgress = starter.start(newGame, entryData);
+                            newProgress.addAll(messenger.systemMessages(newProgress.game(), messageString));
+                            gameRepo.save(newProgress);
+                            gameSocket.send(newProgress);
+                        }, () -> {
+                            throw Utils.gameNotFound();
+                        }
+                    ), () -> {
                     throw Utils.gameNotFound();
                 }
-            ), () -> {
-                throw Utils.gameNotFound();
-            }
-        );
+            );
+        }, () -> {
+            throw new AppException("Wrong color name");
+        });
     }
 
     public void reloadTable(String gameId) {
@@ -150,10 +153,6 @@ public class AppApi {
             if (user.getElo() > User.STARTING_ELO) eloUpdater.adjust(user, User.STARTING_ELO);
             userRepo.setEngine(user.getId());
         });
-    }
-
-    private Color ioColor(String colorName) {
-        return Color.apply(colorName).orElseThrow(() -> new AppException("Invalid color"));
     }
 
 }

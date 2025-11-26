@@ -49,8 +49,8 @@ public class Api {
             Optional<String> myHookOwnerId
     ) {
         Optional<Hook> hook = hookRepo.findByOwnerId(hookOwnerId);
-        Color color = ioColor(colorName);
         Optional<DbGame> gameOption = gameRepo.game(gameId);
+        if (Color.apply(colorName).isEmpty()) throw Utils.gameNotFound();
         gameOption.ifPresentOrElse(game -> {
             Progress p1 = starter.start(game, entryData);
             p1.addAll(messenger.systemMessages(game, messageString));
@@ -67,10 +67,6 @@ public class Api {
     public void create(String hookOwnerId) {
         Optional<Hook> hook = hookRepo.findByOwnerId(hookOwnerId);
         hook.ifPresent(fisherman::add);
-    }
-
-    private Color ioColor(String colorName) {
-        return Color.apply(colorName).orElseThrow(() -> new AppException("Invalid color"));
     }
 
 }
