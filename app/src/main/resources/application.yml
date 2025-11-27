@@ -15,10 +15,6 @@ server:
   tomcat:
     connection-timeout: 2s
 
-sync: #milliseconds
-  duration: 7000
-  sleep: 200
-
 lobby:
   message:
     max: 30
@@ -60,5 +56,5 @@ async:
     core-size: 16
     max-size: 2048
   websockets:
-    parallelism: 64
-    max-size: 1024
+    parallelism: 128
+    max-size: 2048
