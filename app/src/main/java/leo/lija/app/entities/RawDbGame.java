@@ -7,6 +7,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import leo.lija.chess.Clock;
@@ -52,6 +53,10 @@ public class RawDbGame {
     private String castles;
     private boolean isRated;
     private int variant;                // v
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private RawDbGame next;
+
     private Long lmt;
     private String winnerUserId;
     private String initialFen;
@@ -106,6 +111,7 @@ public class RawDbGame {
             dbGame.getCastles(),
             dbGame.isRated(),
             dbGame.getVariant().id(),
+            null,
             dbGame.getLastMoveTime().orElse(null),
             null,
             null,

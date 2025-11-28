@@ -2,7 +2,8 @@ package leo.lija.app;
 
 import jakarta.annotation.PostConstruct;
 import leo.lija.app.ai.RemoteAi;
-import leo.lija.app.command.GameFinishCommand;
+import leo.lija.app.command.GameCleanNext;
+import leo.lija.app.command.GameFinish;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
@@ -33,7 +34,8 @@ public class Cron {
     private final UserRepo userRepo;
     private final HookRepo hookRepo;
     private final GameRepo gameRepo;
-    private final GameFinishCommand gameFinishCommand;
+    private final GameFinish gameFinish;
+    private final GameCleanNext gameCleanNext;
     private final RemoteAi remoteAi;
     private final Fisherman lobbyFisherman;
     private final leo.lija.app.site.Hub siteHub;
@@ -80,17 +82,20 @@ public class Cron {
 
     @PostConstruct
     void gameCleanupUnplayed() {
-        spawn(Duration.ofHours(2), gameRepo::cleanupUnplayed);
+        spawn(Duration.ofMinutes((long) (60 * 12.1)), () -> {
+            gameRepo.cleanupUnplayed();
+            gameCleanNext.apply();
+        });
     }
 
     @PostConstruct
     void gameAutoFinish() {
-        spawn(Duration.ofHours(1), gameFinishCommand::apply);
+        spawn(Duration.ofHours(1), gameFinish::apply);
     }
 
     @PostConstruct
     void remoteAiHealth() {
-        spawn(Duration.ofMinutes(1), remoteAi::diagnose);
+        spawn(Duration.ofSeconds(10), remoteAi::diagnose);
     }
 
     private void spawn(Duration freq, Runnable op) {

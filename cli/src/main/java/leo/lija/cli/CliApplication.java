@@ -1,6 +1,6 @@
 package leo.lija.cli;
 
-import leo.lija.app.command.GameFinishCommand;
+import leo.lija.app.command.GameFinish;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public class CliApplication implements CommandLineRunner {
 
 	private final Info info;
-	private final GameFinishCommand gameFinishCommand;
+	private final GameFinish gameFinish;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CliApplication.class, args);
@@ -37,7 +37,7 @@ public class CliApplication implements CommandLineRunner {
 
 			return switch (args[0]) {
 				case "info" -> info;
-				case "finish" -> (Command) () -> gameFinishCommand.apply();
+				case "finish" -> (Command) () -> gameFinish.apply();
                 default -> defaultCommand;
             };
 
