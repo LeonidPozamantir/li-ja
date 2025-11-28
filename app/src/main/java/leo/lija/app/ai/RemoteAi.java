@@ -36,6 +36,10 @@ public class RemoteAi extends FenBased implements Ai {
         return health ? this : fallback;
     }
 
+    public boolean currentHealth() {
+        return health;
+    }
+
     public void diagnose() {
         boolean h = healthCheck();
         if (h) {
