@@ -20,25 +20,19 @@ lobby:
     max: 30
   entry:
     max: 12
-  message.lifetime: 20
+  message.lifetime: 30
   hook-pool.tick.frequency: 1s
 
 game:
-  message.lifetime: 20
+  message.lifetime: 30
 
 socket:
   host: 0.0.0.0
   port: 9092
 
 memo: #seconds
-  watcher:
-    timeout: 6
-  username:
-    timeout: 10
-  hook:
-    timeout: 6
-  finisher-lock:
-    timeout: 30
+  hook.timeout: 5
+  finisher-lock.timeout: 20
 ai:
   server: false
   use: remote
