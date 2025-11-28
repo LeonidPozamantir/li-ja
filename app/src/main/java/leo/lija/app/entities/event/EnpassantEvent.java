@@ -4,8 +4,6 @@ import leo.lija.chess.Pos;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Map;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 public class EnpassantEvent implements Event {

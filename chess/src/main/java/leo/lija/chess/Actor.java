@@ -114,7 +114,7 @@ public class Actor {
 	Optional<Move> castleOn(Side side) {
 		Color color = color();
 		return board.kingPosOf(color)
-			.filter(p -> board.getHistory().canCastle(color, side))
+			.filter(p -> history().canCastle(color, side))
 			.flatMap(kingPos -> {
 				List<Pos> tripToRook = side.tripToRook.apply(kingPos, board);
 				if (tripToRook.isEmpty()) return Optional.empty();
@@ -232,7 +232,7 @@ public class Actor {
 		return optVictim.flatMap(victim -> {
 			Optional<Pos> optTargetPos = horizontal.apply(next);
 			Optional<Pos> optVictimFrom = optVictimPos.flatMap(dir).flatMap(dir);
-			if (!board.getHistory().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))) return Optional.empty();
+			if (!history().lastMove().equals(Optional.of(Pair.of(optVictimFrom.get(), optVictimPos.get())))) return Optional.empty();
 			Board b = board.taking(pos, optTargetPos.get(), optVictimPos).get();
 			return Optional.of(moveEnPassant(optTargetPos.get(), b, optVictimPos));
 		});

@@ -26,6 +26,8 @@ public class Hub {
 
     private final Map<String, Member> members = new ConcurrentHashMap<>();
 
+    private static final String LOBBY_NAME = "lobby";
+
     public Hub(SocketIOService socketService, MessageRepo messageRepo, @Value("${lobby.message.lifetime}") int timeout) {
         this.socketService = socketService;
         this.messageRepo = messageRepo;
@@ -37,8 +39,8 @@ public class Hub {
     }
 
     public void join(String uid, Integer version, Optional<String> hookOwnerId) {
-        socketService.addToRoom("lobby", uid);
-        history.since(version).forEach(m -> socketService.sendMessageToClient(uid, "lobby", m));
+        socketService.addToRoom(LOBBY_NAME, uid);
+        history.since(version).forEach(m -> socketService.sendMessageToClient(uid, LOBBY_NAME, m));
         members.put(uid, new Member(uid, hookOwnerId));
     }
 
@@ -81,7 +83,7 @@ public class Hub {
 
     public void quit(String uid) {
         members.remove(uid);
-        socketService.removeFromRoom("lobby", uid);
+        socketService.removeFromRoom(LOBBY_NAME, uid);
     }
 
     private void notifyMember(String t, Object data, Member member) {
@@ -89,17 +91,17 @@ public class Hub {
                 "t", t,
                 "d", data
         );
-        socketService.sendMessageToClient(member.uid(), "lobby", msg);
+        socketService.sendMessageToClient(member.uid(), LOBBY_NAME, msg);
     }
 
     private void notifyAll(String t, Object data) {
         Map<String, Object> msg = makeMessage(t, data);
-        socketService.sendMessage("lobby", msg);
+        socketService.sendMessage(LOBBY_NAME, msg);
     }
 
     private void notifyVersion(String t, Object data) {
         Map<String, Object> vmsg = history.add(makeMessage(t, data));
-        socketService.sendMessage("lobby", vmsg);
+        socketService.sendMessage(LOBBY_NAME, vmsg);
     }
 
     private List<String> hookOwnerIds() {

@@ -8,7 +8,6 @@ import leo.lija.app.db.HookRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Progress;
-import leo.lija.app.exceptions.AppException;
 import leo.lija.chess.Color;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

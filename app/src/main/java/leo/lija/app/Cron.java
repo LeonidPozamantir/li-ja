@@ -82,7 +82,7 @@ public class Cron {
 
     @PostConstruct
     void gameCleanupUnplayed() {
-        spawn(Duration.ofMinutes((long) (60 * 12.1)), () -> {
+        spawn(Duration.ofMinutes((long) (60 * 4.1)), () -> {
             gameRepo.cleanupUnplayed();
             gameCleanNext.apply();
         });
