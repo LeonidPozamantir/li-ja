@@ -41,14 +41,6 @@ public class Hub {
         socketService.removeFromRoom("site", uid);
     }
 
-    private void notifyMember(String t, Object data, Member member) {
-        Map<String, Object> msg = Map.of(
-            "t", t,
-            "d", data
-        );
-        socketService.sendMessageToClient(member.uid(), "site", msg);
-    }
-
     private void notifyAll(String t, Object data) {
         Map<String, Object> msg = makeMessage(t, data);
         socketService.sendMessage("site", msg);
