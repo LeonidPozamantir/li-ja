@@ -13,6 +13,6 @@ public class GameCleanNext {
     private final GameRepoJpa jpa;
 
     public void apply() {
-        jpa.cleanNext(LocalDateTime.now().minusMonths(1));
+        jpa.cleanNext(LocalDateTime.now().minusDays(3));
     }
 }
