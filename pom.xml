@@ -19,9 +19,7 @@
 
 	<modules>
 		<module>chess</module>
-		<module>system</module>
 		<module>app</module>
-		<module>benchmark</module>
         <module>cli</module>
 	</modules>
 

@@ -2,7 +2,7 @@ package leo.lija.app;
 
 import jakarta.servlet.http.HttpServletRequest;
 import leo.lija.chess.exceptions.ChessException;
-import leo.lija.system.exceptions.AppException;
+import leo.lija.app.exceptions.AppException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

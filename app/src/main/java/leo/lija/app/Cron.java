@@ -1,71 +1,105 @@
 package leo.lija.app;
 
-import leo.lija.system.Finisher;
-import leo.lija.system.ai.AiService;
-import leo.lija.system.ai.RemoteAi;
-import leo.lija.system.command.GameFinishCommand;
-import leo.lija.system.db.GameRepo;
-import leo.lija.system.db.HookRepo;
-import leo.lija.system.db.UserRepo;
-import leo.lija.system.entities.DbGame;
-import leo.lija.system.memo.HookMemo;
-import leo.lija.system.memo.LobbyMemo;
-import leo.lija.system.memo.UsernameMemo;
+import jakarta.annotation.PostConstruct;
+import leo.lija.app.ai.RemoteAi;
+import leo.lija.app.command.GameCleanNext;
+import leo.lija.app.command.GameFinish;
+import leo.lija.app.db.GameRepo;
+import leo.lija.app.db.HookRepo;
+import leo.lija.app.db.UserRepo;
+import leo.lija.app.lobby.Fisherman;
+import leo.lija.app.memo.HookMemo;
+import leo.lija.app.reporting.Reporting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Component
+@ConditionalOnWebApplication
 @ConditionalOnBooleanProperty(name = "ai.server", havingValue = false)
 @RequiredArgsConstructor
 public class Cron {
 
+    private final TaskScheduler taskScheduler;
+    private final TaskExecutor actionsExecutor;
+
     private final UserRepo userRepo;
-    private final UsernameMemo usernameMemo;
     private final HookRepo hookRepo;
-    private final HookMemo hookMemo;
-    private final LobbyMemo lobbyMemo;
     private final GameRepo gameRepo;
-    private final GameFinishCommand gameFinishCommand;
+    private final GameFinish gameFinish;
+    private final GameCleanNext gameCleanNext;
     private final RemoteAi remoteAi;
-    private final AiService aiService;
+    private final Fisherman lobbyFisherman;
+    private final leo.lija.app.site.Hub siteHub;
+    private final leo.lija.app.lobby.Hub lobbyHub;
+    private final HookMemo hookMemo;
+    private final Reporting reporting;
 
-    @Scheduled(fixedRateString = "${cron.frequency.online-username}")
-    void onlineUsername() {
-        userRepo.updateOnlineUserNames(usernameMemo.keys());
+    private final int TIMEOUT = 500;
+
+    @PostConstruct
+    void reportingUpdate() {
+        spawn(Duration.ofSeconds(2), reporting::update);
     }
 
-//    @Scheduled(fixedRateString = "${cron.hook-cleanup-dead.frequency}")
-//    void hookCleanupDead() {
-//        boolean hasRemoved = hookRepo.keepOnlyOwnerIds(hookMemo.keys());
-//        if (hasRemoved) lobbyMemo.increase();
-//    }
+    @PostConstruct
+    void hookTick() {
+        spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
+            .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));
+    }
 
-    @Scheduled(fixedRateString = "${cron.frequency.hook-cleanup-old}")
+    @PostConstruct
+    void nbMembers() {
+        spawn(Duration.ofSeconds(2), () ->
+            siteHub.nbMembers().join()
+        );
+    }
+
+    @PostConstruct
+    void hookCleanupDead() {
+        spawn(Duration.ofSeconds(2), lobbyFisherman::cleanup);
+    }
+
+    @PostConstruct
     void hookCleanupOld() {
-        hookRepo.cleanupOld();
+        spawn(Duration.ofSeconds(21), hookRepo::cleanupOld);
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.game-cleanup-unplayed}")
+    @PostConstruct
+    void onlineUsername() {
+        spawn(Duration.ofSeconds(3), () ->
+            siteHub.withUsernames(userRepo::updateOnlineUserNames)
+        );
+    }
+
+    @PostConstruct
     void gameCleanupUnplayed() {
-        System.out.println("[cron] remove old unplayed games");
-        gameRepo.cleanupUnplayed();
+        spawn(Duration.ofMinutes((long) (60 * 12.1)), () -> {
+            gameRepo.cleanupUnplayed();
+            gameCleanNext.apply();
+        });
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.game-auto-finish}")
+    @PostConstruct
     void gameAutoFinish() {
-        gameFinishCommand.apply();
+        spawn(Duration.ofHours(1), gameFinish::apply);
     }
 
-    @Scheduled(fixedRateString = "${cron.frequency.remote-ai-health}")
+    @PostConstruct
     void remoteAiHealth() {
-        boolean health = remoteAi.health();
-        aiService.setRemoteAiHealth(health);
-        if (health) System.out.println("remote AI is up");
-        else System.out.println("remote AI is down");
+        spawn(Duration.ofSeconds(10), remoteAi::diagnose);
     }
+
+    private void spawn(Duration freq, Runnable op) {
+        taskScheduler.scheduleWithFixedDelay(op, Instant.now().plus(freq), RichDuration.randomize(freq));
+    }
+
 }

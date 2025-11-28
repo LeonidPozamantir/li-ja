@@ -1,6 +1,6 @@
 package leo.lija.app.controllers;
 
-import leo.lija.system.ai.CraftyServer;
+import leo.lija.app.ai.CraftyServer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
