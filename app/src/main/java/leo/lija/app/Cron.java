@@ -43,7 +43,7 @@ public class Cron {
     private final HookMemo hookMemo;
     private final Reporting reporting;
 
-    private final int TIMEOUT = 500;
+    private static final int TIMEOUT = 500;
 
     @PostConstruct
     void reportingUpdate() {

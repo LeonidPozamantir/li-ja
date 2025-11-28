@@ -1,7 +1,11 @@
 package leo.lija.app;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.Duration;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RichDuration {
 
     public static Duration randomize(Duration d, float ratio) {

@@ -29,7 +29,7 @@ public class Hub {
     }
 
     public CompletableFuture<Void> nbMembers() {
-        return CompletableFuture.runAsync(() -> notifyAll("nbp", members.size()));
+        return CompletableFuture.runAsync(() -> notifyAll("n", members.size()));
     }
 
     public int getNbMembers() {

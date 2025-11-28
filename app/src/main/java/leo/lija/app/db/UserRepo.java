@@ -1,7 +1,6 @@
 package leo.lija.app.db;
 
 import leo.lija.app.entities.User;
-import leo.lija.app.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

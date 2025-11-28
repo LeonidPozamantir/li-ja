@@ -38,6 +38,8 @@ public class SocketIOService extends BaseController {
     private final Map<String, SocketIOClient> uidToClient = new ConcurrentHashMap<>();
     private final Map<String, String> uidToHook = new ConcurrentHashMap<>();
 
+    private static final String UID_MISSING = "Socket UID missing";
+
     @PostConstruct
     public void init() {
         server.addDisconnectListener(onDisconnected());
@@ -48,7 +50,7 @@ public class SocketIOService extends BaseController {
             uidToClient.put(event.uid, client);
             uidToHook.put(event.uid, event.hook);
             lobbySocket.join(
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
                 Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
                 get(Optional.ofNullable(event.hook))
             );
@@ -56,7 +58,7 @@ public class SocketIOService extends BaseController {
 
         server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) ->
             siteSocket.join(
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
                 get(Optional.ofNullable(event.username))
         ));
 
@@ -68,7 +70,7 @@ public class SocketIOService extends BaseController {
             gameSocket.join(
                 event.gameId,
                 event.color,
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException("Socket UID missing")),
+                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
                 Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
                 get(Optional.ofNullable(event.playerId))
             )

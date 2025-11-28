@@ -237,9 +237,8 @@ public class DbGame {
             ? lastMoveTime.map(
                     lmt -> {
                         long mt = nowSeconds() - lmt;
-                        return player.getMoveTimes().isEmpty()
-                            ? String.valueOf(mt)
-                            : player.getMoveTimes() + " " + mt;
+                        if (player.getMoveTimes().isEmpty()) return String.valueOf(mt);
+                        return player.getMoveTimes() + " " + mt;
                     }
                 ).orElse("")
             : player.getMoveTimes();

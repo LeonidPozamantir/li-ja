@@ -1,12 +1,11 @@
 package leo.lija.app.ai;
 
+import leo.lija.app.Ai;
+import leo.lija.app.entities.DbGame;
 import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
-import leo.lija.app.Ai;
-import leo.lija.app.entities.DbGame;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
