@@ -20,4 +20,9 @@ public class ReportC {
     public int nbPlayers() {
         return reporting.getNbMembers();
     }
+
+    @GetMapping("/nb-playing")
+    public long nbPlaying() {
+        return reporting.getNbPlaying();
+    }
 }

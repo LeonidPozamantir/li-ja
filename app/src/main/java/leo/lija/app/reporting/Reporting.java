@@ -21,6 +21,7 @@ public class Reporting {
     private int nbMembers = 0;
     @Getter
     private long nbGames = 0;
+    @Getter
     private long nbPlaying = 0;
     private boolean remoteAi = false;
 
