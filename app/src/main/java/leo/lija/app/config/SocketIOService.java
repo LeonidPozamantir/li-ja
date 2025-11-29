@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import leo.lija.app.controllers.BaseController;
 import leo.lija.app.entities.PovRef;
-import leo.lija.app.exceptions.AppException;
 import leo.lija.app.lobby.Socket;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,8 +37,6 @@ public class SocketIOService extends BaseController {
     private final Map<String, SocketIOClient> uidToClient = new ConcurrentHashMap<>();
     private final Map<String, String> uidToHook = new ConcurrentHashMap<>();
 
-    private static final String UID_MISSING = "Socket UID missing";
-
     @PostConstruct
     public void init() {
         server.addDisconnectListener(onDisconnected());
@@ -50,15 +47,15 @@ public class SocketIOService extends BaseController {
             uidToClient.put(event.uid, client);
             uidToHook.put(event.uid, event.hook);
             lobbySocket.join(
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
-                Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
+                get(Optional.ofNullable(event.uid)),
+                Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.hook))
             );
         });
 
         server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) ->
             siteSocket.join(
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
+                get(Optional.ofNullable(event.uid)),
                 get(Optional.ofNullable(event.username))
         ));
 
@@ -70,8 +67,8 @@ public class SocketIOService extends BaseController {
             gameSocket.join(
                 event.gameId,
                 event.color,
-                get(Optional.ofNullable(event.uid)).orElseThrow(() -> new AppException(UID_MISSING)),
-                Optional.ofNullable(event.version).orElseThrow(() -> new AppException("Socket version missing")),
+                get(Optional.ofNullable(event.uid)),
+                Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.playerId))
             )
         );

@@ -8,6 +8,7 @@ import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
+import leo.lija.app.socket.Util;
 import leo.lija.chess.Color;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -54,14 +55,16 @@ public class Socket {
     public void join(
         String gameId,
         String colorName,
-        String uid,
-        Integer version,
+        Optional<String> uidOption,
+        Optional<Integer> versionOption,
         Optional<String> playerId
     ) {
-        getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
-            Hub hub = hubMemo.get(gameId);
-            hub.join(uid, version, color, playerId.flatMap(gameOption::player).isPresent());
-        }));
+        if (uidOption.isPresent() && versionOption.isPresent()) {
+            getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
+                Hub hub = hubMemo.get(gameId);
+                hub.join(uidOption.get(), versionOption.get(), color, playerId.flatMap(gameOption::player).isPresent());
+            }));
+        } else Util.connectionFail();
     }
 
     public void talk(String uid, SocketIOService.GameTalkForm event) {

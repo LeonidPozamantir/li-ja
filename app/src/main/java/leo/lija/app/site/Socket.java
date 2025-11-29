@@ -2,6 +2,7 @@ package leo.lija.app.site;
 
 import jakarta.annotation.PostConstruct;
 import leo.lija.app.config.SocketIOService;
+import leo.lija.app.socket.Util;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,11 @@ public class Socket {
         socketIOService.setSiteSocket(this);
     }
 
-    public void join(String uid, Optional<String> username) {
-        hub.join(uid, username);
+    public void join(Optional<String> uidOption, Optional<String> username) {
+        uidOption.ifPresentOrElse(
+            uid -> hub.join(uid, username),
+            Util::connectionFail
+        );
     }
 
     public void quit(String uid) {
