@@ -4,6 +4,7 @@ import leo.lija.app.exceptions.AppException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -12,7 +13,7 @@ public class Util {
 
     public static String uid() {
         return IntStream.range(0, 6)
-            .map(i -> (int) (Math.random() * 26) + 97)
+            .map(i -> new Random().nextInt(25) + 97)
             .mapToObj(i -> String.valueOf((char) i))
             .collect(Collectors.joining());
     }

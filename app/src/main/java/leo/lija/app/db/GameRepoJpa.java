@@ -31,4 +31,7 @@ public interface GameRepoJpa extends JpaRepository<RawDbGame, String> {
     @Transactional
     void cleanNext(LocalDateTime from);
 
+    @Query("select count(g) from RawDbGame g where updatedAt > :from")
+    int countPlaying(LocalDateTime from);
+
 }

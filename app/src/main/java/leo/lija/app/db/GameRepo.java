@@ -115,4 +115,8 @@ public class GameRepo {
     public long countAll() {
         return repo.count();
     }
+
+    public int countPlaying() {
+        return repo.countPlaying(LocalDateTime.now().minusSeconds(15));
+    }
 }

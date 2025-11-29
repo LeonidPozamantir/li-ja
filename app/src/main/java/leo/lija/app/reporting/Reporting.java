@@ -23,6 +23,7 @@ public class Reporting {
     private long nbGames = 0;
     @Getter
     private long nbPlaying = 0;
+    private long nbGameSockets = 0;
     private boolean remoteAi = false;
 
     public String getStatus() {
@@ -30,13 +31,14 @@ public class Reporting {
     }
 
     private String status() {
-        return String.join(" ", String.valueOf(nbMembers), String.valueOf(nbGames), String.valueOf(nbPlaying), remoteAi ? "1" : "0");
+        return String.join(" ", String.valueOf(nbMembers), String.valueOf(nbGames), String.valueOf(nbPlaying), String.valueOf(nbGameSockets), remoteAi ? "1" : "0");
     }
 
     public void update() {
         nbMembers = siteHub.getNbMembers();
         nbGames = gameRepo.countAll();
-        nbPlaying = gameHubMemo.count();
+        nbPlaying = gameRepo.countPlaying();
+        nbGameSockets = gameHubMemo.count();
         remoteAi = remoteAiService.currentHealth();
     }
 }
