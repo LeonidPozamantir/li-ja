@@ -53,7 +53,6 @@ public class HubMemo {
     }
 
     public void remove(String gameId) {
-        System.out.println("delete game room " + gameId);
         cache.invalidate(gameId);
     }
 
@@ -62,7 +61,6 @@ public class HubMemo {
     }
 
     private Hub compute(String gameId) {
-        System.out.println("create game room " + gameId);
         return new Hub(executor, socketIOService, gameId, makeHistory.get());
     }
 }
