@@ -45,7 +45,7 @@ public class SocketIOService extends BaseController {
         server.addConnectListener(onConnected());
 
         server.addEventListener("p", Object.class, (client, event, ackSender) -> {
-            client.sendEvent("p", Map.of("t", "p"));
+            client.sendEvent("p", Util.PONG);
         });
 
         server.addEventListener("lobby/join", LobbyJoinForm.class, (client, event, ackSender) -> {

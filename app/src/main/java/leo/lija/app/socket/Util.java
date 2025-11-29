@@ -4,6 +4,7 @@ import leo.lija.app.exceptions.AppException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,6 +18,8 @@ public class Util {
             .mapToObj(i -> String.valueOf((char) i))
             .collect(Collectors.joining());
     }
+
+    public static Map<String, String> PONG = Map.of("t", "p");
 
     public static void connectionFail() {
         throw new AppException("Invalid request");
