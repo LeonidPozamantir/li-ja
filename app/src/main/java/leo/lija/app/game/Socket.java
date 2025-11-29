@@ -119,7 +119,10 @@ public class Socket {
 
     private void scheduleForDeletion(Hub hub, String gameId) {
         taskScheduler.schedule(() ->
-            hub.ifEmpty(() -> hubMemo.remove(gameId)), Instant.now().plusSeconds(60)
+            hub.ifEmpty(() -> {
+                System.out.println("delete game room " + gameId);
+                hubMemo.remove(gameId);
+            }), Instant.now().plusSeconds(10)
         );
     }
 
