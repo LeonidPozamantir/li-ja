@@ -1,3 +1,4 @@
 add indexes as in GameRepo
 deployment and restart scripts
 configure remote AI url
+? create separate socket uid for each socket

@@ -9,6 +9,7 @@ import lombok.NonNull;
 import org.springframework.core.task.TaskExecutor;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class HubMemo {
@@ -39,11 +40,20 @@ public class HubMemo {
         return cache.getUnchecked(gameId);
     }
 
+    public Optional<Hub> getIfPresent(String gameId) {
+        return Optional.ofNullable(cache.getIfPresent(gameId));
+    }
+
     public Hub getFromFullId(String fullId) {
         return get(DbGame.takeGameId(fullId));
     }
 
+    public Optional<Hub> getIfPresentFromFullId(String fullId) {
+        return getIfPresent(DbGame.takeGameId(fullId));
+    }
+
     public void remove(String gameId) {
+        System.out.println("delete game room " + gameId);
         cache.invalidate(gameId);
     }
 

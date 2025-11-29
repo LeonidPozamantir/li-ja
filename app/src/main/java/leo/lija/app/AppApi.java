@@ -11,6 +11,7 @@ import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.RedirectEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
+import leo.lija.app.game.Hub;
 import leo.lija.app.game.HubMemo;
 import leo.lija.app.game.Socket;
 import leo.lija.chess.Color;
@@ -49,7 +50,7 @@ public class AppApi {
     }
 
     public Map<String, Object> show(String fullId) {
-        int version = gameHubMemo.getFromFullId(fullId).getVersion();
+        int version = futureVersion(gameHubMemo.getIfPresentFromFullId(fullId));
         Optional<Pov> povOption = gameRepo.pov(fullId);
         return povOption.map(pov -> {
             List<Room.RoomMessage> roomData = messenger.render(pov.game().getId());
@@ -138,7 +139,7 @@ public class AppApi {
     }
 
     public int gameVersion(String gameId) {
-        return gameHubMemo.get(gameId).getVersion();
+        return futureVersion(gameHubMemo.getIfPresent(gameId));
     }
 
     public boolean isConnected(String gameId, String colorName) {
@@ -153,6 +154,11 @@ public class AppApi {
             if (user.getElo() > User.STARTING_ELO) eloUpdater.adjust(user, User.STARTING_ELO);
             userRepo.setEngine(user.getId());
         });
+    }
+
+    private int futureVersion(Optional<Hub> actorOption) {
+        return actorOption.map(Hub::getVersion)
+            .orElse(0);
     }
 
 }
