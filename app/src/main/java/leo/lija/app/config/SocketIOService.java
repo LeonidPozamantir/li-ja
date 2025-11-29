@@ -2,6 +2,7 @@ package leo.lija.app.config;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
@@ -9,6 +10,7 @@ import jakarta.annotation.PreDestroy;
 import leo.lija.app.controllers.BaseController;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.lobby.Socket;
+import leo.lija.app.socket.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -35,43 +37,47 @@ public class SocketIOService extends BaseController {
 
     private final Map<String, String> sessionToUid = new ConcurrentHashMap<>();
     private final Map<String, SocketIOClient> uidToClient = new ConcurrentHashMap<>();
-    private final Map<String, String> uidToHook = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
         server.addDisconnectListener(onDisconnected());
 
+        server.addConnectListener(onConnected());
+
         server.addEventListener("lobby/join", LobbyJoinForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
-            sessionToUid.put(sessionId, event.uid);
-            uidToClient.put(event.uid, client);
-            uidToHook.put(event.uid, event.hook);
+            String uid = sessionToUid.get(sessionId);
             lobbySocket.join(
-                get(Optional.ofNullable(event.uid)),
+                uid,
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.hook))
             );
         });
 
-        server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) ->
+        server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
             siteSocket.join(
-                get(Optional.ofNullable(event.uid)),
+                uid,
                 get(Optional.ofNullable(event.username))
-        ));
+            );
+        });
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) ->
             lobbySocket.talk(event)
         );
 
-        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) ->
+        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
             gameSocket.join(
                 event.gameId,
                 event.color,
-                get(Optional.ofNullable(event.uid)),
+                uid,
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.playerId))
-            )
-        );
+            );
+        });
 
         server.addEventListener("game/talk", GameTalkForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
@@ -101,15 +107,15 @@ public class SocketIOService extends BaseController {
 
     }
 
-    public record LobbyJoinForm(String uid, Integer version, String hook) {}
+    public record LobbyJoinForm(Integer version, String hook) {}
 
     public record LobbyTalkForm(Data d) {
         public record Data(String txt, String u) {}
     }
 
-    public record SiteJoinForm(String uid, String username) {}
+    public record SiteJoinForm(String username) {}
 
-    public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
+    public record GameJoinForm(String gameId, String color, Integer version, String playerId) {}
 
     public record GameTalkForm(PovRef povRef, Data d) {
         public record Data(String txt) {}
@@ -128,6 +134,15 @@ public class SocketIOService extends BaseController {
         server.stop();
     }
 
+    private ConnectListener onConnected() {
+        return client -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = Util.uid();
+            sessionToUid.put(sessionId, uid);
+            uidToClient.put(uid, client);
+        };
+    }
+
     private DisconnectListener onDisconnected() {
         return client -> {
             String sessionId = client.getSessionId().toString();
@@ -140,16 +155,15 @@ public class SocketIOService extends BaseController {
             gameSocket.quit(uid, gameRooms);
             uidToClient.remove(uid);
             sessionToUid.remove(sessionId);
-            uidToHook.remove(uid);
         };
     }
 
-    public void addToRoom(String room, String username) {
-        uidToClient.get(username).joinRoom(room);
+    public void addToRoom(String room, String uid) {
+        uidToClient.get(uid).joinRoom(room);
     }
 
-    public void removeFromRoom(String room, String username) {
-        uidToClient.get(username).leaveRoom(room);
+    public void removeFromRoom(String room, String uid) {
+        uidToClient.get(uid).leaveRoom(room);
     }
 
     public void sendMessage(String room, Object msg) {

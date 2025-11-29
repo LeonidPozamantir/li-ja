@@ -55,16 +55,16 @@ public class Socket {
     public void join(
         String gameId,
         String colorName,
-        Optional<String> uidOption,
+        String uid,
         Optional<Integer> versionOption,
         Optional<String> playerId
     ) {
-        if (uidOption.isPresent() && versionOption.isPresent()) {
+        versionOption.ifPresentOrElse(version -> {
             getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
                 Hub hub = hubMemo.get(gameId);
-                hub.join(uidOption.get(), versionOption.get(), color, playerId.flatMap(gameOption::player).isPresent());
+                hub.join(uid, version, color, playerId.flatMap(gameOption::player).isPresent());
             }));
-        } else Util.connectionFail();
+        }, Util::connectionFail);
     }
 
     public void talk(String uid, SocketIOService.GameTalkForm event) {
