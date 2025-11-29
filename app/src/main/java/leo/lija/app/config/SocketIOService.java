@@ -44,6 +44,10 @@ public class SocketIOService extends BaseController {
 
         server.addConnectListener(onConnected());
 
+        server.addEventListener("p", Object.class, (client, event, ackSender) -> {
+            client.sendEvent("p", Map.of("t", "p"));
+        });
+
         server.addEventListener("lobby/join", LobbyJoinForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
             String uid = sessionToUid.get(sessionId);
