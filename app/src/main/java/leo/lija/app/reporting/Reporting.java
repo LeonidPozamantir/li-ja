@@ -8,6 +8,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadMXBean;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class Reporting {
@@ -24,14 +29,15 @@ public class Reporting {
     @Getter
     private long nbPlaying = 0;
     private long nbGameSockets = 0;
+    private float loadAvg = 0;
+    private int nbThreads = 0;
     private boolean remoteAi = false;
+
+    private OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
+    private ThreadMXBean threadStats = ManagementFactory.getThreadMXBean();
 
     public String getStatus() {
         return status();
-    }
-
-    private String status() {
-        return String.join(" ", String.valueOf(nbMembers), String.valueOf(nbGames), String.valueOf(nbPlaying), String.valueOf(nbGameSockets), remoteAi ? "1" : "0");
     }
 
     public void update() {
@@ -39,6 +45,21 @@ public class Reporting {
         nbGames = gameRepo.countAll();
         nbPlaying = gameRepo.countPlaying();
         nbGameSockets = gameHubMemo.count();
+        loadAvg = (float) osStats.getSystemLoadAverage();
+//        nbThreads = threadStats.getThreadCount();
         remoteAi = remoteAiService.currentHealth();
     }
+
+    private String status() {
+        return String.join(" ",
+            String.valueOf(nbMembers),
+            String.valueOf(nbGames),
+            String.valueOf(nbPlaying),
+            String.valueOf(nbGameSockets),
+            String.valueOf(loadAvg),
+            remoteAi ? "1" : "0"
+        );
+    }
+
+
 }
