@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.ThreadMXBean;
 import java.util.Optional;
 
 @Service
@@ -28,10 +29,12 @@ public class Reporting {
     @Getter
     private long nbPlaying = 0;
     private long nbGameSockets = 0;
-    private Optional<Float> loadAvg = Optional.empty();
+    private float loadAvg = 0;
+    private int nbThreads = 0;
     private boolean remoteAi = false;
 
     private OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
+    private ThreadMXBean threadStats = ManagementFactory.getThreadMXBean();
 
     public String getStatus() {
         return status();
@@ -42,12 +45,9 @@ public class Reporting {
         nbGames = gameRepo.countAll();
         nbPlaying = gameRepo.countPlaying();
         nbGameSockets = gameHubMemo.count();
-        loadAvg = getLoadAvg();
+        loadAvg = (float) osStats.getSystemLoadAverage();
+//        nbThreads = threadStats.getThreadCount();
         remoteAi = remoteAiService.currentHealth();
-    }
-
-    private Optional<Float> getLoadAvg() {
-        return Optional.of((float) osStats.getSystemLoadAverage());
     }
 
     private String status() {
@@ -56,7 +56,7 @@ public class Reporting {
             String.valueOf(nbGames),
             String.valueOf(nbPlaying),
             String.valueOf(nbGameSockets),
-            loadAvg.map(String::valueOf).orElse("?"),
+            String.valueOf(loadAvg),
             remoteAi ? "1" : "0"
         );
     }
