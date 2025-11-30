@@ -41,10 +41,6 @@ public class SocketIOService extends BaseController {
     public void init() {
         server.addDisconnectListener(onDisconnected());
 
-        server.addEventListener("p", Object.class, (client, event, ackSender) ->
-            client.sendEvent("p", Util.PONG)
-        );
-
         server.addEventListener("lobby/join", LobbyJoinForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
             sessionToUid.put(sessionId, event.uid);
@@ -61,6 +57,10 @@ public class SocketIOService extends BaseController {
                 get(Optional.ofNullable(event.uid)),
                 get(Optional.ofNullable(event.username))
         ));
+
+        server.addEventListener("site/p", String.class, (client, event, ackSender) ->
+            siteSocket.ping(event)
+        );
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) ->
             lobbySocket.talk(event)

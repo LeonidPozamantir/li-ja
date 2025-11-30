@@ -33,6 +33,10 @@ public class Socket {
         );
     }
 
+    public void ping(String uid) {
+        hub.ping(uid);
+    }
+
     public void quit(String uid) {
         hub.quit(uid);
     }

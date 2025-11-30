@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 public class HookMemo extends BooleanExpiryMemo {
 
     public HookMemo(MemoConfigProperties config) {
-        super(config);
-        cache = Builder.expiry(config.hook().timeout());
+        super(config.hook().timeout());
     }
 }

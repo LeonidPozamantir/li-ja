@@ -8,12 +8,13 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-@RequiredArgsConstructor
 public abstract class BooleanExpiryMemo {
 
-    private final MemoConfigProperties config;
+    protected final Cache<String, Boolean> cache;
 
-    protected Cache<String, Boolean> cache;
+    public BooleanExpiryMemo(int timeout) {
+        cache = Builder.expiry(timeout);
+    }
 
     public boolean get(String key) {
         return Optional.ofNullable(cache.getIfPresent(key)).orElse(false);

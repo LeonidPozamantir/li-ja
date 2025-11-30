@@ -46,55 +46,33 @@ public class Cron {
     private static final int TIMEOUT = 500;
 
     @PostConstruct
-    void reportingUpdate() {
-        spawn(Duration.ofSeconds(2), reporting::update);
-    }
+    void scheduleTasks() {
+//        spawn(Duration.ofSeconds(5), siteHub::cleanup);
 
-    @PostConstruct
-    void hookTick() {
+        spawn(Duration.ofSeconds(2), reporting::update);
+
         spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));
-    }
 
-    @PostConstruct
-    void nbMembers() {
         spawn(Duration.ofSeconds(2), () ->
             siteHub.nbMembers().join()
         );
-    }
 
-    @PostConstruct
-    void hookCleanupDead() {
         spawn(Duration.ofSeconds(2), lobbyFisherman::cleanup);
-    }
 
-    @PostConstruct
-    void hookCleanupOld() {
         spawn(Duration.ofSeconds(21), hookRepo::cleanupOld);
-    }
 
-    @PostConstruct
-    void onlineUsername() {
         spawn(Duration.ofSeconds(3), () ->
             siteHub.withUsernames(userRepo::updateOnlineUserNames)
         );
-    }
 
-    @PostConstruct
-    void gameCleanupUnplayed() {
         spawn(Duration.ofMinutes((long) (60 * 4.1)), () -> {
             gameRepo.cleanupUnplayed();
             gameCleanNext.apply();
         });
-    }
 
-    @PostConstruct
-    void gameAutoFinish() {
         spawn(Duration.ofHours(1), gameFinish::apply);
-    }
 
-    @PostConstruct
-    void remoteAiHealth() {
         spawn(Duration.ofSeconds(10), remoteAi::diagnose);
     }
 

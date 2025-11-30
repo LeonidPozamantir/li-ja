@@ -1,6 +1,7 @@
 package leo.lija.app.site;
 
 import leo.lija.app.config.SocketIOService;
+import leo.lija.app.socket.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,10 @@ public class Hub {
 
     public void withUsernames(Consumer<List<String>> op) {
         op.accept(usernames());
+    }
+
+    public void ping(String uid) {
+        socketService.sendMessage("site", Util.PONG);
     }
 
     public void join(String uid, Optional<String> username) {

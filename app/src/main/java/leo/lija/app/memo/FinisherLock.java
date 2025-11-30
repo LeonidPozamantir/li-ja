@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 public class FinisherLock extends BooleanExpiryMemo {
 
     public FinisherLock(MemoConfigProperties config) {
-        super(config);
-        cache = Builder.expiry(config.finisherLock().timeout());
+        super(config.finisherLock().timeout());
     }
 
     public boolean isLocked(DbGame game) {
