@@ -2,7 +2,6 @@ package leo.lija.app.config;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
@@ -42,46 +41,40 @@ public class SocketIOService extends BaseController {
     public void init() {
         server.addDisconnectListener(onDisconnected());
 
-        server.addConnectListener(onConnected());
-
-        server.addEventListener("p", Object.class, (client, event, ackSender) -> {
-            client.sendEvent("p", Util.PONG);
-        });
+        server.addEventListener("p", Object.class, (client, event, ackSender) ->
+            client.sendEvent("p", Util.PONG)
+        );
 
         server.addEventListener("lobby/join", LobbyJoinForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
-            String uid = sessionToUid.get(sessionId);
+            sessionToUid.put(sessionId, event.uid);
+            uidToClient.put(event.uid, client);
             lobbySocket.join(
-                uid,
+                get(Optional.ofNullable(event.uid)),
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.hook))
             );
         });
 
-        server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) -> {
-            String sessionId = client.getSessionId().toString();
-            String uid = sessionToUid.get(sessionId);
+        server.addEventListener("site/join", SiteJoinForm.class, (client, event, ackSender) ->
             siteSocket.join(
-                uid,
+                get(Optional.ofNullable(event.uid)),
                 get(Optional.ofNullable(event.username))
-            );
-        });
+        ));
 
         server.addEventListener("lobby/talk", LobbyTalkForm.class, (client, event, ackSender) ->
             lobbySocket.talk(event)
         );
 
-        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) -> {
-            String sessionId = client.getSessionId().toString();
-            String uid = sessionToUid.get(sessionId);
+        server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) ->
             gameSocket.join(
                 event.gameId,
                 event.color,
-                uid,
+                get(Optional.ofNullable(event.uid)),
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.playerId))
-            );
-        });
+            )
+        );
 
         server.addEventListener("game/talk", GameTalkForm.class, (client, event, ackSender) -> {
             String sessionId = client.getSessionId().toString();
@@ -111,15 +104,15 @@ public class SocketIOService extends BaseController {
 
     }
 
-    public record LobbyJoinForm(Integer version, String hook) {}
+    public record LobbyJoinForm(String uid, Integer version, String hook) {}
 
     public record LobbyTalkForm(Data d) {
         public record Data(String txt, String u) {}
     }
 
-    public record SiteJoinForm(String username) {}
+    public record SiteJoinForm(String uid, String username) {}
 
-    public record GameJoinForm(String gameId, String color, Integer version, String playerId) {}
+    public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
 
     public record GameTalkForm(PovRef povRef, Data d) {
         public record Data(String txt) {}
@@ -136,15 +129,6 @@ public class SocketIOService extends BaseController {
     @PreDestroy
     public void destroy() {
         server.stop();
-    }
-
-    private ConnectListener onConnected() {
-        return client -> {
-            String sessionId = client.getSessionId().toString();
-            String uid = Util.uid();
-            sessionToUid.put(sessionId, uid);
-            uidToClient.put(uid, client);
-        };
     }
 
     private DisconnectListener onDisconnected() {

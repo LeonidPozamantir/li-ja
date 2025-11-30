@@ -23,11 +23,10 @@ public class Socket {
         socketIOService.setLobbySocket(this);
     }
 
-    public void join(String uid, Optional<Integer> versionOption, Optional<String> hook) {
-        versionOption.ifPresentOrElse(
-            version -> hub.join(uid, version, hook),
-            Util::connectionFail
-        );
+    public void join(Optional<String> uidOption, Optional<Integer> versionOption, Optional<String> hook) {
+        if (uidOption.isPresent() && versionOption.isPresent()) {
+            hub.join(uidOption.get(), versionOption.get(), hook);
+        } else Util.connectionFail();
     }
 
     public void talk(SocketIOService.LobbyTalkForm event) {
