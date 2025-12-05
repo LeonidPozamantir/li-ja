@@ -6,6 +6,7 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
+import leo.lija.app.socket.HubActor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +19,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service("lobbyHub")
-public class Hub {
+public class Hub extends HubActor<Member> {
 
-    private final SocketIOService socketService;
     private final MessageRepo messageRepo;
     private final History history;
 
-    private final Map<String, Member> members = new ConcurrentHashMap<>();
-
     private static final String LOBBY_NAME = "lobby";
 
-    public Hub(SocketIOService socketService, MessageRepo messageRepo, @Value("${lobby.message.lifetime}") int timeout) {
-        this.socketService = socketService;
+    public Hub(SocketIOService socketService, MessageRepo messageRepo, History history, @Value("${lobby.uid.timeout}") int timeout) {
+        super(socketService, timeout, LOBBY_NAME);
         this.messageRepo = messageRepo;
-        this.history = new History(timeout);
+        this.history = history;
     }
 
     public void withHooks(Consumer<Collection<String>> op) {
@@ -79,11 +77,6 @@ public class Hub {
     public void biteHook(Hook hook, DbGame game) {
         members.values().stream().filter(m -> m.ownsHook(hook))
                 .forEach(m -> notifyMember("redirect", game.fullIdOf(game.getCreatorColor()), m));
-    }
-
-    public void quit(String uid) {
-        members.remove(uid);
-        socketService.removeFromRoom(LOBBY_NAME, uid);
     }
 
     private void notifyMember(String t, Object data, Member member) {

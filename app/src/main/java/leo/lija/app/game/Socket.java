@@ -109,21 +109,16 @@ public class Socket {
         hub.events(events);
     }
 
+    public void ping(String gameId, String uid) {
+        Hub hub = hubMemo.get(gameId);
+        hub.ping(uid);
+    }
+
     public void quit(String uid, Set<String> games) {
         games.forEach(gameId -> {
             Hub hub = hubMemo.get(gameId);
             hub.quit(uid);
-            scheduleForDeletion(hub, gameId);
         });
-    }
-
-    private void scheduleForDeletion(Hub hub, String gameId) {
-        taskScheduler.schedule(() ->
-            hub.ifEmpty(() -> {
-                System.out.println("delete game room " + gameId);
-                hubMemo.remove(gameId);
-            }), Instant.now().plusSeconds(10)
-        );
     }
 
 }

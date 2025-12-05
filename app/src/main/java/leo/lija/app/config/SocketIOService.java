@@ -66,6 +66,10 @@ public class SocketIOService extends BaseController {
             lobbySocket.talk(event)
         );
 
+        server.addEventListener("lobby/p", String.class, (client, event, ackSender) ->
+            lobbySocket.ping(event)
+        );
+
         server.addEventListener("game/join", GameJoinForm.class, (client, event, ackSender) ->
             gameSocket.join(
                 event.gameId,
@@ -98,6 +102,12 @@ public class SocketIOService extends BaseController {
             String sessionId = client.getSessionId().toString();
             String uid = sessionToUid.get(sessionId);
             gameSocket.outoftime(uid, event);
+        });
+
+        server.addEventListener("game/p", String.class, (client, gameId, ackSender) -> {
+            String sessionId = client.getSessionId().toString();
+            String uid = sessionToUid.get(sessionId);
+            gameSocket.ping(uid, gameId);
         });
 
         server.start();

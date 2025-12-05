@@ -36,6 +36,10 @@ public class Socket {
         hub.talk(txt, username);
     }
 
+    public void ping(String uid) {
+        hub.ping(uid);
+    }
+
     public void addEntry(Entry entry) {
         hub.addEntry(entry);
     }

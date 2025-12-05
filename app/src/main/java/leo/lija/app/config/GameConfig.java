@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 public class GameConfig {
 
     @Bean
-    public HubMemo hubMemo(TaskExecutor executor, SocketIOService socketIOService, @Value("${game.message.lifetime}") int gameTimeout) {
+    public HubMemo hubMemo(TaskExecutor executor, SocketIOService socketIOService, @Value("${game.message.lifetime}") int gameTimeout, @Value("${game.uid.timeout}") int uidTimeout) {
         Supplier<History> gameHistory = () -> new History(gameTimeout);
-        return new HubMemo(executor, socketIOService, gameHistory);
+        return new HubMemo(executor, socketIOService, gameHistory, uidTimeout);
     }
 }

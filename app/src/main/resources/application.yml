@@ -22,9 +22,14 @@ lobby:
     max: 12
   message.lifetime: 30
   hook-pool.tick.frequency: 1s
+  uid.timeout: 10
 
 game:
   message.lifetime: 30
+  uid.timeout: 10
+
+site:
+  uid.timeout: 10
 
 socket:
   host: 0.0.0.0

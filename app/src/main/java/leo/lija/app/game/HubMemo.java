@@ -8,6 +8,7 @@ import leo.lija.app.entities.DbGame;
 import lombok.NonNull;
 import org.springframework.core.task.TaskExecutor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -19,8 +20,9 @@ public class HubMemo {
     private final SocketIOService socketIOService;
     private final Supplier<History> makeHistory;
     private final LoadingCache<@NonNull String, @NonNull Hub> cache;
+    private final int timeout;
 
-    public HubMemo(TaskExecutor executor, SocketIOService socketIOService, Supplier<History> makeHistory) {
+    public HubMemo(TaskExecutor executor, SocketIOService socketIOService, Supplier<History> makeHistory, int timeout) {
         this.executor = executor;
         this.socketIOService = socketIOService;
         this.makeHistory = makeHistory;
@@ -30,10 +32,15 @@ public class HubMemo {
                     return HubMemo.this.compute(key);
                 }
             });
+        this.timeout = timeout;
     }
 
     public Map<String, Hub> all() {
         return cache.asMap();
+    }
+
+    public List<Hub> hubs() {
+        return cache.asMap().values().stream().toList();
     }
 
     public Hub get(String gameId) {
@@ -61,6 +68,6 @@ public class HubMemo {
     }
 
     private Hub compute(String gameId) {
-        return new Hub(executor, socketIOService, gameId, makeHistory.get());
+        return new Hub(executor, socketIOService, gameId, makeHistory.get(), timeout);
     }
 }

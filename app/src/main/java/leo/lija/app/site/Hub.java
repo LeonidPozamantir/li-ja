@@ -1,8 +1,10 @@
 package leo.lija.app.site;
 
 import leo.lija.app.config.SocketIOService;
+import leo.lija.app.socket.HubActor;
 import leo.lija.app.socket.Util;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,24 +15,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service("siteHub")
-@RequiredArgsConstructor
-public class Hub {
+public class Hub extends HubActor<Member> {
 
-    private final SocketIOService socketService;
-
-    private Map<String, Member> members = new ConcurrentHashMap<>();
+    protected Hub(SocketIOService socketService, @Value("${site.uid.timeout}") int timeout) {
+        super(socketService, timeout, "site");
+    }
 
     public void withUsernames(Consumer<List<String>> op) {
         op.accept(usernames());
     }
 
-    public void ping(String uid) {
-        socketService.sendMessage("site", Util.PONG);
-    }
-
     public void join(String uid, Optional<String> username) {
         socketService.addToRoom("site", uid);
         members.put(uid, new Member(uid, username));
+        setAlive(uid);
     }
 
     public CompletableFuture<Void> nbMembers() {
@@ -39,11 +37,6 @@ public class Hub {
 
     public int getNbMembers() {
         return members.size();
-    }
-
-    public void quit(String uid) {
-        members.remove(uid);
-        socketService.removeFromRoom("site", uid);
     }
 
     private void notifyAll(String t, Object data) {

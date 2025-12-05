@@ -4,6 +4,7 @@ import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.event.CrowdEvent;
 import leo.lija.app.entities.event.Event;
+import leo.lija.app.socket.HubActor;
 import leo.lija.chess.Color;
 import org.springframework.core.task.TaskExecutor;
 
@@ -15,29 +16,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
-public class Hub {
+public class Hub extends HubActor<Member> {
 
     private final TaskExecutor executor;
 
-    private final SocketIOService socketService;
     private final String gameId;
     private final History history;
-
-    private final Map<String, Member> members = new ConcurrentHashMap<>();
 
     public Member getMember(String uid) {
         return members.get(uid);
     }
 
-    public Hub(TaskExecutor executor, SocketIOService socketService, String gameId, History history) {
+    public Hub(TaskExecutor executor, SocketIOService socketService, String gameId, History history, int timeout) {
+        super(socketService, timeout, gameId);
         this.executor = executor;
-        this.socketService = socketService;
         this.gameId = gameId;
         this.history = history;
-    }
-
-    public void ifEmpty(Runnable op) {
-        if (members.isEmpty()) op.run();
     }
 
     public int getVersion() {
@@ -61,6 +55,7 @@ public class Hub {
         if (events.size() > 1) notify(events);
     }
 
+    @Override
     public void quit(String uid) {
         members.remove(uid);
         socketService.removeFromRoom(gameId, uid);
