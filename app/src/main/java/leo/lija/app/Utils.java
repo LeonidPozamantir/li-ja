@@ -24,4 +24,16 @@ public class Utils {
         return new AppException("Game not found");
     }
 
+    public static double approximately(double number, float ratio) {
+        return number + ratio * number * (2 * Math.random() - 1);
+    }
+
+    public static float approximately(float number, float ratio) {
+        return (float) approximately((double) number, ratio);
+    }
+
+    public static long approximately(long number, float ratio) {
+        return Math.round(approximately((float) number, ratio));
+    }
+
 }
