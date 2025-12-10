@@ -55,7 +55,7 @@ public class Cron {
             gameHubMaster.broom();
         });
 
-        spawn(Duration.ofSeconds(2), reporting::update);
+        spawn(Duration.ofSeconds(3), reporting::update);
 
         spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));

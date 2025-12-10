@@ -95,7 +95,7 @@ public class Reporting {
             Pair.of("AI", remoteAi ? "✔" : "●")
         );
 
-        if (displays % 10 == 0) {
+        if (displays % 8 == 0) {
             System.out.println(data.stream().map(Pair::getSecond).map(Object::toString).collect(Collectors.joining(" ")));
         }
         displays++;
