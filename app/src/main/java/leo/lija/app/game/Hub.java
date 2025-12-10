@@ -1,48 +1,65 @@
 package leo.lija.app.game;
 
+import leo.lija.app.Utils;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.event.CrowdEvent;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.HubActor;
 import leo.lija.chess.Color;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
+@Slf4j
 public class Hub extends HubActor<Member> {
 
-    private final TaskExecutor executor;
-
+    private final HubMaster hubMaster;
     private final String gameId;
     private final History history;
+    private final int hubTimeout;
+
+    private long lastPingTime = Utils.nowMillis();
 
     public Member getMember(String uid) {
         return members.get(uid);
     }
 
-    public Hub(TaskExecutor executor, SocketIOService socketService, String gameId, History history, int timeout) {
-        super(socketService, timeout, gameId);
-        this.executor = executor;
+    public Hub(HubMaster hubMaster, SocketIOService socketService, String gameId, History history, int uidTimeout, int hubTimeout) {
+        super(socketService, uidTimeout, gameId);
+        this.hubMaster = hubMaster;
         this.gameId = gameId;
         this.history = history;
+        this.hubTimeout = hubTimeout;
     }
 
-    public int getVersion() {
+    @Override
+    public void ping(String uid) {
+        super.ping(uid);
+        lastPingTime = Utils.nowMillis();
+    }
+
+    public void broom() {
+        super.broom();
+        if (lastPingTime < Utils.nowMillis() - hubTimeout * 1000) hubMaster.closeGame(gameId);
+    }
+
+    public int getGameVersion() {
         return history.version();
     }
 
-    public boolean isConnected(Color color) {
+    public boolean isConnectedOnGame(Color color) {
         return member(color).isPresent();
     }
 
     public void join(String uid, Integer version, Color color, boolean owner) {
+        log.warn("join {}", gameId);
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
         msgs.forEach(m -> socketService.sendMessageToClient(uid, gameId, m));

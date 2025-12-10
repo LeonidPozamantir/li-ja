@@ -24,6 +24,14 @@ public class Utils {
         return new AppException("Game not found");
     }
 
+    public static long nowMillis() {
+        return System.currentTimeMillis();
+    }
+
+    public static long nowSeconds() {
+        return nowMillis() / 1000;
+    }
+
     public static double approximately(double number, float ratio) {
         return number + ratio * number * (2 * Math.random() - 1);
     }

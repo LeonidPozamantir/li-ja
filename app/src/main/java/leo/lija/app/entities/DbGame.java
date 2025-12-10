@@ -1,6 +1,7 @@
 package leo.lija.app.entities;
 
 
+import leo.lija.app.Utils;
 import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.app.entities.event.StateEvent;
 import leo.lija.chess.Board;
@@ -219,7 +220,7 @@ public class DbGame {
         else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
         check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
-        lastMoveTime = recordMoveTimes() ? Optional.of(nowSeconds()) : Optional.empty();
+        lastMoveTime = recordMoveTimes() ? Optional.of(Utils.nowSeconds()) : Optional.empty();
 
         clock.ifPresent(c -> events.addLast(ClockEvent.apply(c)));
         if (playable() && (abortableBefore != abortable()
@@ -236,17 +237,13 @@ public class DbGame {
         String newMoveTimes = recordMoveTimes() && move.color() == player.getColor()
             ? lastMoveTime.map(
                     lmt -> {
-                        long mt = nowSeconds() - lmt;
+                        long mt = Utils.nowSeconds() - lmt;
                         if (player.getMoveTimes().isEmpty()) return String.valueOf(mt);
                         return player.getMoveTimes() + " " + mt;
                     }
                 ).orElse("")
             : player.getMoveTimes();
         return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId(), newMoveTimes, newBlurs);
-    }
-
-    private long nowSeconds() {
-        return System.currentTimeMillis() / 1000;
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {

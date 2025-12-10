@@ -7,11 +7,10 @@ import leo.lija.app.command.GameFinish;
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.db.HookRepo;
 import leo.lija.app.db.UserRepo;
-import leo.lija.app.game.HubMemo;
+import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.memo.HookMemo;
 import leo.lija.app.reporting.Reporting;
-import leo.lija.app.socket.HubActor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -42,7 +41,7 @@ public class Cron {
     private final Fisherman lobbyFisherman;
     private final leo.lija.app.site.Hub siteHub;
     private final leo.lija.app.lobby.Hub lobbyHub;
-    private final HubMemo gameHubMemo;
+    private final HubMaster gameHubMaster;
     private final HookMemo hookMemo;
     private final Reporting reporting;
 
@@ -53,7 +52,7 @@ public class Cron {
         spawn(Duration.ofSeconds(5), () -> {
             siteHub.broom();
             lobbyHub.broom();
-            gameHubMemo.hubs().forEach(HubActor::broom);
+            gameHubMaster.broom();
         });
 
         spawn(Duration.ofSeconds(2), reporting::update);

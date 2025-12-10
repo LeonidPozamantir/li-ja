@@ -11,8 +11,7 @@ import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.RedirectEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
-import leo.lija.app.game.Hub;
-import leo.lija.app.game.HubMemo;
+import leo.lija.app.game.HubMaster;
 import leo.lija.app.game.Socket;
 import leo.lija.chess.Color;
 import leo.lija.chess.Pos;
@@ -34,23 +33,23 @@ public class AppApi {
     private final UserRepo userRepo;
     private final GameRepo gameRepo;
     private final Socket gameSocket;
-    private final HubMemo gameHubMemo;
+    private final HubMaster gameHubMaster;
     private final Messenger messenger;
     private final Starter starter;
     private final EloUpdater eloUpdater;
 
-    AppApi(UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMemo gameHubMemo, Messenger messenger, Starter starter, EloUpdater eloUpdater) {
+    AppApi(UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMaster gameHubMaster, Messenger messenger, Starter starter, EloUpdater eloUpdater) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
-        this.gameHubMemo = gameHubMemo;
+        this.gameHubMaster = gameHubMaster;
         this.messenger = messenger;
         this.starter = starter;
         this.eloUpdater = eloUpdater;
     }
 
     public Map<String, Object> show(String fullId) {
-        int version = futureVersion(gameHubMemo.getIfPresentFromFullId(fullId));
+        int version = futureVersion(DbGame.takeGameId(fullId));
         Optional<Pov> povOption = gameRepo.pov(fullId);
         return povOption.map(pov -> {
             List<Room.RoomMessage> roomData = messenger.render(pov.game().getId());
@@ -139,12 +138,12 @@ public class AppApi {
     }
 
     public int gameVersion(String gameId) {
-        return futureVersion(gameHubMemo.getIfPresent(gameId));
+        return futureVersion(gameId);
     }
 
     public boolean isConnected(String gameId, String colorName) {
         return Color.apply(colorName).map(c ->
-            gameHubMemo.get(gameId).isConnected(c)
+            gameHubMaster.isConnectedOnGame(gameId, c)
         ).orElse(false);
     }
 
@@ -156,9 +155,8 @@ public class AppApi {
         });
     }
 
-    private int futureVersion(Optional<Hub> actorOption) {
-        return actorOption.map(Hub::getVersion)
-            .orElse(0);
+    private int futureVersion(String gameId) {
+        return gameHubMaster.getGameVersion(gameId);
     }
 
 }

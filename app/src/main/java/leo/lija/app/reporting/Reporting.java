@@ -2,7 +2,6 @@ package leo.lija.app.reporting;
 
 import leo.lija.app.ai.RemoteAi;
 import leo.lija.app.db.GameRepo;
-import leo.lija.app.game.HubMemo;
 import leo.lija.app.site.Hub;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +17,6 @@ public class Reporting {
 
     private final Hub siteHub;
     private final GameRepo gameRepo;
-    private final HubMemo gameHubMemo;
     private final RemoteAi remoteAiService;
 
     @Getter
@@ -44,8 +41,8 @@ public class Reporting {
         nbMembers = siteHub.getNbMembers();
         nbGames = gameRepo.countAll();
         nbPlaying = gameRepo.countPlaying();
-        nbGameSockets = gameHubMemo.count();
-        loadAvg = (float) osStats.getSystemLoadAverage();
+        nbGameSockets = 0; // gameHubMemo.count();
+        loadAvg = 0; // (float) osStats.getSystemLoadAverage();
 //        nbThreads = threadStats.getThreadCount();
         remoteAi = remoteAiService.currentHealth();
     }

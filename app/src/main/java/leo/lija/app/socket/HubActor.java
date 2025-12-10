@@ -15,9 +15,9 @@ public abstract class HubActor<M> {
     private final PingMemo aliveUids;
     private final String room;
 
-    protected HubActor(SocketIOService socketService, int timeout, String room) {
+    protected HubActor(SocketIOService socketService, int uidTimeout, String room) {
         this.socketService = socketService;
-        this.aliveUids = new PingMemo(timeout);
+        this.aliveUids = new PingMemo(uidTimeout);
         this.room = room;
     }
 
@@ -27,13 +27,12 @@ public abstract class HubActor<M> {
     }
 
     public void broom() {
-        uids().stream()
-            .filter(k -> !aliveUids.get(k))
-            .forEach(this::quit);
+        members.forEach((uid, member) -> {
+            if (!aliveUids.get(uid)) quit(uid);
+        });
     }
 
     public void quit(String uid) {
-        log.info("quit {}", uid);
         members.remove(uid);
         socketService.removeFromRoom(room, uid);
     }

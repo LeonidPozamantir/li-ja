@@ -13,7 +13,6 @@ import leo.lija.chess.Color;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,15 +25,15 @@ public class Socket {
 
     private final Function<String, Optional<DbGame>> getGame;
     private final Hand hand;
-    private final HubMemo hubMemo;
+    private final HubMaster hubMaster;
     private final Messenger messenger;
     private final SocketIOService socketIOService;
 
-    public Socket(TaskScheduler taskScheduler, GameRepo gameRepo, Hand hand, HubMemo hubMemo, Messenger messenger, SocketIOService socketIOService) {
+    public Socket(TaskScheduler taskScheduler, GameRepo gameRepo, Hand hand, HubMaster hubMaster, Messenger messenger, SocketIOService socketIOService) {
         this.taskScheduler = taskScheduler;
         this.getGame = gameRepo::game;
         this.hand = hand;
-        this.hubMemo = hubMemo;
+        this.hubMaster = hubMaster;
         this.messenger = messenger;
         this.socketIOService = socketIOService;
     }
@@ -49,7 +48,7 @@ public class Socket {
     }
 
     public void send(String gameId, List<Event> events) {
-        hubMemo.get(gameId).events(events);
+        hubMaster.events(gameId, events);
     }
 
     public void join(
@@ -61,7 +60,7 @@ public class Socket {
     ) {
         if (uidOption.isPresent() && versionOption.isPresent()) {
             getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
-                Hub hub = hubMemo.get(gameId);
+                Hub hub = hubMaster.getHub(gameId);
                 hub.join(uidOption.get(), versionOption.get(), color, playerId.flatMap(gameOption::player).isPresent());
             }));
         } else Util.connectionFail();
@@ -69,7 +68,7 @@ public class Socket {
 
     public void talk(String uid, SocketIOService.GameTalkForm event) {
         String gameId = event.povRef().gameId();
-        Hub hub = hubMemo.get(gameId);
+        Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
         if (member instanceof Owner) hub.events(
             messenger.playerMessage(event.povRef(), event.d().txt())
@@ -78,7 +77,7 @@ public class Socket {
 
     public void move(String uid, SocketIOService.GameMoveForm event) {
         String gameId = event.povRef().gameId();
-        Hub hub = hubMemo.get(gameId);
+        Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
         if (!(member instanceof Owner)) return;
 
@@ -91,7 +90,7 @@ public class Socket {
 
     public void moretime(String uid, SocketIOService.GameMoretimeForm event) {
         String gameId = event.povRef().gameId();
-        Hub hub = hubMemo.get(gameId);
+        Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
         if (!(member instanceof Owner)) return;
 
@@ -101,7 +100,7 @@ public class Socket {
 
     public void outoftime(String uid, SocketIOService.GameOutoftimeForm event) {
         String gameId = event.povRef().gameId();
-        Hub hub = hubMemo.get(gameId);
+        Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
         if (!(member instanceof Owner)) return;
 
@@ -110,13 +109,13 @@ public class Socket {
     }
 
     public void ping(String gameId, String uid) {
-        Hub hub = hubMemo.get(gameId);
+        Hub hub = hubMaster.getHub(gameId);
         hub.ping(uid);
     }
 
     public void quit(String uid, Set<String> games) {
         games.forEach(gameId -> {
-            Hub hub = hubMemo.get(gameId);
+            Hub hub = hubMaster.getHub(gameId);
             hub.quit(uid);
         });
     }
