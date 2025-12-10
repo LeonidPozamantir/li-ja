@@ -2,6 +2,7 @@ package leo.lija.app.game;
 
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.event.Event;
+import leo.lija.app.socket.HubActor;
 import leo.lija.chess.Color;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +56,6 @@ public class HubMaster {
     public void closeGame(String gameId) {
         Hub hub = hubs.get(gameId);
         if (hub == null) return;
-        log.warn("close game {}", gameId);
         hubs.remove(gameId);
     }
 
@@ -63,6 +63,16 @@ public class HubMaster {
         return Optional.ofNullable(hubs.get(gameId))
             .map(hub -> hub.isConnectedOnGame(color))
             .orElse(false);
+    }
+
+    public int getNbHubs() {
+        return hubs.size();
+    }
+
+    public int getNbMembers() {
+        return hubs.values().stream()
+            .mapToInt(HubActor::getNbMembers)
+            .sum();
     }
 
     private Hub mkHub(String gameId) {

@@ -27,14 +27,26 @@ public abstract class HubActor<M> {
     }
 
     public void broom() {
-        members.forEach((uid, member) -> {
-            if (!aliveUids.get(uid)) quit(uid);
-        });
+        members.keySet().stream().filter(k -> !aliveUids.get(k)).forEach(this::eject);
+    }
+
+    public void eject(String uid) {
+        quit(uid);
+        socketService.removeFromRoom(room, uid);
     }
 
     public void quit(String uid) {
         members.remove(uid);
-        socketService.removeFromRoom(room, uid);
+    }
+
+    public int getNbMembers() {
+        return members.size();
+    }
+
+    public void addMember(String uid, M member) {
+        eject(uid);
+        members.put(uid, member);
+        setAlive(uid);
     }
 
     protected void setAlive(String uid) {

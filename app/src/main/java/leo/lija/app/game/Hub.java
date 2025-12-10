@@ -8,7 +8,6 @@ import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.HubActor;
 import leo.lija.chess.Color;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskExecutor;
 
 import java.util.List;
 import java.util.Map;
@@ -59,22 +58,20 @@ public class Hub extends HubActor<Member> {
     }
 
     public void join(String uid, Integer version, Color color, boolean owner) {
-        log.warn("join {}", gameId);
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
         msgs.forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
-        members.put(uid, Member.apply(uid, new PovRef(gameId, color), owner));
+        addMember(uid, Member.apply(uid, new PovRef(gameId, color), owner));
         notify(crowdEvent());
     }
 
     public void events(List<Event> events) {
-        if (events.size() == 1) notify(events.getFirst());
-        if (events.size() > 1) notify(events);
+        applyEvents(events);
     }
 
     @Override
     public void quit(String uid) {
-        members.remove(uid);
+        super.quit(uid);
         socketService.removeFromRoom(gameId, uid);
         notify(crowdEvent());
     }
@@ -85,6 +82,11 @@ public class Hub extends HubActor<Member> {
             member(BLACK).isPresent(),
             (int) members.values().stream().filter(Member::watcher).count()
         );
+    }
+
+    private void applyEvents(List<Event> events) {
+        if (events.size() == 1) notify(events.getFirst());
+        if (events.size() > 1) notify(events);
     }
 
     private void notify(Event e) {

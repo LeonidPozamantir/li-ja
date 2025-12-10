@@ -27,16 +27,11 @@ public class Hub extends HubActor<Member> {
 
     public void join(String uid, Optional<String> username) {
         socketService.addToRoom("site", uid);
-        members.put(uid, new Member(uid, username));
-        setAlive(uid);
+        addMember(uid, new Member(uid, username));
     }
 
     public CompletableFuture<Void> nbMembers() {
         return CompletableFuture.runAsync(() -> notifyAll("n", members.size()));
-    }
-
-    public int getNbMembers() {
-        return members.size();
     }
 
     private void notifyAll(String t, Object data) {

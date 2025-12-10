@@ -39,7 +39,7 @@ public class Hub extends HubActor<Member> {
     public void join(String uid, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom(LOBBY_NAME, uid);
         history.since(version).forEach(m -> socketService.sendMessageToClient(uid, LOBBY_NAME, m));
-        members.put(uid, new Member(uid, hookOwnerId));
+        addMember(uid, new Member(uid, hookOwnerId));
     }
 
     public void talk(String txt, String u) {
