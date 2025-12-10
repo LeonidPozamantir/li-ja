@@ -80,6 +80,7 @@ public class Cron {
         spawn(Duration.ofHours(1), gameFinish::apply);
 
         spawn(Duration.ofSeconds(10), remoteAi::diagnose);
+        remoteAi.diagnose();
     }
 
     private void spawn(Duration freq, Runnable op) {
