@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -60,17 +61,21 @@ public class Cron {
         spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));
 
-        spawn(Duration.ofSeconds(2), () ->
-            siteHub.nbMembers().join()
-        );
+        spawn(Duration.ofSeconds(2), () -> {
+            int nb = hubs().stream().mapToInt(Hub::getNbMembers).sum();
+            hubs().forEach(h -> h.nbMembers(nb));
+        });
 
         spawn(Duration.ofSeconds(2), lobbyFisherman::cleanup);
 
         spawn(Duration.ofSeconds(21), hookRepo::cleanupOld);
 
-        spawn(Duration.ofSeconds(3), () ->
-            siteHub.withUsernames(userRepo::updateOnlineUserNames)
-        );
+        spawn(Duration.ofSeconds(3), () -> {
+            List<String> xs = hubs().stream()
+                .flatMap(h -> h.getUsernames().stream())
+                .toList();
+            userRepo.updateOnlineUserNames(xs);
+        });
 
         spawn(Duration.ofMinutes((long) (60 * 4.1)), () -> {
             gameRepo.cleanupUnplayed();
@@ -81,6 +86,10 @@ public class Cron {
 
         spawn(Duration.ofSeconds(10), remoteAi::diagnose);
         remoteAi.diagnose();
+    }
+
+    private List<Hub> hubs() {
+        return List.of(siteHub, lobbyHub, gameHubMaster);
     }
 
     private void spawn(Duration freq, Runnable op) {

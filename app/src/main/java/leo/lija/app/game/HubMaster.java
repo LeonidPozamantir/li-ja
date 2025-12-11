@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @Slf4j
-public class HubMaster {
+public class HubMaster implements leo.lija.app.Hub {
 
     private final SocketIOService socketIOService;
     private final Supplier<History> makeHistory;
@@ -73,6 +73,16 @@ public class HubMaster {
         return hubs.values().stream()
             .mapToInt(HubActor::getNbMembers)
             .sum();
+    }
+
+    public List<String> getUsernames() {
+        return hubs.values().stream()
+            .flatMap(hub -> hub.getUsernames().stream())
+            .toList();
+    }
+
+    public void nbMembers(int nb) {
+        hubs.values().forEach(h -> h.nbMembers(nb));
     }
 
     private Hub mkHub(String gameId) {

@@ -9,7 +9,6 @@ import jakarta.annotation.PreDestroy;
 import leo.lija.app.controllers.BaseController;
 import leo.lija.app.entities.PovRef;
 import leo.lija.app.lobby.Socket;
-import leo.lija.app.socket.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -47,6 +46,7 @@ public class SocketIOService extends BaseController {
             uidToClient.put(event.uid, client);
             lobbySocket.join(
                 get(Optional.ofNullable(event.uid)),
+                get(Optional.ofNullable(event.username)),
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.hook))
             );
@@ -75,6 +75,7 @@ public class SocketIOService extends BaseController {
                 event.gameId,
                 event.color,
                 get(Optional.ofNullable(event.uid)),
+                get(Optional.ofNullable(event.username)),
                 Optional.ofNullable(event.version),
                 get(Optional.ofNullable(event.playerId))
             )
@@ -114,7 +115,7 @@ public class SocketIOService extends BaseController {
 
     }
 
-    public record LobbyJoinForm(String uid, Integer version, String hook) {}
+    public record LobbyJoinForm(String uid, String username, Integer version, String hook) {}
 
     public record LobbyTalkForm(Data d) {
         public record Data(String txt, String u) {}
@@ -122,7 +123,7 @@ public class SocketIOService extends BaseController {
 
     public record SiteJoinForm(String uid, String username) {}
 
-    public record GameJoinForm(String gameId, String color, String uid, Integer version, String playerId) {}
+    public record GameJoinForm(String gameId, String color, String uid, String username, Integer version, String playerId) {}
 
     public record GameTalkForm(PovRef povRef, Data d) {
         public record Data(String txt) {}

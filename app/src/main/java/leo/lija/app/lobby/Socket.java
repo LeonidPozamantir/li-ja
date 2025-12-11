@@ -23,9 +23,9 @@ public class Socket {
         socketIOService.setLobbySocket(this);
     }
 
-    public void join(Optional<String> uidOption, Optional<Integer> versionOption, Optional<String> hook) {
+    public void join(Optional<String> uidOption, Optional<String> username, Optional<Integer> versionOption, Optional<String> hook) {
         if (uidOption.isPresent() && versionOption.isPresent()) {
-            hub.join(uidOption.get(), versionOption.get(), hook);
+            hub.join(uidOption.get(), username, versionOption.get(), hook);
         } else Util.connectionFail();
     }
 

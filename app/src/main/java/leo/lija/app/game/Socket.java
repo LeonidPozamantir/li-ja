@@ -55,13 +55,14 @@ public class Socket {
         String gameId,
         String colorName,
         Optional<String> uidOption,
+        Optional<String> username,
         Optional<Integer> versionOption,
         Optional<String> playerId
     ) {
         if (uidOption.isPresent() && versionOption.isPresent()) {
             getGame.apply(gameId).ifPresent(gameOption -> Color.apply(colorName).ifPresent(color -> {
                 Hub hub = hubMaster.getHub(gameId);
-                hub.join(uidOption.get(), versionOption.get(), color, playerId.flatMap(gameOption::player).isPresent());
+                hub.join(uidOption.get(), username, versionOption.get(), color, playerId.flatMap(gameOption::player).isPresent());
             }));
         } else Util.connectionFail();
     }
@@ -70,7 +71,7 @@ public class Socket {
         String gameId = event.povRef().gameId();
         Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
-        if (member instanceof Owner) hub.events(
+        if (member.owner) hub.events(
             messenger.playerMessage(event.povRef(), event.d().txt())
         );
     }
@@ -79,7 +80,7 @@ public class Socket {
         String gameId = event.povRef().gameId();
         Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
-        if (!(member instanceof Owner)) return;
+        if (!member.owner) return;
 
         String orig = event.d().from();
         String dest = event.d().to();
@@ -92,7 +93,7 @@ public class Socket {
         String gameId = event.povRef().gameId();
         Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
-        if (!(member instanceof Owner)) return;
+        if (!member.owner) return;
 
         List<Event> events = hand.moretime(event.povRef());
         hub.events(events);
@@ -102,7 +103,7 @@ public class Socket {
         String gameId = event.povRef().gameId();
         Hub hub = hubMaster.getHub(gameId);
         Member member = hub.getMember(uid);
-        if (!(member instanceof Owner)) return;
+        if (!member.owner) return;
 
         List<Event> events = hand.outoftime(event.povRef());
         hub.events(events);

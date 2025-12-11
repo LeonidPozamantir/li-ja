@@ -1,8 +1,6 @@
 package leo.lija.app.memo;
 
 import com.google.common.cache.Cache;
-import leo.lija.app.config.MemoConfigProperties;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -12,7 +10,7 @@ public abstract class BooleanExpiryMemo {
 
     protected final Cache<String, Boolean> cache;
 
-    public BooleanExpiryMemo(int timeout) {
+    protected BooleanExpiryMemo(int timeout) {
         cache = Builder.expiry(timeout);
     }
 

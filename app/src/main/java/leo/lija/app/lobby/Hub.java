@@ -15,11 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service("lobbyHub")
-public class Hub extends HubActor<Member> {
+public class Hub extends HubActor<Member> implements leo.lija.app.Hub {
 
     private final MessageRepo messageRepo;
     private final History history;
@@ -36,10 +35,10 @@ public class Hub extends HubActor<Member> {
         op.accept(hookOwnerIds());
     }
 
-    public void join(String uid, Integer version, Optional<String> hookOwnerId) {
+    public void join(String uid, Optional<String> username, Integer version, Optional<String> hookOwnerId) {
         socketService.addToRoom(LOBBY_NAME, uid);
         history.since(version).forEach(m -> socketService.sendMessageToClient(uid, LOBBY_NAME, m));
-        addMember(uid, new Member(uid, hookOwnerId));
+        addMember(uid, new Member(uid, username, hookOwnerId));
     }
 
     public void talk(String txt, String u) {
@@ -84,12 +83,7 @@ public class Hub extends HubActor<Member> {
                 "t", t,
                 "d", data
         );
-        socketService.sendMessageToClient(member.uid(), LOBBY_NAME, msg);
-    }
-
-    private void notifyAll(String t, Object data) {
-        Map<String, Object> msg = makeMessage(t, data);
-        socketService.sendMessage(LOBBY_NAME, msg);
+        socketService.sendMessageToClient(member.getUid(), LOBBY_NAME, msg);
     }
 
     private void notifyVersion(String t, Object data) {
@@ -99,15 +93,9 @@ public class Hub extends HubActor<Member> {
 
     private List<String> hookOwnerIds() {
         return members.values().stream()
-                .filter(m -> m.hookOwnerId().isPresent())
-                .map(m -> m.hookOwnerId().get())
-                .toList();
-    }
-
-    private Map<String, Object> makeMessage(String t, Object data) {
-        return Map.of(
-                "t", t,
-                "d", data
-        );
+            .map(Member::getHookOwnerId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
     }
 }

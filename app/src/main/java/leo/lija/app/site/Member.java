@@ -1,6 +1,11 @@
 package leo.lija.app.site;
 
+import leo.lija.app.socket.SocketMember;
+
 import java.util.Optional;
 
-public record Member(String uid, Optional<String> username) {
+public class Member extends SocketMember {
+    public Member(String uid, Optional<String> username) {
+        super(uid, username);
+    }
 }

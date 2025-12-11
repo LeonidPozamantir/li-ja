@@ -44,6 +44,7 @@ public class Hub extends HubActor<Member> {
         lastPingTime = Utils.nowMillis();
     }
 
+    @Override
     public void broom() {
         super.broom();
         if (lastPingTime < Utils.nowMillis() - hubTimeout * 1000) hubMaster.closeGame(gameId);
@@ -57,11 +58,11 @@ public class Hub extends HubActor<Member> {
         return member(color).isPresent();
     }
 
-    public void join(String uid, Integer version, Color color, boolean owner) {
+    public void join(String uid, Optional<String> username, Integer version, Color color, boolean owner) {
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
         msgs.forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
-        addMember(uid, Member.apply(uid, new PovRef(gameId, color), owner));
+        addMember(uid, Member.apply(uid, username, new PovRef(gameId, color), owner));
         notify(crowdEvent());
     }
 
