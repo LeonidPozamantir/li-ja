@@ -55,7 +55,7 @@ public class Reporting {
     private MemoryMXBean memoryStats = ManagementFactory.getMemoryMXBean();
 
     public int getNbMembers() {
-        return site.nbMembers;
+        return allMembers();
     }
 
     public String getStatus() {
@@ -110,7 +110,7 @@ public class Reporting {
 
     private String status() {
         return String.join(" ",
-            String.valueOf(site.nbMembers + lobby.nbMembers + game.nbMembers),
+            String.valueOf(allMembers()),
             String.valueOf(nbGames),
             String.valueOf(nbPlaying),
             String.valueOf(game.nbHubs),
@@ -119,5 +119,7 @@ public class Reporting {
         );
     }
 
-
+    private int allMembers() {
+        return site.nbMembers + lobby.nbMembers + game.nbMembers;
+    }
 }
