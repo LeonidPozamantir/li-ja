@@ -110,7 +110,7 @@ public class Reporting {
 
     private String status() {
         return String.join(" ",
-            String.valueOf(site.nbMembers),
+            String.valueOf(site.nbMembers + lobby.nbMembers + game.nbMembers),
             String.valueOf(nbGames),
             String.valueOf(nbPlaying),
             String.valueOf(game.nbHubs),
