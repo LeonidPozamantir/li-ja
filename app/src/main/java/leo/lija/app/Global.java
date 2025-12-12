@@ -28,8 +28,8 @@ public class Global {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleInternalErrorException(Exception e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<String> handleInternalErrorException(Exception e) {
+//        return ResponseEntity.internalServerError().body(e.getMessage());
+//    }
 }
