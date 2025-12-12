@@ -1,4 +1,4 @@
-package leo.lija.app.reporting;
+package leo.lija.app.report;
 
 import leo.lija.app.Utils;
 import leo.lija.app.ai.RemoteAi;
@@ -82,7 +82,7 @@ public class Reporting {
     }
 
     private void display() {
-        List<Pair<String, Object>> data = List.of(
+        Formatter.DataLine data = Formatter.dataLine(List.of(
             Pair.of("site", site.nbMembers),
             Pair.of("lobby", lobby.nbMembers),
             Pair.of("game", game.nbMembers),
@@ -93,19 +93,13 @@ public class Reporting {
             Pair.of("load", String.valueOf(loadAvg).replace("0.", ".")),
             Pair.of("mem", memory),
             Pair.of("AI", remoteAi ? "✔" : "●")
-        );
+        ));
 
         if (displays % 8 == 0) {
-            System.out.println(data.stream().map(Pair::getSecond).map(Object::toString).collect(Collectors.joining(" ")));
+            System.out.println(data.header());
         }
         displays++;
-        data.forEach(p -> {
-            String name = p.getFirst();
-            Object value = p.getSecond();
-            String s = value.toString();
-            System.out.print(" ".repeat(Math.max(name.length() - s.length(), 0)) + s + " ");
-        });
-        System.out.println();
+        System.out.println(data.line());
     }
 
     private String status() {

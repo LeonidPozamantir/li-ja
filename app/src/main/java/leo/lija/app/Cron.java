@@ -10,7 +10,7 @@ import leo.lija.app.db.UserRepo;
 import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.memo.HookMemo;
-import leo.lija.app.reporting.Reporting;
+import leo.lija.app.report.Reporting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;

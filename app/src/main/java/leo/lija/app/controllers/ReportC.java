@@ -1,6 +1,6 @@
 package leo.lija.app.controllers;
 
-import leo.lija.app.reporting.Reporting;
+import leo.lija.app.report.Reporting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
