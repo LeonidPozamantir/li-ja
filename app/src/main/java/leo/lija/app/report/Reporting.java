@@ -64,11 +64,16 @@ public class Reporting {
 
     public void update() {
         long before = Utils.nowMillis();
-        site = new SiteSocket(siteHub.getNbMembers());
-        lobby = new LobbySocket(lobbyHub.getNbMembers());
-        game = new GameSocket(gameHubMaster.getNbHubs(), gameHubMaster.getNbMembers());
-        nbGames = gameRepo.countAll();
-        nbPlaying = gameRepo.countPlaying();
+        try {
+            site = new SiteSocket(siteHub.getNbMembers());
+            lobby = new LobbySocket(lobbyHub.getNbMembers());
+            game = new GameSocket(gameHubMaster.getNbHubs(), gameHubMaster.getNbMembers());
+            nbGames = gameRepo.countAll();
+            nbPlaying = gameRepo.countPlaying();
+        } catch (Exception e) {
+            System.out.println("Reporting: " + e.getMessage());
+        }
+        
         CompletableFuture.runAsync(() -> {
             latency = Utils.nowMillis() - before;
         });
@@ -92,7 +97,7 @@ public class Reporting {
             Pair.of("thread", nbThreads),
             Pair.of("load", String.valueOf(loadAvg).replace("0.", ".")),
             Pair.of("mem", memory),
-            Pair.of("AI", remoteAi ? "✔" : "●")
+            Pair.of("AI", remoteAi ? "1" : "0")
         ));
 
         if (displays % 8 == 0) {
