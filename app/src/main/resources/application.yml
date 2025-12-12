@@ -54,7 +54,7 @@ moretime:
 async:
   actions:
     core-size: 16
-    max-size: 2048
+    max-size: 1024
   websockets:
-    parallelism: 128
-    max-size: 2048
+    parallelism: 64
+    max-size: 1024
