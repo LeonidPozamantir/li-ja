@@ -73,7 +73,7 @@ public class Reporting {
         } catch (Exception e) {
             System.out.println("Reporting: " + e.getMessage());
         }
-        
+
         CompletableFuture.runAsync(() -> {
             latency = Utils.nowMillis() - before;
         });

@@ -88,6 +88,10 @@ public class GameRepo {
         });
     }
 
+    public Optional<DbGame> findOneCheckmate() {
+        return decode(repo.findFirstByStatusOrderByCreatedAtDesc(Status.MATE.id()));
+    }
+
     public Optional<DbGame> decode(RawDbGame raw) {
         return raw.decode();
     }

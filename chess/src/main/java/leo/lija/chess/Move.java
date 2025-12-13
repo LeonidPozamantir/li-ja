@@ -81,8 +81,12 @@ public record Move(
         return piece.color();
     }
 
+    public String notation() {
+        return orig + " " + dest;
+    }
+
     @Override
     public String toString() {
-        return orig + " " + dest;
+        return notation();
     }
 }

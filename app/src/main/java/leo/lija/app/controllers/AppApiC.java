@@ -1,10 +1,13 @@
 package leo.lija.app.controllers;
 
+import io.vavr.Tuple3;
 import jakarta.validation.Valid;
 import leo.lija.app.AppApi;
+import leo.lija.app.Captcha;
 import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
+import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ public class AppApiC {
 
     private final AppApi api;
     private final TaskExecutor executor;
+    private final Captcha captcha;
 
     @GetMapping("/show/{fullId}")
     public CompletableFuture<Map<String, Object>> show(@PathVariable String fullId) {
@@ -65,5 +69,14 @@ public class AppApiC {
     @PostMapping("/adjust/{username}")
     public void adjust(@PathVariable String username) {
         api.adjust(username);
+    }
+
+    public Map<String, String> captcha() {
+        Tuple3<String, String, Color> data = captcha.create();
+        return Map.of(
+            "id", data._1,
+            "fen", data._2,
+            "color", data._3.toString()
+        );
     }
 }

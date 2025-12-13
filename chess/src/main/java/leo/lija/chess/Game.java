@@ -81,7 +81,11 @@ public class Game {
         return 1 + turns / 2;
     }
 
+    public Game withBoard(Board b) {
+        return new Game(b, player, pgnMoves, clock, deads, turns);
+    }
+
     public Game updateBoard(UnaryOperator<Board> f) {
-        return new Game(f.apply(board), player, pgnMoves, clock, deads, turns);
+        return withBoard(f.apply(board));
     }
 }

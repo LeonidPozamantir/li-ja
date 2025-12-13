@@ -222,6 +222,10 @@ public class Board {
 
     }
 
+    public Situation situationOf(Color color) {
+        return new Situation(this, color);
+    }
+
     public String visual() {
         return visualFormat.obj2Str(this);
     }
