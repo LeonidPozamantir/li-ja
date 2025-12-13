@@ -12,37 +12,40 @@ import java.util.UUID;
 
 public interface UserRepoJpa extends JpaRepository<User, UUID> {
 
-    public Optional<User> findById(UUID id);
+    Optional<User> findById(UUID id);
+
+    @Query("select avg(u.elo) from User u")
+    int averageElo();
 
     @Modifying
     @Query("update User set isOnline = true where username in :usernames and isOnline = false")
     @Transactional
-    public void updateOnlineUsernamesTrue(Collection<String> usernames);
+    void updateOnlineUsernamesTrue(Collection<String> usernames);
 
     @Modifying
     @Query("update User set isOnline = false where username not in :usernames and isOnline = true")
     @Transactional
-    public void updateOnlineUsernamesFalse(Collection<String> usernames);
+    void updateOnlineUsernamesFalse(Collection<String> usernames);
 
-    public Optional<User> findByUsernameCanonical(String username);
+    Optional<User> findByUsernameCanonical(String username);
 
     @Modifying
     @Query("update User set elo = :elo where id = :id")
     @Transactional
-    public void setElo(UUID id, int elo);
+    void setElo(UUID id, int elo);
 
     @Modifying
     @Query("update User set engine = true where id = :id")
     @Transactional
-    public void setEngine(UUID id);
+    void setEngine(UUID id);
 
     @Modifying
     @Query("update User set nbGames = nbGames + 1, nbRatedGames = nbRatedGames + 1 where id = :id")
     @Transactional
-    public void incRated(UUID id);
+    void incRated(UUID id);
 
     @Modifying
     @Query("update User set nbGames = nbGames + 1 where id = :id")
     @Transactional
-    public void incNonRated(UUID id);
+    void incNonRated(UUID id);
 }

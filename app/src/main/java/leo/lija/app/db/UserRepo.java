@@ -15,6 +15,10 @@ public class UserRepo {
 
     private final UserRepoJpa repo;
 
+    public int averageElo() {
+        return repo.averageElo();
+    }
+
     public void updateOnlineUserNames(Collection<String> usernames) {
         List<String> names = usernames.stream().map(String::toLowerCase).distinct().toList();
         repo.updateOnlineUsernamesFalse(names);

@@ -37,7 +37,8 @@ public class CliApplication implements CommandLineRunner {
 
 			return switch (args[0]) {
 				case "info" -> info;
-				case "finish" -> (Command) () -> gameFinish.apply();
+				case "finish" -> (Command) gameFinish::apply;
+                case ""
                 default -> defaultCommand;
             };
 
