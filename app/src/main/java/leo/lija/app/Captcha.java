@@ -24,15 +24,15 @@ public class Captcha {
     public Tuple3<String, String, Color> create() {
         return gameRepo.findOneCheckmate()
             .map(game -> {
-                Game chess = game.toChess();
-                Game rewinded = rewind(chess);
-                return new Tuple3<>(game.getId(), fen(rewinded), chess.getPlayer().getOpposite());
+                Game rewinded = rewind(game.toChess());
+                return new Tuple3<>(game.getId(), fen(rewinded), rewinded.getPlayer());
             }).orElseThrow(() -> new AppException("No checkmate available"));
     }
 
     public List<String> solve(String id) {
         return gameRepo.game(id).map(game -> {
-                List<String> moves = mateMoves(game.toChess());
+                Game rewinded = rewind(game.toChess());
+                List<String> moves = mateMoves(rewinded);
                 if (!moves.isEmpty()) return moves;
                 throw new AppException("No solution found");
             })
@@ -54,7 +54,10 @@ public class Captcha {
                 Pos orig = lastMove.getFirst();
                 Pos dest = lastMove.getSecond();
                 Board rewindedBoard = game.getBoard().move(dest, orig).orElseThrow(() -> new AppException("Can't rewind board"));
-                return game.withBoard(rewindedBoard);
+                Game g2 = game.withBoard(rewindedBoard);
+                Game g3 = g2.withPlayer(game.getPlayer().getOpposite());
+                Game g4 = g3.withTurns(game.getTurns() - 1);
+                return g4;
             }).orElseThrow(() -> new AppException("No last move"));
     }
 

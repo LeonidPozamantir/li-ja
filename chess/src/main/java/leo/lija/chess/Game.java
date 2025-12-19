@@ -88,4 +88,12 @@ public class Game {
     public Game updateBoard(UnaryOperator<Board> f) {
         return withBoard(f.apply(board));
     }
+
+    public Game withPlayer(Color c) {
+        return new Game(board, c, pgnMoves, clock, deads, turns);
+    }
+
+    public Game withTurns(int t) {
+        return new Game(board, player, pgnMoves, clock, deads, t);
+    }
 }

@@ -5,6 +5,7 @@ import leo.lija.app.Captcha;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,8 @@ public class CaptchaC {
         );
     }
 
-    public Map<String, List<String>> solve(String gameId) {
-        return Map.of("moves", captcha.solve(gameId));
+    @GetMapping("/solve/{gameId}")
+    public List<String> solve(@PathVariable String gameId) {
+        return captcha.solve(gameId);
     }
 }

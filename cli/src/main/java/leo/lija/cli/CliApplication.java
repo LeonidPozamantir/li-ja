@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 public class CliApplication implements CommandLineRunner {
 
 	private final Info info;
+    private final AverageElo averageElo;
 	private final GameFinish gameFinish;
 
 	public static void main(String[] args) {
@@ -37,8 +38,8 @@ public class CliApplication implements CommandLineRunner {
 
 			return switch (args[0]) {
 				case "info" -> info;
+                case "average-elo" -> averageElo;
 				case "finish" -> (Command) gameFinish::apply;
-                case ""
                 default -> defaultCommand;
             };
 
