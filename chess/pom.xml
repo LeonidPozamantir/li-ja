@@ -42,6 +42,11 @@
 			<artifactId>vavr</artifactId>
 			<version>0.10.6</version>
 		</dependency>
+        <dependency>
+            <groupId>com.google.mug</groupId>
+            <artifactId>dot-parse</artifactId>
+            <version>9.5</version>
+        </dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>

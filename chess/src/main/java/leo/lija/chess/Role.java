@@ -39,9 +39,11 @@ public enum Role {
 
     public static final List<Role> all = List.of(KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN);
     private static final Map<Character, Role> allByFen = all.stream().collect(Collectors.toMap(r -> r.fen, Function.identity()));
+    public static final Map<Character, Role> allByPgn = all.stream().collect(Collectors.toMap(Role::pgn, Function.identity()));
     public static final List<Role> allPromotable = List.of(QUEEN, ROOK, BISHOP, KNIGHT);
     public static final Map<String, Role> allPromotableByName = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(Role::toString, Function.identity())));
-    public static final Map<Character, Role> allPromotableByFen = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(r -> r.fen, Function.identity())));
+    private static final Map<Character, Role> allPromotableByFen = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(r -> r.fen, Function.identity())));
+    public static final Map<Character, Role> allPromotableByPgn = Collections.unmodifiableMap(allPromotable.stream().collect(Collectors.toMap(Role::pgn, Function.identity())));
 
     public static Optional<Role> byFen(Character c) {
         return Optional.ofNullable(allByFen.get(c));
