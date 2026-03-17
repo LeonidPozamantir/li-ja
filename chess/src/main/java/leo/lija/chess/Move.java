@@ -87,6 +87,6 @@ public record Move(
 
     @Override
     public String toString() {
-        return notation();
+        return "%s %s".formatted(piece, notation());
     }
 }

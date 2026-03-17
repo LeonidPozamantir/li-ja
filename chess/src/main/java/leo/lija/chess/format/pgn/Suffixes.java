@@ -1,4 +1,4 @@
-package leo.lija.chess.format;
+package leo.lija.chess.format.pgn;
 
 import leo.lija.chess.Role;
 

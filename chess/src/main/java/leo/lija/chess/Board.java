@@ -99,6 +99,12 @@ public class Board {
         return Optional.ofNullable(cachedKingPos.get().get(color));
     }
 
+    public Set<Pos> threatsOf(Color c) {
+        return actorsOf(c).stream()
+            .flatMap(a -> a.threats().stream())
+            .collect(Collectors.toSet());
+    }
+
     public Optional<List<Pos>> destsFrom(Pos from) {
         return actorAt(from).map(Actor::destinations);
     }

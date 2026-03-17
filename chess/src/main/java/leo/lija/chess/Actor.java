@@ -105,13 +105,11 @@ public class Actor {
 			.toList();
 	}
 
-	Set<Pos> enemyThreats = null;
-
 	private List<Move> castle() {
 		return Stream.of(castleOn(KING_SIDE),	castleOn(QUEEN_SIDE)).filter(Optional::isPresent).map(Optional::get).toList();
 	}
 
-	Optional<Move> castleOn(Side side) {
+	public Optional<Move> castleOn(Side side) {
 		Color color = color();
 		return board.kingPosOf(color)
 			.filter(p -> history().canCastle(color, side))
@@ -125,12 +123,7 @@ public class Actor {
 				if (newKingPos.isEmpty() || newRookPos.isEmpty()) return Optional.empty();
 
 				List<Pos> securedPoss = kingPos.horizontalPath(newKingPos.get());
-				if (enemyThreats == null) {
-					enemyThreats = board.actorsOf(color().getOpposite()).stream()
-						.flatMap(actor -> actor.threats().stream())
-						.collect(Collectors.toSet());
-				}
-				if (!Collections.disjoint(securedPoss, enemyThreats)) return Optional.empty();
+				if (!Collections.disjoint(securedPoss, board.threatsOf(color.getOpposite()))) return Optional.empty();
 
 				return board.take(rookPos)
 					.flatMap(b1 -> {

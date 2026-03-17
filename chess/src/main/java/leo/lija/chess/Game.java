@@ -1,6 +1,6 @@
 package leo.lija.chess;
 
-import leo.lija.chess.format.PgnDump;
+import leo.lija.chess.format.pgn.PgnDump;
 import leo.lija.chess.utils.Pair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -55,13 +55,17 @@ public class Game {
     public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
         if (promotion == null) promotion = QUEEN;
         Move move =  situation().move(from, to, promotion);
+        return Pair.of(apply(move), move);
+    }
+
+    public Game apply(Move move) {
         Game newGame = new Game(move.finalizeAfter(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
         String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
         io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
-        return Pair.of(new Game(newGame.board, newGame.player, newPgnMoves, clock.map(Clock::step), newDeads, turns + 1), move);
+        return new Game(newGame.board, newGame.player, newPgnMoves, clock.map(Clock::step), newDeads, turns + 1);
     }
 
     public Situation situation() {
