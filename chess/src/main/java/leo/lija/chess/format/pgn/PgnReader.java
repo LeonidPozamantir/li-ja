@@ -7,13 +7,18 @@ import leo.lija.chess.exceptions.ChessException;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 @UtilityClass
 public class PgnReader {
 
     public Replay apply(String pgn) {
+        return withSans(pgn, UnaryOperator.identity());
+    }
+
+    public Replay withSans(String pgn, UnaryOperator<List<San>> op) {
         ParsedPgn parsed  = PgnParser.apply(pgn);
-        return parsed.sans().stream().reduce(Replay.apply(makeGame(parsed.tags())),
+        return op.apply(parsed.sans()).stream().reduce(Replay.apply(makeGame(parsed.tags())),
             (replay, san) -> {
                 Move move = san.apply(replay.game());
                 List<Move> moves = replay.moves();

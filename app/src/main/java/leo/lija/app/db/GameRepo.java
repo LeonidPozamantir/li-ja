@@ -7,6 +7,7 @@ import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.RawDbGame;
 import leo.lija.app.entities.Status;
+import leo.lija.app.entities.Variant;
 import leo.lija.chess.Color;
 import leo.lija.chess.format.Fen;
 import lombok.RequiredArgsConstructor;
@@ -88,8 +89,8 @@ public class GameRepo {
         });
     }
 
-    public Optional<DbGame> findOneCheckmate() {
-        return decode(repo.findFirstByStatusOrderByCreatedAtDesc(Status.MATE.id()));
+    public Optional<DbGame> findOneStandardCheckmate() {
+        return decode(repo.findFirstByStatusAndVariantOrderByCreatedAtDesc(Status.MATE.id(), Variant.STANDARD.id()));
     }
 
     public Optional<DbGame> decode(RawDbGame raw) {

@@ -34,6 +34,6 @@ public interface GameRepoJpa extends JpaRepository<RawDbGame, String> {
     @Query("select count(g) from RawDbGame g where updatedAt > :from")
     int countPlaying(LocalDateTime from);
 
-    RawDbGame findFirstByStatusOrderByCreatedAtDesc(int status);
+    RawDbGame findFirstByStatusAndVariantOrderByCreatedAtDesc(int status, int variant);
 
 }

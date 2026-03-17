@@ -82,10 +82,11 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2""";
         @Test
         @DisplayName("all games")
         void allGames() {
-            assertThat(raws).isNotEmpty();
-            assertThat(raws).allMatch(cur ->
-                PgnReader.apply(cur).moves().size() == cur.split(" ").length
-            );
+            assertThat(raws)
+                .isNotEmpty()
+                .allMatch(cur ->
+                    PgnReader.apply(cur).moves().size() == cur.split(" ").length
+                );
         }
     }
 
