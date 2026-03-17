@@ -32,12 +32,12 @@ public class PgnParser {
         return tag().followedBy(Parser.zeroOrMore(Character::isWhitespace, "ki")).atLeastOnce();
     }
 
-    private Parser.OrEmpty whitespace() {
+    private Parser<String>.OrEmpty whitespace() {
         return Parser.zeroOrMore(Character::isWhitespace, "ki");
     }
 
     public Parser<Tag> tag() {
-        return Parser.sequence(tagName(), tagValue().followedBy(CRLF()), (name, value) -> {
+        return Parser.sequence(tagName(), tagValue().followedBy(crlf()), (name, value) -> {
            if (name.equals("FEN")) return new Fen(value);
            return new Unknown(name, value);
         });
@@ -115,7 +115,7 @@ public class PgnParser {
         return Parser.sequence(tmp, checkmate, (p, cm) -> new Suffixes(p.getSecond(), cm, p.getFirst()));
     }
 
-    public Parser<String> CRLF() {
+    public Parser<String> crlf() {
         return Parser.string("\r\n").or(Parser.string("\n"));
     }
 

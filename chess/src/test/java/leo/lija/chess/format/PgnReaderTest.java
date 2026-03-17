@@ -76,14 +76,15 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2""";
         @Test
         @DisplayName("one complete game")
         void oneGame() {
-            assertThat(PgnReader.apply(raw).moves().size()).isEqualTo(raw.split(" ").length);
+            assertThat(PgnReader.apply(raw).moves()).hasSize(raw.split(" ").length);
         }
 
         @Test
         @DisplayName("all games")
         void allGames() {
-            assertThat(raws).allMatch(raw ->
-                PgnReader.apply(raw).moves().size() == raw.split(" ").length
+            assertThat(raws).isNotEmpty();
+            assertThat(raws).allMatch(cur ->
+                PgnReader.apply(cur).moves().size() == cur.split(" ").length
             );
         }
     }
