@@ -61,6 +61,26 @@ public class AppC extends BaseController {
         return performAndRedirect(fullId, hand::drawDecline);
     }
 
+    @GetMapping("/takeback-accept/{fullId}")
+    public ResponseEntity<Void> takebackAccept(@PathVariable String fullId) {
+        return performAndRedirect(fullId, hand::takebackAccept);
+    }
+
+    @GetMapping("/takeback-offer/{fullId}")
+    public ResponseEntity<Void> takebackOffer(@PathVariable String fullId) {
+        return performAndRedirect(fullId, hand::takebackOffer);
+    }
+
+    @GetMapping("/takeback-cancel/{fullId}")
+    public ResponseEntity<Void> takebackCancel(@PathVariable String fullId) {
+        return performAndRedirect(fullId, hand::takebackCancel);
+    }
+
+    @GetMapping("/takeback-decline/{fullId}")
+    public ResponseEntity<Void> takebackDecline(@PathVariable String fullId) {
+        return performAndRedirect(fullId, hand::takebackDecline);
+    }
+
     private void perform(String fullId, Function<String, List<Event>> op) {
         List<Event> events = op.apply(fullId);
         gameSocket.send(DbGame.takeGameId(fullId), events);

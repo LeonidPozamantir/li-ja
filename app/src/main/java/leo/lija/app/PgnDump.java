@@ -28,7 +28,7 @@ public class PgnDump {
     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public String game2Str(DbGame game) {
-        return "%s\n\n%s %s".formatted(header(game), moves(game), result(game));
+        return "%s%n%n%s %s".formatted(header(game), moves(game), result(game));
     }
 
     public String header(DbGame game) {

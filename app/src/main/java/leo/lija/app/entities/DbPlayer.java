@@ -29,12 +29,13 @@ public class DbPlayer {
     private Optional<Integer> elo;
     private Boolean isOfferingDraw;
     private Optional<Integer> lastDrawOffer;
+    private Boolean isOfferingTakeback;
     private Optional<String> userId;
     private String moveTimes;
     private Integer blurs;
 
     public DbPlayer copy() {
-        return new DbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, userId, moveTimes, blurs);
+        return new DbPlayer(id, color, ps, aiLevel, isWinner, elo, isOfferingDraw, lastDrawOffer, isOfferingTakeback, userId, moveTimes, blurs);
     }
 
     public String encodePieces(Map<Pos, Piece> pieces, io.vavr.collection.List<Pair<Pos, Piece>> deads) {
@@ -79,4 +80,15 @@ public class DbPlayer {
         return res;
     }
 
+    public DbPlayer offerTakeback() {
+        DbPlayer res = copy();
+        res.isOfferingTakeback = true;
+        return res;
+    }
+
+    public DbPlayer removeTakebackOffer() {
+        DbPlayer res = copy();
+        res.isOfferingTakeback = false;
+        return res;
+    }
 }

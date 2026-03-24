@@ -246,7 +246,7 @@ public class DbGame {
                     }
                 ).orElse("")
             : player.getMoveTimes();
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getUserId(), newMoveTimes, newBlurs);
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getIsOfferingTakeback(), player.getUserId(), newMoveTimes, newBlurs);
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {
