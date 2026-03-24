@@ -47,7 +47,7 @@ public class PgnDump {
                 Pair.of("WhiteElo", elo(game.getWhitePlayer())),
                 Pair.of("BlackElo", elo(game.getBlackPlayer())),
                 Pair.of("Result", result(game)),
-                Pair.of("PlayCount", String.valueOf(game.getTurns())),
+                Pair.of("PlyCount", String.valueOf(game.getTurns())),
                 Pair.of("Variant", game.getVariant().name())
             ),
             game.getVariant().isStandard()
