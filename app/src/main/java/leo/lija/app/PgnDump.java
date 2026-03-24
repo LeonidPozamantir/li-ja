@@ -69,9 +69,11 @@ public class PgnDump {
     }
 
     public String player(DbPlayer p, Optional<User> u) {
-        return p.isAi()
-            ? "Crafty level " + p.getAiLevel()
-            : u.map(User::getUsername).orElse("Anonymous");
+        return p.getAiLevel().map(aiLevel -> "Crafty level " + aiLevel)
+            .orElse(
+                u.map(User::getUsername)
+                    .orElse("Anonymous")
+            );
     }
 
     public String moves(DbGame game) {

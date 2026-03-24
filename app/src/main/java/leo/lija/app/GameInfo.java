@@ -6,7 +6,7 @@ import leo.lija.chess.Opening;
 import java.util.Map;
 import java.util.Optional;
 
-public record GameInfo(DbGame game, String pgn, String fen, Optional<Opening> opening) {
+public record GameInfo(DbGame game, String pgn, Optional<Opening> opening) {
 
     public Map<String, Object> toMap() {
         return Map.of(
