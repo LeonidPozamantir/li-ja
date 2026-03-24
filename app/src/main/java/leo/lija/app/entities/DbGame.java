@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,12 +56,13 @@ public class DbGame {
     private boolean isRated;
     private Variant variant;
     private Optional<Long> lastMoveTime;
+    private Optional<LocalDateTime> createdAt;
 
     public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor) {
-        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD, Optional.empty());
+        this(id, whitePlayer, blackPlayer, pgn, status, turns, clock, lastMove, check, creatorColor, "", "KQkq", false, Variant.STANDARD, Optional.empty(), Optional.empty());
     }
 
-    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant, Optional<Long> lastMoveTime) {
+    public DbGame(String id, DbPlayer whitePlayer, DbPlayer blackPlayer, String pgn, Status status, int turns, Optional<Clock> clock, Optional<String> lastMove, Optional<Pos> check, Color creatorColor, String positionHashes, String castles, boolean isRated, Variant variant, Optional<Long> lastMoveTime, Optional<LocalDateTime> createdAt) {
         this.id = id;
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
@@ -76,10 +78,11 @@ public class DbGame {
         this.isRated = isRated;
         this.variant = variant;
         this.lastMoveTime = lastMoveTime;
+        this.createdAt = createdAt;
     }
 
     public DbGame copy() {
-        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant, lastMoveTime);
+        return new DbGame(id, whitePlayer.copy(), blackPlayer.copy(), pgn, status, turns, clock, lastMove, check, creatorColor, positionHashes, castles, isRated, variant, lastMoveTime, createdAt);
     }
 
     public List<DbPlayer> players() {
@@ -337,6 +340,10 @@ public class DbGame {
 
     public DbPlayer invited() {
         return player(creatorColor.getOpposite());
+    }
+
+    public List<String> pgnList() {
+        return List.of(pgn.split(" "));
     }
 
     public static final int GAME_ID_SIZE = 8;

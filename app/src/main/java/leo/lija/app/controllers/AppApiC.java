@@ -61,6 +61,13 @@ public class AppApiC {
         return CompletableFuture.supplyAsync(() -> api.gameVersion(gameId), executor).join();
     }
 
+    @GetMapping("/game-info/{gameId}")
+    public ResponseEntity<Object> gameInfo(@PathVariable String gameId) {
+        return api.gameInfo(gameId)
+            .map(gi -> ResponseEntity.ok((Object) gi))
+            .orElse(ResponseEntity.badRequest().body("No such entity"));
+    }
+
     @PostMapping("/rematch-accept/{gameId}/{color}/{newGameId}")
     public void rematchAccept(@PathVariable String gameId, @PathVariable String color, @PathVariable String newGameId, @Valid @RequestBody RematchForm r) {
         api.rematchAccept(gameId, newGameId, color, r.whiteRedirect(), r.blackRedirect(), r.entry(), r.messages());

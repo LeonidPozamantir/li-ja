@@ -37,8 +37,9 @@ public class AppApi {
     private final Messenger messenger;
     private final Starter starter;
     private final EloUpdater eloUpdater;
+    private final GameInfoService gameInfoService;
 
-    AppApi(UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMaster gameHubMaster, Messenger messenger, Starter starter, EloUpdater eloUpdater) {
+    AppApi(UserRepo userRepo, GameRepo gameRepo, @Qualifier("gameSocket") Socket gameSocket, HubMaster gameHubMaster, Messenger messenger, Starter starter, EloUpdater eloUpdater, GameInfoService gameInfoService) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
@@ -46,6 +47,7 @@ public class AppApi {
         this.messenger = messenger;
         this.starter = starter;
         this.eloUpdater = eloUpdater;
+        this.gameInfoService = gameInfoService;
     }
 
     public Map<String, Object> show(String fullId) {
@@ -139,6 +141,11 @@ public class AppApi {
 
     public int gameVersion(String gameId) {
         return futureVersion(gameId);
+    }
+
+    public Optional<GameInfo> gameInfo (String gameId) {
+        return gameRepo.game(gameId)
+            .map(gameInfoService::apply);
     }
 
     public boolean isConnected(String gameId, String colorName) {

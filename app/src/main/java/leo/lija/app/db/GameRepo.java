@@ -105,6 +105,10 @@ public class GameRepo {
         repo.saveInitialFen(dbGame.getId(), Fen.obj2Str(dbGame.toChess()));
     }
 
+    public Optional<String> initialFen(String gameId) {
+        return repo.findById(gameId).map(RawDbGame::getInitialFen);
+    }
+
     public void cleanupUnplayed() {
         repo.cleanupUnplayed(LocalDateTime.now().minusDays(2));
     }

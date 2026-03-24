@@ -91,7 +91,8 @@ public class RawDbGame {
                                     castles,
                                     isRated,
                                     trueVariant,
-                                    Optional.ofNullable(lmt)
+                                    Optional.ofNullable(lmt),
+                                    Optional.ofNullable(createdAt)
                                 );
                 })))));
     }
@@ -115,7 +116,7 @@ public class RawDbGame {
             dbGame.getLastMoveTime().orElse(null),
             null,
             null,
-            null,
+            dbGame.getCreatedAt().orElse(null),
             null
         );
     }

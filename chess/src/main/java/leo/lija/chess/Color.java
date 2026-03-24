@@ -60,6 +60,13 @@ public enum Color {
         return new Piece(this, KING);
     }
 
+    public boolean isWhite() {
+        return this == WHITE;
+    }
+
+    public boolean isBlack() {
+        return this == BLACK;
+    }
 
     @Override
     public String toString() {
