@@ -8,7 +8,7 @@ import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.Room;
 import leo.lija.app.entities.User;
 import leo.lija.app.entities.event.Event;
-import leo.lija.app.entities.event.RedirectEvent;
+import leo.lija.app.entities.event.RedirectOwnerEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.app.game.HubMaster;
@@ -71,7 +71,7 @@ public class AppApi {
         Optional<Pov> povOption = gameRepo.pov(fullId);
         povOption.ifPresentOrElse(pov -> {
             Progress p1 = starter.start(pov.game(), entryData);
-            p1.add(new RedirectEvent(pov.color().getOpposite(), url));
+            p1.add(new RedirectOwnerEvent(pov.color().getOpposite(), url));
             p1.addAll(messenger.systemMessages(p1.game(), messages));
             gameRepo.save(p1);
             gameSocket.send(p1);
@@ -104,8 +104,8 @@ public class AppApi {
             newGameOption.ifPresentOrElse(newGame ->
                     g1Option.ifPresentOrElse(g1 -> {
                             Progress progress = new Progress(g1, List.of(
-                                new RedirectEvent(WHITE, whiteRedirect),
-                                new RedirectEvent(BLACK, blackRedirect),
+                                new RedirectOwnerEvent(WHITE, whiteRedirect),
+                                new RedirectOwnerEvent(BLACK, blackRedirect),
                                 // tell spectators to reload the table
                                 new ReloadTableEvent(WHITE),
                                 new ReloadTableEvent(BLACK)

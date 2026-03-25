@@ -1,16 +1,13 @@
 package leo.lija.app.entities.event;
 
-import leo.lija.chess.Color;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @EqualsAndHashCode
-public class RedirectEvent implements Event {
-    private Color color;
-    private String url;
+public abstract class RedirectEvent implements Event {
+
+    String url;
 
     @Override
     public String typ() {
@@ -20,15 +17,5 @@ public class RedirectEvent implements Event {
     @Override
     public String data() {
         return url;
-    }
-
-    @Override
-    public Optional<Color> only() {
-        return Optional.of(color);
-    }
-
-    @Override
-    public boolean owner() {
-        return true;
     }
 }

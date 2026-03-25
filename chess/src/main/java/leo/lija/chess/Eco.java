@@ -2,12 +2,10 @@ package leo.lija.chess;
 
 import io.vavr.Tuple3;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 public class Eco {

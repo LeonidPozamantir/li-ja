@@ -9,6 +9,7 @@ import leo.lija.app.entities.PovRef;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.app.entities.event.Event;
+import leo.lija.app.entities.event.ReloadEvent;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
 import leo.lija.chess.Clock;
@@ -35,7 +36,6 @@ public class Hand {
     private final Messenger messenger;
     private final AiService ai;
     private final Finisher finisher;
-    private final Takeback takeback;
     private final int moretimeSeconds;
 
     public Hand(
@@ -43,13 +43,11 @@ public class Hand {
             Messenger messenger,
             AiService ai,
             Finisher finisher,
-            Takeback takeback,
             @Value("${moretime.seconds}") int moretimeSeconds) {
         this.gameRepo = gameRepo;
         this.messenger = messenger;
         this.ai = ai;
         this.finisher = finisher;
-        this.takeback = takeback;
         this.moretimeSeconds = moretimeSeconds;
     }
 
@@ -174,7 +172,7 @@ public class Hand {
 
     public List<Event> takebackAccept(String fullId) {
         return attempt(fullId, pov -> {
-            if (pov.opponent().getIsOfferingTakeback()) return takeback.perform(pov.game());
+            if (pov.opponent().getIsProposingTakeback()) return takeback(pov);
             else throw new AppException("opponent is not proposing a takeback");
         });
     }
@@ -183,14 +181,17 @@ public class Hand {
         return attempt(fullId, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
-            if (g1.player(color.getOpposite()).getIsOfferingTakeback()) return takeback.perform(g1);
-
-            List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
-            events.addAll(messenger.systemMessages(g1, "Takeback proposition sent"));
-            Progress p1 = new Progress(g1, events);
-            g1.updatePlayer(color, DbPlayer::offerTakeback);
-            gameRepo.save(p1);
-            return p1.events();
+            if (g1.playable() && g1.bothPlayersHaveMoved()) {
+                if (g1.player(color.getOpposite()).getIsProposingTakeback()) return takeback(pov);
+                else {
+                    List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
+                    events.addAll(messenger.systemMessages(g1, "Takeback proposition sent"));
+                    Progress p1 = new Progress(g1, events);
+                    g1.updatePlayer(color, DbPlayer::proposeTakeback);
+                    gameRepo.save(p1);
+                    return p1.events();
+                }
+            } else throw new AppException("invalid takeback proposition " + fullId);
         });
     }
 
@@ -198,15 +199,15 @@ public class Hand {
         return attempt(fullId, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
-            if (pov.player().getIsOfferingTakeback()) {
+            if (pov.player().getIsProposingTakeback()) {
                 List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
                 events.addAll(messenger.systemMessages(g1, "Takeback proposition cancelled"));
                 Progress p1 = new Progress(g1, events);
-                g1.updatePlayer(color, DbPlayer::removeDrawOffer);
+                g1.updatePlayer(color, DbPlayer::removeTakebackProposition);
                 gameRepo.save(p1);
                 return p1.events();
             } else {
-                throw new AppException("no draw offer to cancel " + fullId);
+                throw new AppException("no takeback proposition to cancel " + fullId);
             }
         });
     }
@@ -215,11 +216,11 @@ public class Hand {
         return fromPov(fullId, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
-            if (g1.player(color.getOpposite()).getIsOfferingDraw()) {
+            if (g1.player(color.getOpposite()).getIsProposingTakeback()) {
                 List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
-                events.addAll(messenger.systemMessages(g1, "Draw offer declined"));
+                events.addAll(messenger.systemMessages(g1, "Takeback proposition declined"));
                 Progress p1 = new Progress(g1, events);
-                g1.updatePlayer(color, DbPlayer::removeDrawOffer);
+                g1.updatePlayer(color, DbPlayer::removeTakebackProposition);
                 gameRepo.save(p1);
                 return p1.events();
             } else {
@@ -240,6 +241,14 @@ public class Hand {
                 gameRepo.save(progress);
                 return progress.events();
         }).orElseThrow(() -> new AppException("cannot add more time")));
+    }
+
+    private List<Event> takeback(Pov pov) {
+        Progress p1 = pov.game().rewind();
+        messenger.systemMessage(p1.game(), "Takeback proposition accepted");
+        p1.add(new ReloadEvent());
+        gameRepo.save(p1);
+        return p1.events();
     }
 
     private <A> A attempt(String fullId, Function<Pov, A> action) {

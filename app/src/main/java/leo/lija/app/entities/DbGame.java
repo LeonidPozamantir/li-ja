@@ -12,8 +12,10 @@ import leo.lija.chess.History;
 import leo.lija.chess.Move;
 import leo.lija.chess.Piece;
 import leo.lija.chess.Pos;
+import leo.lija.chess.Replay;
 import leo.lija.chess.Role;
 import leo.lija.chess.Situation;
+import leo.lija.chess.format.pgn.PgnReader;
 import leo.lija.chess.utils.Pair;
 import leo.lija.app.entities.event.EndEvent;
 import leo.lija.app.entities.event.Event;
@@ -32,6 +34,7 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.stream.IntStream;
 
+import static leo.lija.app.Utils.nowSeconds;
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 import static leo.lija.chess.Pos.posAt;
@@ -222,7 +225,7 @@ public class DbGame {
         else if (situation.stalemate()) status = Status.STALEMATE;
         else if (situation.autoDraw()) status = Status.DRAW;
         clock = game.getClock();
-        check = game.situation().check() ? game.situation().kingPos() : Optional.empty();
+        check = situation.check() ? situation.kingPos() : Optional.empty();
         lastMoveTime = recordMoveTimes() ? Optional.of(Utils.nowSeconds()) : Optional.empty();
 
         clock.ifPresent(c -> events.addLast(ClockEvent.apply(c)));
@@ -246,12 +249,47 @@ public class DbGame {
                     }
                 ).orElse("")
             : player.getMoveTimes();
-        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getIsOfferingTakeback(), player.getUserId(), newMoveTimes, newBlurs);
+        return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getIsProposingTakeback(), player.getUserId(), newMoveTimes, newBlurs);
+    }
+
+    public Progress rewind() {
+        Replay replay = PgnReader.withSans(pgn, l -> {
+            l.removeLast();
+            return l;
+        });
+        Game rewindedGame = replay.game();
+        History rewindedHistory = rewindedGame.getBoard().getHistory();
+        Situation rewindedSituation = rewindedGame.situation();
+        UnaryOperator<DbPlayer> rewindPlayer = player -> {
+            DbPlayer res = player.copy();
+            res.setPs(player.encodePieces(rewindedGame.getBoard().getPieces(), rewindedGame.getDeads()));
+            res.setIsProposingTakeback(false);
+            return res;
+        };
+        pgn = rewindedGame.getPgnMoves();
+        whitePlayer = rewindPlayer.apply(whitePlayer);
+        blackPlayer = rewindPlayer.apply(blackPlayer);
+        turns = rewindedGame.getTurns();
+        positionHashes = rewindedHistory.positionHashes().mkString();
+        castles = rewindedHistory.castleNotation();
+        lastMove = rewindedHistory.lastMove().map(p -> p.getFirst() + " " + p.getSecond());
+        if (rewindedSituation.checkmate()) status = Status.MATE;
+        else if (rewindedSituation.stalemate()) status = Status.STALEMATE;
+        else if (rewindedSituation.autoDraw()) status = Status.DRAW;
+        clock = rewindedGame.getClock();
+        check = rewindedSituation.check() ? rewindedSituation.kingPos() : Optional.empty();
+        lastMoveTime = recordMoveTimes() ? Optional.of(nowSeconds()) : Optional.empty();
+        return new Progress(this);
     }
 
     public void updatePlayer(Color color, UnaryOperator<DbPlayer> f) {
         if (color == WHITE) whitePlayer = f.apply(whitePlayer);
         if (color == BLACK) blackPlayer = f.apply(blackPlayer);
+    }
+
+    public void updatePlayers(UnaryOperator<DbPlayer> f) {
+        whitePlayer = f.apply(whitePlayer);
+        blackPlayer = f.apply(blackPlayer);
     }
 
     private boolean recordMoveTimes() {
@@ -344,6 +382,10 @@ public class DbGame {
 
     public List<String> pgnList() {
         return List.of(pgn.split(" "));
+    }
+
+    public boolean bothPlayersHaveMoved() {
+        return turns > 1;
     }
 
     public static final int GAME_ID_SIZE = 8;

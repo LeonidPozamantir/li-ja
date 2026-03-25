@@ -85,6 +85,8 @@ public class GameRepo {
             g.getPlayers().get(1).setLastDrawOffer(null);
             g.getPlayers().get(0).setIsOfferingDraw(null);
             g.getPlayers().get(1).setIsOfferingDraw(null);
+            g.getPlayers().get(0).setIsProposingTakeback(null);
+            g.getPlayers().get(1).setIsProposingTakeback(null);
             repo.save(g);
         });
     }
