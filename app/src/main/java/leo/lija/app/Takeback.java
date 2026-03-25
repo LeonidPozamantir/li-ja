@@ -6,6 +6,7 @@ import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.ReloadEvent;
+import leo.lija.app.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +20,26 @@ public class Takeback {
     private final Messenger messenger;
 
     public List<Event> apply(DbGame game) {
-        return save(game.rewind());
+        try {
+            return save(game.rewind());
+        } catch (AppException e) {
+            throw failInfo(game, e);
+        }
     }
 
     public List<Event> _double(DbGame game) {
-        Progress p1 = game.rewind();
-        Progress p = p1.game().rewind();
-        Progress p2 = p1.withGame(p.game());
-        return save(p2);
+        try {
+            Progress p1 = game.rewind();
+            Progress p = p1.game().rewind();
+            Progress p2 = p1.withGame(p.game());
+            return save(p2);
+        } catch (AppException e) {
+            throw failInfo(game, e);
+        }
+    }
+
+    private AppException failInfo(DbGame game, Exception e) {
+        return new AppException("Takeback %s".formatted(game.getId()), e);
     }
 
     private List<Event> save(Progress p1) {
