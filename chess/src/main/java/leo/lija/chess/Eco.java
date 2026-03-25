@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 public class Eco {
@@ -41,17 +42,28 @@ public class Eco {
         public Branch set(Opening o) {
             return new Branch(moves, Optional.of(o));
         }
+
+        @Override
+        public String toString() {
+            return opening.map(Opening::name).orElse("-");
+        }
     }
 
     public static Optional<Opening> openingOf(String pgn) {
-        return Arrays.stream(pgn.split(" ")).reduce(tree,
-            (branch, move) -> branch.get(move).orElse(branch),
-            (b1, b2) -> b1
-        ).opening;
+        return next(tree, List.of(pgn.split(" "))).opening;
+    }
+
+    private static Branch next(Branch branch, List<String> moves) {
+        if (moves.isEmpty()) return branch;
+        String m = moves.getFirst();
+        List<String> ms = moves.subList(1, moves.size());
+        return branch.get(m)
+            .map(b -> next(b, ms))
+            .orElse(branch);
     }
 
     static Branch tree = Stream.of(
-new Tuple3<>("A01", "Nimzovich-Larsen Attack", "b3"),
+        new Tuple3<>("A01", "Nimzovich-Larsen Attack", "b3"),
         new Tuple3<>("A02", "Bird's Opening", "f4"),
         new Tuple3<>("A03", "Bird's Opening", "f4 d5"),
         new Tuple3<>("A04", "Reti Opening", "Nf3"),
