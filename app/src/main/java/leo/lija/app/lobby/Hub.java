@@ -1,7 +1,6 @@
 package leo.lija.app.lobby;
 
 import leo.lija.app.config.SocketIOService;
-import leo.lija.app.db.MessageRepo;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
@@ -20,14 +19,14 @@ import java.util.function.Consumer;
 @Service("lobbyHub")
 public class Hub extends HubActor<Member> implements leo.lija.app.Hub {
 
-    private final MessageRepo messageRepo;
+    private final Messenger messenger;
     private final History history;
 
     private static final String LOBBY_NAME = "lobby";
 
-    public Hub(SocketIOService socketService, MessageRepo messageRepo, History history, @Value("${lobby.uid.timeout}") int timeout) {
+    public Hub(SocketIOService socketService, Messenger messenger, History history, @Value("${lobby.uid.timeout}") int timeout) {
         super(socketService, timeout, LOBBY_NAME);
-        this.messageRepo = messageRepo;
+        this.messenger = messenger;
         this.history = history;
     }
 
@@ -42,7 +41,7 @@ public class Hub extends HubActor<Member> implements leo.lija.app.Hub {
     }
 
     public void talk(String txt, String u) {
-        Message message = messageRepo.add(txt, u);
+        Message message = messenger.apply(txt, u);
         notifyVersion("talk", Map.of(
             "txt", message.getText(),
             "u", message.getUsername()

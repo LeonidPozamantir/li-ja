@@ -25,6 +25,12 @@ public class User {
     private int nbGames;
     private int nbRatedGames;
     private boolean engine;
+    private boolean isChatBan;
+    private boolean enabled;
+
+    public boolean disabled() {
+        return !enabled;
+    }
 
     public static final int STARTING_ELO = 1200;
 

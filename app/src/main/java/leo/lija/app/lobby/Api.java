@@ -21,15 +21,15 @@ public class Api {
     private final Fisherman fisherman;
     private final GameRepo gameRepo;
     private final leo.lija.app.game.Socket gameSocket;
-    private final Messenger messenger;
+    private final Messenger gameMessenger;
     private final Starter starter;
 
-    public Api(HookRepo hookRepo, Fisherman fisherman, GameRepo gameRepo, @Qualifier("gameSocket") leo.lija.app.game.Socket gameSocket, Messenger messenger, Starter starter) {
+    public Api(HookRepo hookRepo, Fisherman fisherman, GameRepo gameRepo, @Qualifier("gameSocket") leo.lija.app.game.Socket gameSocket, Messenger gameMessenger, Starter starter) {
         this.hookRepo = hookRepo;
         this.fisherman = fisherman;
         this.gameRepo = gameRepo;
         this.gameSocket = gameSocket;
-        this.messenger = messenger;
+        this.gameMessenger = gameMessenger;
         this.starter = starter;
     }
 
@@ -52,7 +52,7 @@ public class Api {
         if (Color.apply(colorName).isEmpty()) throw Utils.gameNotFound();
         gameOption.ifPresentOrElse(game -> {
             Progress p1 = starter.start(game, entryData);
-            p1.addAll(messenger.systemMessages(game, messageString));
+            p1.addAll(gameMessenger.systemMessages(game, messageString));
             gameRepo.save(p1);
             gameSocket.send(p1);
             hook.ifPresent(h -> fisherman.bite(h, p1.game()));
