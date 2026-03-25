@@ -23,7 +23,7 @@ public abstract class BooleanExpiryMemo {
     }
 
     public void putAll(Collection<String> keys) {
-        keys.forEach(k -> cache.put(k, true));
+        keys.stream().distinct().forEach(k -> cache.put(k, true));
     }
 
     public void remove(String key) {

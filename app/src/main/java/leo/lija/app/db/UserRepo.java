@@ -4,9 +4,9 @@ import leo.lija.app.entities.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -19,7 +19,7 @@ public class UserRepo {
         return repo.averageElo();
     }
 
-    public void updateOnlineUserNames(Collection<String> usernames) {
+    public void updateOnlineUserNames(Set<String> usernames) {
         List<String> names = usernames.stream().map(String::toLowerCase).distinct().toList();
         repo.updateOnlineUsernamesFalse(names);
         repo.updateOnlineUsernamesTrue(names);

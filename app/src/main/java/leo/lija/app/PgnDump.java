@@ -40,7 +40,7 @@ public class PgnDump {
         return Streams.concat(
             Stream.of(
                 Pair.of("Event", game.rated() ? "Rated game" : "Casual game"),
-                Pair.of("Site", "http://leochess.com/" + game.getId()),
+                Pair.of("Site", "http://lija.com/" + game.getId()),
                 Pair.of("Date", game.getCreatedAt().map(dateFormat::format).orElse("?")),
                 Pair.of("White", player(game.getWhitePlayer(), whiteUser)),
                 Pair.of("Black", player(game.getBlackPlayer(), blackUser)),

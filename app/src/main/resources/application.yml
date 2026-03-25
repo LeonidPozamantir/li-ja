@@ -39,6 +39,7 @@ socket:
 memo: #seconds
   hook.timeout: 5
   finisher-lock.timeout: 20
+  username.timeout: 5
 ai:
   server: false
   use: remote

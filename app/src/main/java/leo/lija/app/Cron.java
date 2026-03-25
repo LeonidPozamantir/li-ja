@@ -10,6 +10,7 @@ import leo.lija.app.db.UserRepo;
 import leo.lija.app.game.HubMaster;
 import leo.lija.app.lobby.Fisherman;
 import leo.lija.app.memo.HookMemo;
+import leo.lija.app.memo.UsernameMemo;
 import leo.lija.app.report.Reporting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
@@ -44,6 +45,7 @@ public class Cron {
     private final leo.lija.app.lobby.Hub lobbyHub;
     private final HubMaster gameHubMaster;
     private final HookMemo hookMemo;
+    private final UsernameMemo usernameMemo;
     private final Reporting reporting;
 
     private static final int TIMEOUT = 500;
@@ -74,7 +76,8 @@ public class Cron {
             List<String> xs = hubs().stream()
                 .flatMap(h -> h.getUsernames().stream())
                 .toList();
-            userRepo.updateOnlineUserNames(xs);
+            usernameMemo.putAll(xs);
+            userRepo.updateOnlineUserNames(usernameMemo.keys());
         });
 
         spawn(Duration.ofMinutes((long) (60 * 4.1)), () -> {
