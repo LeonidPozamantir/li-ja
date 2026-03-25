@@ -36,4 +36,9 @@ public class PausedClock extends Clock {
     public PausedClock giveTime(Color c, float t) {
         return addTime(c, -t);
     }
+
+    @Override
+    public Clock _switch() {
+        return new PausedClock(limit, increment, color.getOpposite(), whiteTime, blackTime);
+    }
 }

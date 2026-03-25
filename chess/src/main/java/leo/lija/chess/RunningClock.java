@@ -52,4 +52,8 @@ public class RunningClock extends Clock {
         return addTime(c, -t);
     }
 
+    @Override
+    public Clock _switch() {
+        return new RunningClock(limit, increment, color.getOpposite(), whiteTime, blackTime);
+    }
 }
