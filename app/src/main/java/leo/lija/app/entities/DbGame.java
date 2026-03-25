@@ -15,7 +15,9 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Replay;
 import leo.lija.chess.Role;
 import leo.lija.chess.Situation;
+import leo.lija.chess.format.pgn.Fen;
 import leo.lija.chess.format.pgn.PgnReader;
+import leo.lija.chess.format.pgn.Tag;
 import leo.lija.chess.utils.Pair;
 import leo.lija.app.entities.event.EndEvent;
 import leo.lija.app.entities.event.Event;
@@ -252,11 +254,12 @@ public class DbGame {
         return new DbPlayer(player.getId(), player.getColor(), newPs, player.getAiLevel(), player.getIsWinner(), player.getElo(), player.getIsOfferingDraw(), player.getLastDrawOffer(), player.getIsProposingTakeback(), player.getUserId(), newMoveTimes, newBlurs);
     }
 
-    public Progress rewind() {
-        Replay replay = PgnReader.withSans(pgn, l -> {
-            l.removeLast();
-            return l;
-        });
+    public Progress rewind(Optional<String> initialFen) {
+        Replay replay = PgnReader.withSans(
+            pgn,
+            l -> l.subList(0, l.size() - 1),
+            initialFen.map(fen -> List.of((Tag) new Fen(fen))).orElse(List.of())
+        );
         Game rewindedGame = replay.game();
         History rewindedHistory = rewindedGame.getBoard().getHistory();
         Situation rewindedSituation = rewindedGame.situation();

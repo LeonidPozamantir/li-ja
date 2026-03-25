@@ -173,19 +173,23 @@ public class Hand {
     }
 
     public List<Event> takebackAccept(String fullId) {
-        return attempt(fullId, pov -> {
-            if (pov.opponent().getIsProposingTakeback()) return takeback.apply(pov.game());
+        return fromPov(fullId, pov -> {
+            if (pov.opponent().getIsProposingTakeback()) {
+                Optional<String> fen = gameRepo.initialFen(pov.game().getId());
+                return takeback.apply(pov.game(), fen);
+            }
             else throw new AppException("opponent is not proposing a takeback");
         });
     }
 
     public List<Event> takebackOffer(String fullId) {
-        return attempt(fullId, pov -> {
+        return fromPov(fullId, pov -> {
             DbGame g1 = pov.game();
             Color color = pov.color();
             if (g1.playable() && g1.bothPlayersHaveMoved()) {
-                if (g1.player(color.getOpposite()).isAi()) return takeback._double(pov.game());
-                else if (g1.player(color.getOpposite()).getIsProposingTakeback()) return takeback.apply(pov.game());
+                Optional<String> fen = gameRepo.initialFen(pov.game().getId());
+                if (g1.player(color.getOpposite()).isAi()) return takeback._double(pov.game(), fen);
+                else if (g1.player(color.getOpposite()).getIsProposingTakeback()) return takeback.apply(pov.game(), fen);
                 else {
                     List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
                     events.addAll(messenger.systemMessages(g1, "Takeback proposition sent"));

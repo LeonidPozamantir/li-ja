@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,18 +20,18 @@ public class Takeback {
     private final GameRepo gameRepo;
     private final Messenger messenger;
 
-    public List<Event> apply(DbGame game) {
+    public List<Event> apply(DbGame game, Optional<String> initialFen) {
         try {
-            return save(game.rewind());
+            return save(game.rewind(initialFen));
         } catch (AppException e) {
             throw failInfo(game, e);
         }
     }
 
-    public List<Event> _double(DbGame game) {
+    public List<Event> _double(DbGame game, Optional<String> initialFen) {
         try {
-            Progress p1 = game.rewind();
-            Progress p = p1.game().rewind();
+            Progress p1 = game.rewind(initialFen);
+            Progress p = p1.game().rewind(initialFen);
             Progress p2 = p1.withGame(p.game());
             return save(p2);
         } catch (AppException e) {

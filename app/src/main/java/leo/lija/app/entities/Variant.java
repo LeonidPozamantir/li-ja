@@ -21,6 +21,10 @@ public record Variant(int id, String string) {
         return this == STANDARD;
     }
 
+    public boolean isExotic() {
+        return !isStandard();
+    }
+
     public static final Variant STANDARD = new Variant(1, "Standard");
     public static final Variant CHESS960 = new Variant(2, "Chess960");
 

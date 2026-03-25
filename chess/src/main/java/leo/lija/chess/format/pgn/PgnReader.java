@@ -6,6 +6,7 @@ import leo.lija.chess.Replay;
 import leo.lija.chess.exceptions.ChessException;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -13,12 +14,22 @@ import java.util.function.UnaryOperator;
 public class PgnReader {
 
     public Replay apply(String pgn) {
-        return withSans(pgn, UnaryOperator.identity());
+        return apply(pgn, List.of());
+    }
+
+    public Replay apply(String pgn, List<Tag> tags) {
+        return withSans(pgn, UnaryOperator.identity(), tags);
     }
 
     public Replay withSans(String pgn, UnaryOperator<List<San>> op) {
+        return withSans(pgn, op, List.of());
+    }
+
+    public Replay withSans(String pgn, UnaryOperator<List<San>> op, List<Tag> tags) {
         ParsedPgn parsed  = PgnParser.apply(pgn);
-        return op.apply(parsed.sans()).stream().reduce(Replay.apply(makeGame(parsed.tags())),
+        List<Tag> allTags = new ArrayList<>(parsed.tags());
+        allTags.addAll(tags);
+        return op.apply(parsed.sans()).stream().reduce(Replay.apply(makeGame(allTags)),
             (replay, san) -> {
                 Move move = san.apply(replay.game());
                 List<Move> moves = replay.moves();
