@@ -35,6 +35,7 @@ public class Hand {
     private final Messenger messenger;
     private final AiService ai;
     private final Finisher finisher;
+    private final Takeback takeback;
     private final int moretimeSeconds;
 
     public Hand(
@@ -42,11 +43,13 @@ public class Hand {
             Messenger messenger,
             AiService ai,
             Finisher finisher,
+            Takeback takeback,
             @Value("${moretime.seconds}") int moretimeSeconds) {
         this.gameRepo = gameRepo;
         this.messenger = messenger;
         this.ai = ai;
         this.finisher = finisher;
+        this.takeback = takeback;
         this.moretimeSeconds = moretimeSeconds;
     }
 
@@ -165,6 +168,62 @@ public class Hand {
                 return p1.events();
             } else {
                 throw new AppException("no draw offer to decline " + fullId);
+            }
+        });
+    }
+
+    public List<Event> takebackAccept(String fullId) {
+        return attempt(fullId, pov -> {
+            if (pov.opponent().getIsOfferingTakeback()) return takeback.perform(pov.game());
+            else throw new AppException("opponent is not proposing a takeback");
+        });
+    }
+
+    public List<Event> takebackOffer(String fullId) {
+        return attempt(fullId, pov -> {
+            DbGame g1 = pov.game();
+            Color color = pov.color();
+            if (g1.player(color.getOpposite()).getIsOfferingTakeback()) return takeback.perform(g1);
+
+            List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
+            events.addAll(messenger.systemMessages(g1, "Takeback proposition sent"));
+            Progress p1 = new Progress(g1, events);
+            g1.updatePlayer(color, DbPlayer::offerTakeback);
+            gameRepo.save(p1);
+            return p1.events();
+        });
+    }
+
+    public List<Event> takebackCancel(String fullId) {
+        return attempt(fullId, pov -> {
+            DbGame g1 = pov.game();
+            Color color = pov.color();
+            if (pov.player().getIsOfferingTakeback()) {
+                List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
+                events.addAll(messenger.systemMessages(g1, "Takeback proposition cancelled"));
+                Progress p1 = new Progress(g1, events);
+                g1.updatePlayer(color, DbPlayer::removeDrawOffer);
+                gameRepo.save(p1);
+                return p1.events();
+            } else {
+                throw new AppException("no draw offer to cancel " + fullId);
+            }
+        });
+    }
+
+    public List<Event> takebackDecline(String fullId) {
+        return fromPov(fullId, pov -> {
+            DbGame g1 = pov.game();
+            Color color = pov.color();
+            if (g1.player(color.getOpposite()).getIsOfferingDraw()) {
+                List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));
+                events.addAll(messenger.systemMessages(g1, "Draw offer declined"));
+                Progress p1 = new Progress(g1, events);
+                g1.updatePlayer(color, DbPlayer::removeDrawOffer);
+                gameRepo.save(p1);
+                return p1.events();
+            } else {
+                throw new AppException("no takeback proposition to decline " + fullId);
             }
         });
     }
