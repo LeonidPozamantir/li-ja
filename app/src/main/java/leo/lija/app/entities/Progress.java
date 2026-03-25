@@ -21,6 +21,10 @@ public record Progress(DbGame game, List<Event> events) {
         events.addAll(es);
     }
 
+    public Progress withGame(DbGame g) {
+        return new Progress(g, events);
+    }
+
     public Progress map(UnaryOperator<DbGame> f) {
         return new Progress(f.apply(game), events);
     }
