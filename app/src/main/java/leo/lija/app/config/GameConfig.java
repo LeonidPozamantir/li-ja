@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 public class GameConfig {
 
     @Bean
-    public HubMaster hubMaster(SocketIOService socketIOService, @Value("${game.message.lifetime}") int gameTimeout, @Value("${game.uid.timeout}") int uidTimeout, @Value("${game.hub.timeout}") int hubTimeout) {
+    public HubMaster hubMaster(SocketIOService socketIOService, @Value("${game.message.lifetime}") int gameTimeout, @Value("${game.uid.timeout}") int uidTimeout, @Value("${game.hub.timeout}") int hubTimeout, @Value("${game.player.timeout}") int playerTimeout) {
         Supplier<History> gameHistory = () -> new History(gameTimeout);
-        return new HubMaster(socketIOService, gameHistory, uidTimeout, hubTimeout);
+        return new HubMaster(socketIOService, gameHistory, uidTimeout, hubTimeout, playerTimeout);
     }
 }
