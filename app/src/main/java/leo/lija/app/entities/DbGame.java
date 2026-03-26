@@ -279,7 +279,7 @@ public class DbGame {
         if (rewindedSituation.checkmate()) status = Status.MATE;
         else if (rewindedSituation.stalemate()) status = Status.STALEMATE;
         else if (rewindedSituation.autoDraw()) status = Status.DRAW;
-        clock = clock.map(Clock::_switch);
+        clock = clock.map(Clock::switch0);
         check = rewindedSituation.check() ? rewindedSituation.kingPos() : Optional.empty();
         lastMoveTime = recordMoveTimes() ? Optional.of(nowSeconds()) : Optional.empty();
         return new Progress(this);

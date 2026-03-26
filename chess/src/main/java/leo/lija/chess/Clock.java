@@ -69,7 +69,7 @@ public abstract class Clock {
         return timerOption.isPresent();
     }
 
-    public abstract Clock _switch();
+    public abstract Clock switch0();
 
     protected double now() {
         return System.currentTimeMillis() / 1000d;

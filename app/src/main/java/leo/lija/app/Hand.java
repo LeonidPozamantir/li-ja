@@ -188,7 +188,7 @@ public class Hand {
             Color color = pov.color();
             if (g1.playable() && g1.bothPlayersHaveMoved()) {
                 Optional<String> fen = gameRepo.initialFen(pov.game().getId());
-                if (g1.player(color.getOpposite()).isAi()) return takeback._double(pov.game(), fen);
+                if (g1.player(color.getOpposite()).isAi()) return takeback.double0(pov.game(), fen);
                 else if (g1.player(color.getOpposite()).getIsProposingTakeback()) return takeback.apply(pov.game(), fen);
                 else {
                     List<Event> events = new ArrayList<>(List.of(new ReloadTableEvent(color.getOpposite())));

@@ -38,7 +38,7 @@ public class PausedClock extends Clock {
     }
 
     @Override
-    public Clock _switch() {
+    public Clock switch0() {
         return new PausedClock(limit, increment, color.getOpposite(), whiteTime, blackTime);
     }
 }

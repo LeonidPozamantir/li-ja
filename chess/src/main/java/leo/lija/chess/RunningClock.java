@@ -53,7 +53,7 @@ public class RunningClock extends Clock {
     }
 
     @Override
-    public Clock _switch() {
+    public Clock switch0() {
         return new RunningClock(limit, increment, color.getOpposite(), whiteTime, blackTime);
     }
 }

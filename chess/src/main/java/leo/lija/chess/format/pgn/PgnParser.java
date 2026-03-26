@@ -1,6 +1,5 @@
 package leo.lija.chess.format.pgn;
 
-import com.google.common.labs.parse.CharacterSet;
 import com.google.common.labs.parse.Parser;
 import io.vavr.Tuple4;
 import leo.lija.chess.Pos;
@@ -18,13 +17,22 @@ import java.util.Optional;
 public class PgnParser {
 
     public ParsedPgn apply(String pgn) {
+        Pair<List<Tag>, String> parsed = applyTags(pgn);
+        String moveString = parsed.getSecond();
+        List<San> sans = applyMoves(moveString);
+        return new ParsedPgn(parsed.getFirst(), sans);
+    }
+
+    public Pair<List<Tag>, String> applyTags(String pgn) {
         return all().parse(pgn);
     }
 
-    public Parser<ParsedPgn> all() {
+    public Parser<Pair<List<Tag>, String>> all() {
         return Parser.anyOf(
-            Parser.sequence(tags(), moves().followedBy(result().optional()), ParsedPgn::new),
-            moves().map(m -> new ParsedPgn(List.of(), m))
+            Parser.sequence(tags(), Parser.zeroOrMore((char c) -> true, "li"), Pair::of),
+            Parser.zeroOrMore((char c) -> true, "li").notEmpty()
+                .atLeastOnce()
+                .map(l -> Pair.of(List.of(), String.join("", l)))
         );
     }
 
@@ -32,12 +40,8 @@ public class PgnParser {
         return tag().followedBy(Parser.zeroOrMore(Character::isWhitespace, "ki")).atLeastOnce();
     }
 
-    private Parser<String>.OrEmpty whitespace() {
-        return Parser.zeroOrMore(Character::isWhitespace, "ki");
-    }
-
     public Parser<Tag> tag() {
-        return Parser.sequence(tagName(), tagValue().followedBy(crlf()), (name, value) -> {
+        return Parser.sequence(tagName(), tagValue(), (name, value) -> {
            if (name.equals("FEN")) return new Fen(value);
            return new Unknown(name, value);
         });
@@ -51,8 +55,20 @@ public class PgnParser {
         return Parser.quotedBy(" \"", "\"]");
     }
 
+    public Parser<String> crlf() {
+        return Parser.string("\r\n").or(Parser.string("\n"));
+    }
+
+    private Parser<String>.OrEmpty space() {
+        return Parser.zeroOrMore(Character::isWhitespace, "ki");
+    }
+
+    public List<San> applyMoves(String pgn) {
+        return moves().parse(pgn);
+    }
+
     public Parser<List<San>> moves() {
-        return move().atLeastOnce();
+        return move().atLeastOnce().followedBy(result().optional());
     }
 
     public Parser<String> result() {
@@ -63,12 +79,12 @@ public class PgnParser {
         return Parser.anyOf(
                 number().then(Parser.anyOf(qCastle(), kCastle(), std())),
                 Parser.anyOf(qCastle(), kCastle(), std())
-            ).followedBy(comment().optional())
-            .followedBy(whitespace());
+            ).followedBy(comment())
+            .followedBy(space());
     }
 
-    public Parser<String> comment() {
-        return Parser.quotedBy(" {", "}");
+    public Parser<String>.OrEmpty comment() {
+        return space().followedBy(Parser.quotedBy("{", "}").optional());
     }
 
     public Parser<San> qCastle() {
@@ -81,13 +97,13 @@ public class PgnParser {
 
     public Parser<Std> std() {
         return Parser.sequence(
-            Parser.anyOf(simple(), disambiguated()),
+            Parser.anyOf(complete(), simple(), disambiguated()),
             suffixes(),
             Std::withSuffixes);
     }
 
     public Parser<String> number() {
-        return Parser.digits().then(Parser.consecutive(CharacterSet.charsIn("[. ]")));
+        return Parser.digits().followedBy(Parser.string(".").atLeastOnce()).followedBy(space());
     }
 
     public Parser<Std> simple() {
@@ -109,15 +125,21 @@ public class PgnParser {
         );
     }
 
+    public Parser<Std> complete() {
+        Parser<Pair<Role, Integer>> rofi = Parser.sequence(role().notEmpty(), file, Pair::of);
+        Parser<Pair<Integer, Boolean>> raca = Parser.sequence(rank, x, Pair::of);
+        Parser<Tuple4<Role, Integer, Integer, Boolean>> rofiraca = Parser.sequence(rofi, raca,
+            (p1, p2) -> new Tuple4<>(p1.getFirst(), p1.getSecond(), p2.getFirst(), p2.getSecond()));
+        return Parser.sequence(rofiraca, dest(),
+            (t4, p) -> new Std(p, t4._1, t4._4, Optional.of(t4._2), Optional.of(t4._3)));
+    }
 
     public Parser<Suffixes>.OrEmpty suffixes() {
         Parser<Pair<Optional<Role>, Boolean>>.OrEmpty tmp = Parser.sequence(promotion().optional(), check, Pair::of);
         return Parser.sequence(tmp, checkmate, (p, cm) -> new Suffixes(p.getSecond(), cm, p.getFirst()));
     }
 
-    public Parser<String> crlf() {
-        return Parser.string("\r\n").or(Parser.string("\n"));
-    }
+
 
     Parser<Boolean>.OrEmpty x = exists("x");
 

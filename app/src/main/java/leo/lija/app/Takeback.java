@@ -2,7 +2,6 @@ package leo.lija.app;
 
 import leo.lija.app.db.GameRepo;
 import leo.lija.app.entities.DbGame;
-import leo.lija.app.entities.Pov;
 import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.ReloadEvent;
@@ -28,7 +27,7 @@ public class Takeback {
         }
     }
 
-    public List<Event> _double(DbGame game, Optional<String> initialFen) {
+    public List<Event> double0(DbGame game, Optional<String> initialFen) {
         try {
             Progress p1 = game.rewind(initialFen);
             Progress p = p1.game().rewind(initialFen);
