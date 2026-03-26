@@ -26,4 +26,9 @@ public class CrowdEvent implements Event {
             "watchers", watchers
         );
     }
+
+    public CrowdEvent incWatchers() {
+        watchers++;
+        return this;
+    }
 }

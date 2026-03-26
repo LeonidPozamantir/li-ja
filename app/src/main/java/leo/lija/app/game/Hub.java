@@ -61,7 +61,9 @@ public class Hub extends HubActor<Member> {
     public void join(String uid, Optional<String> username, Integer version, Color color, boolean owner) {
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
+        Map<String, Object> crowdMsg = makeEvent("crowd", crowdEvent().incWatchers().data());
         msgs.forEach(m -> socketService.sendMessageToClient(uid, gameId, m));
+        socketService.sendMessageToClient(uid, gameId, crowdMsg);
         addMember(uid, Member.apply(uid, username, new PovRef(gameId, color), owner));
         notify(crowdEvent());
     }
@@ -102,6 +104,10 @@ public class Hub extends HubActor<Member> {
                 "t", "batch",
                 "d", vevents.stream().filter(v -> v.visible(member))
             )));
+    }
+
+    public Map<String, Object> makeEvent(String t, Object data) {
+        return Map.of("t", t, "d", data);
     }
 
     private Optional<Member> member(Color color) {
