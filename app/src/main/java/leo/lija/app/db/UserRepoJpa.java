@@ -48,4 +48,12 @@ public interface UserRepoJpa extends JpaRepository<User, UUID> {
     @Query("update User set nbGames = nbGames + 1 where id = :id")
     @Transactional
     void incNonRated(UUID id);
+
+    @Modifying
+    @Query("""
+        update User
+        set isChatBan = case when isChatBan = true then false else true end
+        where id = :id""")
+    @Transactional
+    void toggleChatBan(UUID id);
 }

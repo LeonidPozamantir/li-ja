@@ -3,6 +3,7 @@ package leo.lija.app.controllers;
 import jakarta.validation.Valid;
 import leo.lija.app.forms.LobbyJoinForm;
 import leo.lija.app.lobby.Api;
+import leo.lija.app.lobby.Messenger;
 import leo.lija.app.lobby.Preload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class LobbyC extends BaseController {
 
     private final Api api;
     private final Preload preloader;
+    private final Messenger messenger;
 
     @PostMapping("/lobby/cancel/{ownerId}")
     public ResponseEntity<Void> cancel(@PathVariable String ownerId) {
@@ -52,4 +54,8 @@ public class LobbyC extends BaseController {
         api.create(hookOwnerId);
     }
 
+    @PostMapping("/api/lobby/chat-ban/{username}")
+    public void chatBan(String username) {
+        messenger.ban(username);
+    }
 }

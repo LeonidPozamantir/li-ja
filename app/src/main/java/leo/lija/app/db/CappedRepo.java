@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 @RequiredArgsConstructor
-public abstract class CappedRepo<T> {
+public abstract class CappedRepo<T, U extends JpaRepository<T, Integer>> {
 
-    protected final JpaRepository<T, Integer> repo;
+    protected final U repo;
     protected final int max;
 
     public List<T> recent() {

@@ -45,4 +45,8 @@ public class UserRepo {
         if (rated) repo.incRated(UUID.fromString(userId));
         else repo.incNonRated(UUID.fromString(userId));
     }
+
+    public void toggleChatBan(User user) {
+        repo.toggleChatBan(user.getId());
+    }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.regex.Pattern;
 
 @Repository
-public class MessageRepo extends CappedRepo<Message> {
+public class MessageRepo extends CappedRepo<Message, MessageRepoJpa> {
 
     public MessageRepo(MessageRepoJpa repo, @Value("${lobby.message.max}") int max) {
         super(repo, max);
@@ -16,6 +16,10 @@ public class MessageRepo extends CappedRepo<Message> {
 
     public Message add(Message message) {
         return repo.save(message);
+    }
+
+    public void deleteByUsername(String username) {
+        repo.deleteByUsername(username);
     }
 
 }

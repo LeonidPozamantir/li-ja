@@ -37,4 +37,12 @@ public class Messenger {
         if (t.isEmpty()) throw new AppException("Empty message");
         return new Message(null, user.getUsername(), URL_REGEX.matcher(t).replaceAll(m -> "lija.com/" + m.group(1)));
     }
+
+    public void ban(String username) {
+        Optional<User> userOption = userRepo.byUsername(username);
+        userOption.ifPresent(user -> {
+            userRepo.toggleChatBan(user);
+            messageRepo.deleteByUsername(user.getUsername());
+        });
+    }
 }
