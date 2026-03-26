@@ -61,7 +61,7 @@ public class Game {
     public Game apply(Move move) {
         Game newGame = new Game(move.finalizeAfter(), player.getOpposite());
         String pgnMove = PgnDump.move(situation(), move, newGame.situation());
-        String newPgnMoves = (pgnMoves + " " + pgnMove).trim();
+        String newPgnMoves = pgnMoves.isEmpty() ? pgnMove : pgnMoves + " " + pgnMove;
         Optional<Pos> cpos = move.capture();
         Optional<Piece> cpiece = cpos.flatMap(p -> board.at(p));
         io.vavr.collection.List<Pair<Pos, Piece>> newDeads = cpiece.isPresent() ? deads.append(Pair.of(cpos.get(), cpiece.get())) : deads;
