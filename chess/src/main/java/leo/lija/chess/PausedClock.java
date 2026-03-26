@@ -16,7 +16,7 @@ public class PausedClock extends Clock {
 
     @Override
     RunningClock step() {
-        return new RunningClock(limit, increment, color, whiteTime, blackTime, now()).step();
+        return run().step();
     }
 
     @Override
@@ -40,5 +40,9 @@ public class PausedClock extends Clock {
     @Override
     public Clock switch0() {
         return new PausedClock(limit, increment, color.getOpposite(), whiteTime, blackTime);
+    }
+
+    private RunningClock run() {
+        return new RunningClock(limit, increment, color, whiteTime, blackTime, now());
     }
 }

@@ -21,6 +21,10 @@ public enum Color {
         return new Piece(this, role);
     }
 
+    public <A> A fold(A w, A b) {
+        return isWhite() ? w : b;
+    }
+
     private Color opposite;
     private int unmovedPawnY;
     private int passablePawnY;
