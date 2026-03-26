@@ -19,14 +19,16 @@ public class HubMaster implements leo.lija.app.Hub {
     private final Supplier<History> makeHistory;
     private final int uidTimeout;
     private final int hubTimeout;
+    private final int playerTimeout;
 
     private final Map<String, Hub> hubs = new ConcurrentHashMap<>();
 
-    public HubMaster(SocketIOService socketIOService, Supplier<History> makeHistory, int uidTimeout, int hubTimeout) {
+    public HubMaster(SocketIOService socketIOService, Supplier<History> makeHistory, int uidTimeout, int hubTimeout, int playerTimeout) {
         this.socketIOService = socketIOService;
         this.makeHistory = makeHistory;
         this.uidTimeout = uidTimeout;
         this.hubTimeout = hubTimeout;
+        this.playerTimeout = playerTimeout;
     }
 
     public void broom() {
@@ -86,6 +88,6 @@ public class HubMaster implements leo.lija.app.Hub {
     }
 
     private Hub mkHub(String gameId) {
-        return new Hub(this, socketIOService, gameId, makeHistory.get(), uidTimeout, hubTimeout);
+        return new Hub(this, socketIOService, gameId, makeHistory.get(), uidTimeout, hubTimeout, playerTimeout);
     }
 }

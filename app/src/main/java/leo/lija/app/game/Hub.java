@@ -23,31 +23,45 @@ public class Hub extends HubActor<Member> {
     private final String gameId;
     private final History history;
     private final int hubTimeout;
+    private final int playerTimeout;
 
     private long lastPingTime = Utils.nowMillis();
+
+    // when the players have been seen online for the last time
+    private long whiteTime = Utils.nowMillis();
+    private long blackTime = Utils.nowMillis();
 
     public Member getMember(String uid) {
         return members.get(uid);
     }
 
-    public Hub(HubMaster hubMaster, SocketIOService socketService, String gameId, History history, int uidTimeout, int hubTimeout) {
+    public Hub(HubMaster hubMaster, SocketIOService socketService, String gameId, History history, int uidTimeout, int hubTimeout, int playerTimeout) {
         super(socketService, uidTimeout, gameId);
         this.hubMaster = hubMaster;
         this.gameId = gameId;
         this.history = history;
         this.hubTimeout = hubTimeout;
+        this.playerTimeout = playerTimeout;
     }
 
     @Override
     public void ping(String uid) {
         super.ping(uid);
         lastPingTime = Utils.nowMillis();
+        ownerOf(uid).ifPresent(o ->
+            playerTime(o.color(), lastPingTime)
+        );
     }
 
     @Override
     public void broom() {
         super.broom();
-        if (lastPingTime < Utils.nowMillis() - hubTimeout * 1000) hubMaster.closeGame(gameId);
+        if (lastPingTime < Utils.nowMillis() - hubTimeout * 1000L) {
+            hubMaster.closeGame(gameId);
+        }
+        Color.all.forEach(c -> {
+                if (playerIsGone(c)) notifyOwner(c.getOpposite(), "gone", null);
+        });
     }
 
     public int getGameVersion() {
@@ -55,7 +69,7 @@ public class Hub extends HubActor<Member> {
     }
 
     public boolean isConnectedOnGame(Color color) {
-        return member(color).isPresent();
+        return ownerOf(color).isPresent();
     }
 
     public void join(String uid, Optional<String> username, Integer version, Color color, boolean owner) {
@@ -81,8 +95,8 @@ public class Hub extends HubActor<Member> {
 
     private CrowdEvent crowdEvent() {
         return new CrowdEvent(
-            member(WHITE).isPresent(),
-            member(BLACK).isPresent(),
+            ownerOf(WHITE).isPresent(),
+            ownerOf(BLACK).isPresent(),
             (int) members.values().stream().filter(Member::watcher).count()
         );
     }
@@ -106,12 +120,33 @@ public class Hub extends HubActor<Member> {
             )));
     }
 
+    private void notifyOwner(Color color, String t, Object data) {
+        ownerOf(color).ifPresent(m ->
+            socketService.sendMessageToClient(m.getUid(), gameId, makeEvent(t, data))
+        );
+    }
+
     public Map<String, Object> makeEvent(String t, Object data) {
         return Map.of("t", t, "d", data);
     }
 
-    private Optional<Member> member(Color color) {
+    private Optional<Member> ownerOf(Color color) {
         return members.values().stream().filter(m -> m.isOwner() && m.color() == color).findAny();
     }
 
+    private Optional<Member> ownerOf(String uid) {
+        return Optional.ofNullable(members.get(uid)).filter(Member::isOwner);
+    }
+
+    private double playerTime(Color color) {
+        return color.fold(whiteTime, blackTime);
+    }
+
+    private void playerTime(Color color, double time) {
+        if (color.isWhite()) whiteTime = (long) time; else blackTime = (long) time;
+    }
+
+    private boolean playerIsGone(Color color) {
+        return playerTime(color) < Utils.nowMillis() - playerTimeout * 1000L;
+    }
 }
