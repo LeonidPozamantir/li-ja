@@ -16,7 +16,7 @@ public class PausedClock extends Clock {
 
     @Override
     RunningClock step() {
-        return new RunningClock(limit, increment, color, whiteTime, blackTime, now()).giveTime(WHITE, increment).step();
+        return new RunningClock(limit, increment, color, whiteTime, blackTime, now()).step();
     }
 
     @Override
