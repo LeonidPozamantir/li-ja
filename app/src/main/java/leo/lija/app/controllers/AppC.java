@@ -36,6 +36,11 @@ public class AppC extends BaseController {
         return performAndRedirect(fullId, hand::resign);
     }
 
+    @GetMapping("/resign-force/{fullId}")
+    public ResponseEntity<Void> resignForce(@PathVariable String fullId) {
+        return performAndRedirect(fullId, hand::resignForce);
+    }
+
     @GetMapping("/draw-claim/{fullId}")
     public ResponseEntity<Void> drawClaim(@PathVariable String fullId) {
         return performAndRedirect(fullId, hand::drawClaim);
@@ -81,16 +86,20 @@ public class AppC extends BaseController {
         return performAndRedirect(fullId, hand::takebackDecline);
     }
 
-    private void perform(String fullId, Function<String, List<Event>> op) {
-        List<Event> events = op.apply(fullId);
-        gameSocket.send(DbGame.takeGameId(fullId), events);
-    }
-
     private ResponseEntity<Void> performAndRedirect(String fullId, Function<String, List<Event>> op) {
         perform(fullId, op);
         return ResponseEntity.status(HttpStatus.FOUND)
             .location(URI.create("/" + fullId))
             .build();
+    }
+
+    private void perform(String fullId, Function<String, List<Event>> op) {
+        List<Event> events = op.apply(fullId);
+        performEvents(fullId, events);
+    }
+
+    private void performEvents(String fullId, List<Event> events) {
+        gameSocket.send(DbGame.takeGameId(fullId), events);
     }
 
 }

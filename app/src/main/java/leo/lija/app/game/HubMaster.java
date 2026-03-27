@@ -67,6 +67,12 @@ public class HubMaster implements leo.lija.app.Hub {
             .orElse(false);
     }
 
+    public boolean isGone(String gameId, Color color) {
+        return Optional.ofNullable(hubs.get(gameId))
+            .map(hub -> hub.isGone(color))
+            .orElse(false);
+    }
+
     public int getNbHubs() {
         return hubs.size();
     }

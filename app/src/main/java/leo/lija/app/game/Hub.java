@@ -48,8 +48,10 @@ public class Hub extends HubActor<Member> {
     public void ping(String uid) {
         super.ping(uid);
         lastPingTime = Utils.nowMillis();
-        ownerOf(uid).ifPresent(o ->
-            playerTime(o.color(), lastPingTime)
+        ownerOf(uid).ifPresent(o -> {
+                if (playerIsGone(o.color())) notifyGone(o.color(), false);
+                playerTime(o.color(), lastPingTime);
+            }
         );
     }
 
@@ -60,7 +62,7 @@ public class Hub extends HubActor<Member> {
             hubMaster.closeGame(gameId);
         }
         Color.all.forEach(c -> {
-                if (playerIsGone(c)) notifyOwner(c.getOpposite(), "gone", null);
+                if (playerIsGone(c)) notifyGone(c, true);
         });
     }
 
@@ -72,6 +74,10 @@ public class Hub extends HubActor<Member> {
         return ownerOf(color).isPresent();
     }
 
+    public boolean isGone(Color color) {
+        return playerIsGone(color);
+    }
+
     public void join(String uid, Optional<String> username, Integer version, Color color, boolean owner) {
         socketService.addToRoom(gameId, uid);
         List<History.VersionedEvent> msgs = history.since(version).stream().filter(m -> m.visible(color, owner)).toList();
@@ -80,6 +86,8 @@ public class Hub extends HubActor<Member> {
         socketService.sendMessageToClient(uid, gameId, crowdMsg);
         addMember(uid, Member.apply(uid, username, new PovRef(gameId, color), owner));
         notify(crowdEvent());
+        if (playerIsGone(color)) notifyGone(color, false);
+        playerTime(color, Utils.nowMillis());
     }
 
     public void events(List<Event> events) {
@@ -124,6 +132,10 @@ public class Hub extends HubActor<Member> {
         ownerOf(color).ifPresent(m ->
             socketService.sendMessageToClient(m.getUid(), gameId, makeEvent(t, data))
         );
+    }
+
+    public void notifyGone(Color color, Boolean gone) {
+        notifyOwner(color.getOpposite(), "gone", gone);
     }
 
     public Map<String, Object> makeEvent(String t, Object data) {

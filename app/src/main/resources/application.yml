@@ -28,7 +28,7 @@ game:
   message.lifetime: 30
   uid.timeout: 10
   hub.timeout: 120
-  player.timeout: 60
+  player.timeout: 30
 
 site:
   uid.timeout: 10

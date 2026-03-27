@@ -14,9 +14,9 @@ public record Status(int id) {
     public static final Status MATE = new Status(30);
     public static final Status RESIGN = new Status(31);
     public static final Status STALEMATE = new Status(32);
-    public static final Status TIMEOUT = new Status(33);
+    public static final Status TIMEOUT = new Status(33); // when player leaves the game
     public static final Status DRAW = new Status(34);
-    public static final Status OUTOFTIME = new Status(35);
+    public static final Status OUTOFTIME = new Status(35); // clock flag
     public static final Status CHEAT = new Status(36);
 
     private static final List<Status> all = List.of(CREATED, STARTED, ABORTED, MATE, RESIGN, STALEMATE, TIMEOUT, DRAW, OUTOFTIME, CHEAT);

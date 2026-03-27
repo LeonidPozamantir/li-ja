@@ -49,6 +49,11 @@ public class Finisher {
         throw new AppException("game is not resignable");
     }
 
+    public List<Event> resignForce(Pov pov) {
+        if (pov.game().resignable()) return finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
+        throw new AppException("game is not resignable");
+    }
+
     public List<Event> drawClaim(Pov pov) {
         DbGame game = pov.game();
         Color color = pov.color();

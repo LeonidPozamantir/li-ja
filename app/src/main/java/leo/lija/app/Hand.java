@@ -11,6 +11,7 @@ import leo.lija.app.entities.event.ClockEvent;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.entities.event.ReloadTableEvent;
 import leo.lija.app.exceptions.AppException;
+import leo.lija.app.game.HubMaster;
 import leo.lija.chess.Clock;
 import leo.lija.chess.Color;
 import leo.lija.chess.Game;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static leo.lija.chess.Pos.posAt;
@@ -36,20 +39,22 @@ public class Hand {
     private final Takeback takeback;
     private final AiService ai;
     private final Finisher finisher;
+    private final HubMaster hubMaster;
     private final int moretimeSeconds;
 
     public Hand(
-            GameRepo gameRepo,
-            Messenger messenger,
-            Takeback takeback,
-            AiService ai,
-            Finisher finisher,
-            @Value("${moretime.seconds}") int moretimeSeconds) {
+        GameRepo gameRepo,
+        Messenger messenger,
+        Takeback takeback,
+        AiService ai,
+        Finisher finisher, HubMaster hubMaster,
+        @Value("${moretime.seconds}") int moretimeSeconds) {
         this.gameRepo = gameRepo;
         this.messenger = messenger;
         this.takeback = takeback;
         this.ai = ai;
         this.finisher = finisher;
+        this.hubMaster = hubMaster;
         this.moretimeSeconds = moretimeSeconds;
     }
 
@@ -105,6 +110,16 @@ public class Hand {
 
     public List<Event> resign(String fullId) {
         return attempt(fullId, finisher::resign);
+    }
+
+    public List<Event> resignForce(String fullId) {
+        return gameRepo.pov(fullId).map(pov -> CompletableFuture.supplyAsync(() -> {
+                boolean isGone = hubMaster.isGone(pov.game().getId(), pov.color().getOpposite());
+                if (isGone) return finisher.resignForce(pov);
+                throw new AppException("Opponent is not gone");
+            }).orTimeout(100, TimeUnit.MILLISECONDS)
+            .join()
+        ).orElseThrow(() -> new AppException("No such game"));
     }
 
     public List<Event> outoftime(PovRef ref) {
