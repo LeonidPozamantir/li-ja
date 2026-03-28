@@ -3,6 +3,7 @@ package leo.lija.chess;
 import io.vavr.collection.List;
 import leo.lija.chess.exceptions.ChessRulesException;
 import leo.lija.chess.utils.Pair;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.With;
 
@@ -20,7 +21,7 @@ public record Move(
     Board before,
     @With Board after,
     Optional<Pos> capture,
-    @With Optional<Role> promotion,
+    @With(AccessLevel.PRIVATE) Optional<Role> promotion,
     Optional<Pair<Pair<Pos, Pos>, Pair<Pos, Pos>>> castle,
     boolean enpassant
 ) {
@@ -83,6 +84,16 @@ public record Move(
 
     public String notation() {
         return orig + " " + dest;
+    }
+
+    public Optional<Move> setPromotion(Optional<Role> op) {
+        return op.map(p -> {
+            if (after.count(color().queen()) > before().count(color().queen())) {
+                return after.take(dest)
+                    .flatMap(b2 -> b2.place(color().of(p), dest))
+                    .map(b3 -> this.withAfter(b3).withPromotion(Optional.of(p)));
+            } else return Optional.<Move>empty();
+        }).orElse(Optional.of(this));
     }
 
     @Override

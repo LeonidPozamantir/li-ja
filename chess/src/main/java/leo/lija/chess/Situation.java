@@ -77,26 +77,16 @@ public class Situation {
 		return checkmate() || stalemate() || autoDraw();
 	}
 
-	public Move move(Pos from, Pos to, Role promotion) {
-		if (!promotion.isPromotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
+	public Move move(Pos from, Pos to, Optional<Role> promotion) {
+		if (promotion.isPresent() && !promotion.get().isPromotable) throw new ChessRulesException("Cannot promote to %s".formatted(promotion));
 
-		Optional<Actor> actor = board.actorAt(from);
-		Optional<Move> someMove = actor
-			.filter(a -> a.is(color))
-			.flatMap(a -> a.moves().stream()
-				.filter(m -> m.dest().equals(to))
-				.findFirst()
-			);
-
-		Optional<Move> resMove = promotion == QUEEN
-			? someMove
-			: someMove.map(Move::after)
-				.filter(b1 -> b1.count(color.queen()) > board.count(color.queen()))
-				.flatMap(b1 -> b1.take(to))
-				.flatMap(b2 -> b2.place(color.of(promotion), to))
-				.map(b3 -> someMove.get().withAfter(b3).withPromotion(Optional.of(promotion)));
-
-			return resMove.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
+		return board.actorAt(from)
+            .filter(a -> a.is(color))
+            .flatMap(a -> a.moves().stream()
+                .filter(m -> m.dest().equals(to))
+                .findFirst()
+            ).flatMap(m1 -> m1.setPromotion(promotion))
+			.orElseThrow(() -> new ChessRulesException("Illegal move %s->%s".formatted(from, to)));
 	}
 
 }

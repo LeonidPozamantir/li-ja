@@ -54,7 +54,7 @@ public class Game {
 
     public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
         if (promotion == null) promotion = QUEEN;
-        Move move =  situation().move(from, to, promotion);
+        Move move =  situation().move(from, to, Optional.of(promotion).filter(p -> p != QUEEN));
         return Pair.of(apply(move), move);
     }
 

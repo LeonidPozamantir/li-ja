@@ -51,6 +51,7 @@ public class Std implements San {
             .toList();
         if (potentialMoves.isEmpty()) throw new ChessException("No move found: %s\n%s".formatted(this, game.getBoard()));
         if (potentialMoves.size() > 1) throw new ChessException("Many moves found: %s\n%s".formatted(this, game.getBoard()));
-        return potentialMoves.getFirst();
+        return potentialMoves.getFirst().setPromotion(promotion)
+            .orElseThrow(() -> new ChessException("Wrong promotion"));
     }
 }

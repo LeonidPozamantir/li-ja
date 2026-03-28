@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class PgnParser {
@@ -156,8 +157,10 @@ public class PgnParser {
     Parser<Integer> rank = mapParser(rangeToMap(List.of('1','2','3','4','5','6','7','8')));
 
     public Parser<Role> promotion() {
-        return Parser.string("=").then(mapParser(Role.allPromotableByPgn));
+        return Parser.string("=").then(mapParser(promotable));
     }
+
+    Map<Character, Role> promotable = Role.allPromotableByPgn.entrySet().stream().collect(Collectors.toMap(e -> Character.toUpperCase(e.getKey()), Map.Entry::getValue));
 
     public Parser<Pos> dest() {
         return mapParser(Pos.allKeys);
