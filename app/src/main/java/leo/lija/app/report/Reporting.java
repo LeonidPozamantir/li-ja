@@ -8,6 +8,7 @@ import leo.lija.app.site.Hub;
 import leo.lija.chess.utils.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class Reporting {
 
     record SiteSocket(int nbMembers) {}

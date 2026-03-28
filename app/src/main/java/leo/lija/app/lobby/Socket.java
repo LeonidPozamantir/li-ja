@@ -7,12 +7,14 @@ import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.socket.Util;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service("lobbySocket")
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class Socket {
 
     private final Hub hub;

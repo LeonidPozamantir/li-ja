@@ -10,11 +10,13 @@ import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Progress;
 import leo.lija.chess.Color;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@ConditionalOnWebApplication
 public class Api {
 
     private final HookRepo hookRepo;

@@ -9,6 +9,7 @@ import leo.lija.app.forms.JoinForm;
 import leo.lija.app.forms.RematchForm;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class AppApiC {
 
     private final AppApi api;

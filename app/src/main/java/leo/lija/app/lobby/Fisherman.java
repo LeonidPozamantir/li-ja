@@ -5,10 +5,12 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.memo.HookMemo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class Fisherman {
 
     private final HookRepo hookRepo;

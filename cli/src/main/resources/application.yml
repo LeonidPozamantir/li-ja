@@ -16,6 +16,7 @@ lobby:
     max: 30
   entry:
     max: 12
+  message.lifetime: 30
 
 memo:
   version:

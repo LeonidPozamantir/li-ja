@@ -3,9 +3,11 @@ package leo.lija.app.config;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 
 @org.springframework.context.annotation.Configuration
+@ConditionalOnWebApplication
 public class SocketIOConfig {
 
     @Value("${socket.host:localhost}")

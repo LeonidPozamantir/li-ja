@@ -4,12 +4,14 @@ import jakarta.annotation.PostConstruct;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.socket.Util;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Qualifier("siteSocket")
 @Service
+@ConditionalOnWebApplication
 public class Socket {
 
     private final SocketIOService socketIOService;

@@ -21,6 +21,7 @@ public class CliApplication implements CommandLineRunner {
 	private final Info info;
     private final AverageElo averageElo;
 	private final GameFinish gameFinish;
+    private final Eco eco;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CliApplication.class, args);
@@ -40,6 +41,7 @@ public class CliApplication implements CommandLineRunner {
 				case "info" -> info;
                 case "average-elo" -> averageElo;
 				case "finish" -> (Command) gameFinish::apply;
+                case "eco" -> eco;
                 default -> defaultCommand;
             };
 

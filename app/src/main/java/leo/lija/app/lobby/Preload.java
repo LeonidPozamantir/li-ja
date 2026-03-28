@@ -8,6 +8,7 @@ import leo.lija.app.entities.Entry;
 import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
+@ConditionalOnWebApplication
 public class Preload {
 
     private final Fisherman fisherman;

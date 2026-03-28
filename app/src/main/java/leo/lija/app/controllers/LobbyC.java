@@ -6,6 +6,7 @@ import leo.lija.app.lobby.Api;
 import leo.lija.app.lobby.Messenger;
 import leo.lija.app.lobby.Preload;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class LobbyC extends BaseController {
 
     private final Api api;

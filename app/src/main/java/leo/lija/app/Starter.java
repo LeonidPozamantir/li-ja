@@ -13,10 +13,12 @@ import leo.lija.chess.Game;
 import leo.lija.chess.Move;
 import leo.lija.chess.utils.Pair;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class Starter {
 
     private final GameRepo gameRepo;

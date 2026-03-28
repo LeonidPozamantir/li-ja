@@ -16,6 +16,7 @@ import leo.lija.app.game.Socket;
 import leo.lija.chess.Color;
 import leo.lija.chess.Pos;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Color.WHITE;
 
 @Service
+@ConditionalOnWebApplication
 public class AppApi {
 
     private final UserRepo userRepo;

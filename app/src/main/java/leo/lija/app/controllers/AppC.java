@@ -5,6 +5,7 @@ import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.game.Socket;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @RestController
+@ConditionalOnWebApplication
 public class AppC extends BaseController {
 
     private final Hand hand;

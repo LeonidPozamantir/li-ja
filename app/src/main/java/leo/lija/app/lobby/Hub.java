@@ -7,6 +7,7 @@ import leo.lija.app.entities.Hook;
 import leo.lija.app.entities.Message;
 import leo.lija.app.socket.HubActor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 @Service("lobbyHub")
+@ConditionalOnWebApplication
 public class Hub extends HubActor<Member> implements leo.lija.app.Hub {
 
     private final Messenger messenger;

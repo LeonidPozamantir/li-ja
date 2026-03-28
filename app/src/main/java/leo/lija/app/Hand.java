@@ -20,6 +20,7 @@ import leo.lija.chess.Pos;
 import leo.lija.chess.Role;
 import leo.lija.chess.utils.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.function.Function;
 import static leo.lija.chess.Pos.posAt;
 
 @Service
+@ConditionalOnWebApplication
 public class Hand {
 
     private final GameRepo gameRepo;

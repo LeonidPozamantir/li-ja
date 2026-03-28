@@ -1,16 +1,18 @@
 package leo.lija.chess;
 
 import leo.lija.chess.utils.CsvLoader;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Eco {
 
-    record Branch(Map<String, Branch> moves, Optional<Opening> opening) {
+    public record Branch(Map<String, Branch> moves, Optional<Opening> opening) {
 
         public Branch() {
             this(new HashMap<>(), Optional.empty());
@@ -45,6 +47,16 @@ public class Eco {
         public String toString() {
             return opening.map(Opening::name).orElse("-");
         }
+
+        public String render() {
+            return render("");
+        }
+
+        public String render(String margin) {
+            return margin + toString() + "\n" + moves.entrySet().stream()
+                .map(e -> margin + e.getKey() + e.getValue().render(margin + "  "))
+                .collect(Collectors.joining("\n"));
+        }
     }
 
     public static Optional<Opening> openingOf(String pgn) {
@@ -60,6 +72,7 @@ public class Eco {
             .orElse(branch);
     }
 
+    @Getter
     static Branch tree;
 
     static {

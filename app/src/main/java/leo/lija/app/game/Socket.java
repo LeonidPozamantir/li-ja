@@ -10,6 +10,7 @@ import leo.lija.app.entities.Progress;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.Util;
 import leo.lija.chess.Color;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 @Service("gameSocket")
+@ConditionalOnWebApplication
 public class Socket {
 
     private final TaskScheduler taskScheduler;
