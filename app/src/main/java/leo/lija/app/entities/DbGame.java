@@ -313,7 +313,7 @@ public class DbGame {
     }
 
     // Leo: make lazy val
-    private boolean hasAi() {
+    public boolean hasAi() {
         return players().stream().anyMatch(DbPlayer::isAi);
     }
 

@@ -55,7 +55,7 @@ public class LobbyC extends BaseController {
     }
 
     @PostMapping("/api/lobby/chat-ban/{username}")
-    public void chatBan(String username) {
+    public void chatBan(@PathVariable String username) {
         messenger.ban(username);
     }
 }

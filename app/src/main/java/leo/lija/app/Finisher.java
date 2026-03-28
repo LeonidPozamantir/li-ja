@@ -50,7 +50,7 @@ public class Finisher {
     }
 
     public List<Event> resignForce(Pov pov) {
-        if (pov.game().resignable()) return finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
+        if (pov.game().resignable() && !pov.game().hasAi()) return finish(pov.game(), Status.TIMEOUT, Optional.of(pov.color()));
         throw new AppException("game is not resignable");
     }
 
