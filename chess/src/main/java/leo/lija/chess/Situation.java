@@ -54,8 +54,7 @@ public class Situation {
 	}
 
 	public boolean check() {
-		return kingPos().map(king -> board.actorsOf(color.getOpposite()).stream().anyMatch(a -> a.threatens(king)))
-			.orElse(false);
+		return board.check(color);
 	}
 
 	public boolean checkmate() {

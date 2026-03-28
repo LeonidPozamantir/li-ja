@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -100,10 +101,33 @@ public class Actor {
 
 	private List<Move> kingSafety(List<Move> ms) {
 		return ms.stream()
-			.filter(m -> m.after().actorsOf(color().getOpposite()).stream()
-				.noneMatch(a -> m.after().kingPosOf(color()).map(a::threatens).orElse(false)))
-			.toList();
+			.filter(m -> {
+                Predicate<Actor> condition = a -> {
+                    if (m.piece().is(KING)) return true;
+                    if (check()) return a.attacker();
+                    return a.projection();
+                };
+                return m.after().kingPosOf(color()).map(afterKingPos ->
+                    m.after().actorsOf(color().getOpposite()).stream().noneMatch(
+                        oActor -> condition.test(oActor) && oActor.threatens(afterKingPos)
+                    )
+                ).orElse(true);
+
+            }).toList();
 	}
+
+    public boolean attacker() {
+        return piece.role().attacker;
+    }
+
+    public boolean projection() {
+        return piece.role().projection;
+    }
+
+    // leo: should be lazy
+    public boolean check() {
+        return board.check(color());
+    }
 
 	private List<Move> castle() {
 		return Stream.of(castleOn(KING_SIDE),	castleOn(QUEEN_SIDE)).filter(Optional::isPresent).map(Optional::get).toList();

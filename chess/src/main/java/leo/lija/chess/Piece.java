@@ -1,5 +1,7 @@
 package leo.lija.chess;
 
+import java.util.Set;
+
 public record Piece(Color color, Role role) {
 
     public boolean is(Color color) {
@@ -8,6 +10,10 @@ public record Piece(Color color, Role role) {
 
     public boolean is(Role role) {
         return role == this.role;
+    }
+
+    public boolean oneOf(Set<Role> rs) {
+        return rs.contains(role);
     }
 
     @Override

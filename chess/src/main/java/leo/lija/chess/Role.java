@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public enum Role {
-    KING('k',false, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    QUEEN('q',true, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    ROOK('r', true, List.of(Pos::up, Pos::down, Pos::left, Pos::right)),
-    BISHOP('b', true, List.of(Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
-    KNIGHT('n', true, List.of(
+    KING('k',false, false, false, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
+    QUEEN('q',true, true, true, List.of(Pos::up, Pos::down, Pos::left, Pos::right, Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
+    ROOK('r', true, true, true, List.of(Pos::up, Pos::down, Pos::left, Pos::right)),
+    BISHOP('b', true, true, true, List.of(Pos::upLeft, Pos::upRight, Pos::downLeft, Pos::downRight)),
+    KNIGHT('n', true, true, false, List.of(
         pos -> pos.up().flatMap(Pos::upLeft),
         pos -> pos.up().flatMap(Pos::upRight),
         pos -> pos.left().flatMap(Pos::upLeft),
@@ -25,10 +25,12 @@ public enum Role {
         pos -> pos.down().flatMap(Pos::downLeft),
         pos -> pos.down().flatMap(Pos::downRight)
     )),
-    PAWN('p', false,null);
+    PAWN('p', false, true, false,null);
 
     public final char fen;
     public final boolean isPromotable;
+    public final boolean attacker;
+    public final boolean projection;
     final List<Function<Pos, Optional<Pos>>> dirs;
 
     private Optional<Character> cachedPgn = Optional.empty();

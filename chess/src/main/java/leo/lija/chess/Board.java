@@ -30,7 +30,6 @@ import static leo.lija.chess.Role.PAWN;
 import static leo.lija.chess.Role.QUEEN;
 import static leo.lija.chess.Role.ROOK;
 
-@RequiredArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Board {
 
@@ -44,6 +43,13 @@ public class Board {
     @Getter
     @EqualsAndHashCode.Include
     private final History history;
+
+    public Board(Map<Pos, Piece> pieces, History history) {
+        this.pieces = pieces;
+        this.history = history;
+        checkWhite = checkOf(WHITE);
+        checkBlack = checkOf(BLACK);
+    }
 
     private Optional<Map<Color, Set<Pos>>> cachedOccupation = Optional.empty();
     private Optional<Map<Color, List<Actor>>> cachedColorActors = Optional.empty();
@@ -103,6 +109,17 @@ public class Board {
         return actorsOf(c).stream()
             .flatMap(a -> a.threats().stream())
             .collect(Collectors.toSet());
+    }
+
+    public boolean check(Color c) {
+        return c.isWhite() ? checkWhite : checkBlack;
+    }
+
+    final boolean checkWhite;
+    final boolean checkBlack;
+
+    private boolean checkOf(Color c) {
+        return kingPosOf(c).map(king -> actorsOf(c.getOpposite()).stream().anyMatch(a -> a.threatens(king))).orElse(false);
     }
 
     public Optional<List<Pos>> destsFrom(Pos from) {
@@ -241,8 +258,7 @@ public class Board {
     }
 
     public Board() {
-        this.pieces = cachedStandard.pieces;
-        this.history = cachedStandard.history;
+        this(cachedStandard.pieces, cachedStandard.history);
     }
 
     public Board(Map<Pos, Piece> pieces) {
