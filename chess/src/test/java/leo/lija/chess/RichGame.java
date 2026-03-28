@@ -45,10 +45,10 @@ public class RichGame extends Game {
     }
 
     public RichGame playMove(Pos from, Pos to) {
-        return playMove(from, to, QUEEN);
+        return playMove(from, to, Optional.empty());
     }
 
-    public RichGame playMove(Pos from, Pos to, Role promotion) {
+    public RichGame playMove(Pos from, Pos to, Optional<Role> promotion) {
         return new RichGame(apply(from, to, promotion).getFirst());
     }
 

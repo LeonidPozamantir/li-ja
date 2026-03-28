@@ -49,12 +49,11 @@ public class Game {
     }
 
     public Pair<Game, Move> apply(Pos from, Pos to) {
-        return apply(from, to, null);
+        return apply(from, to, Optional.empty());
     }
 
-    public Pair<Game, Move> apply(Pos from, Pos to, Role promotion) {
-        if (promotion == null) promotion = QUEEN;
-        Move move =  situation().move(from, to, Optional.of(promotion).filter(p -> p != QUEEN));
+    public Pair<Game, Move> apply(Pos from, Pos to, Optional<Role> promotion) {
+        Move move =  situation().move(from, to, promotion);
         return Pair.of(apply(move), move);
     }
 

@@ -72,7 +72,7 @@ public class Hand {
             if (!g1.playable()) throw new AppException("Game is not playable");
             Pos orig = posAt(origString).orElseThrow(() -> new AppException("Wrong orig " + origString));
             Pos dest = posAt(destString).orElseThrow(() -> new AppException("Wrong dest " + destString));
-            Role promotion = promString.map(ps -> Role.promotable(promString).orElseThrow(() -> new AppException("Wrong promotion " + promString))).orElse(null);
+            Optional<Role> promotion = Role.promotable(promString);
             Pair<Game, Move> newChessGameAndMove = g1.toChess().apply(orig, dest, promotion);
             Game newChessGame = newChessGameAndMove.getFirst();
             Move move = newChessGameAndMove.getSecond();

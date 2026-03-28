@@ -60,6 +60,6 @@ public enum Role {
     }
 
     public static Optional<Role> promotable(Optional<String> name) {
-        return name.flatMap(n -> promotable(n));//.orElse(Optional.of(QUEEN)); - incorrect, fill be fixed 11/05
+        return name.flatMap(Role::promotable);
     }
 }

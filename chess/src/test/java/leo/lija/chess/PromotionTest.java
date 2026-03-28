@@ -3,6 +3,8 @@ package leo.lija.chess;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static leo.lija.chess.Color.BLACK;
 import static leo.lija.chess.Pos.A7;
 import static leo.lija.chess.Pos.A8;
@@ -23,7 +25,7 @@ K      """);
     @Test
     @DisplayName("promote to a queen")
     void promoteToQueen() {
-        beGame(game.playMove(C2, C1, QUEEN), """
+        beGame(game.playMove(C2, C1, Optional.of(QUEEN)), """
 
 K q    """);
     }
@@ -39,7 +41,7 @@ K q    """);
     @Test
     @DisplayName("promote to a knight")
     void promoteToKnight() {
-        beGame(game.playMove(C2, C1, KNIGHT), """
+        beGame(game.playMove(C2, C1, Optional.of(KNIGHT)), """
 
 K n    """);
     }
@@ -59,7 +61,7 @@ K  q""");
     void promoteToKnightByKilling() {
         beGame(new RichGame(visual.str2Obj("""
   p
-K  R"""), BLACK).playMove(C2, D1, KNIGHT), """
+K  R"""), BLACK).playMove(C2, D1, Optional.of(KNIGHT)), """
 
 K  n""");
     }
@@ -75,7 +77,7 @@ P
 
 
 
-K n    """)).playMove(A7, A8, KNIGHT), """
+K n    """)).playMove(A7, A8, Optional.of(KNIGHT)), """
 N
 
 

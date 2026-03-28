@@ -150,14 +150,14 @@ K      """), BLACK);
                 @Test
                 @DisplayName("to queen")
                 void queen() {
-                    Game newGame = game.playMove(C2, C1, QUEEN);
+                    Game newGame = game.playMove(C2, C1, Optional.of(QUEEN));
                     assertThat(findMove(game, newGame)).contains(Pair.of(C2, C1));
                 }
 
                 @Test
                 @DisplayName("to knight")
                 void knight() {
-                    Game newGame = game.playMove(C2, C1, KNIGHT);
+                    Game newGame = game.playMove(C2, C1, Optional.of(KNIGHT));
                     assertThat(findMove(game, newGame)).contains(Pair.of(C2, C1));
                 }
 
