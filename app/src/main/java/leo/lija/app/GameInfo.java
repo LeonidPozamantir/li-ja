@@ -11,10 +11,12 @@ public record GameInfo(DbGame game, String pgn, Optional<Opening> opening) {
     public Map<String, Object> toMap() {
         return Map.of(
             "pgn", pgn,
-            "opening", opening.map(o -> Map.of(
+            "opening", game.getVariant().isStandard()
+                ? opening.map(o -> Map.of(
                 "code", o.code(),
                 "name", o.name()
             ))
+                : Optional.empty()
         );
     }
 
