@@ -1,8 +1,8 @@
 package leo.lija.app.controllers;
 
 import io.vavr.Tuple3;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import leo.lija.app.AppApi;
 import leo.lija.app.Captcha;
 import leo.lija.app.forms.EntryForm;
 import leo.lija.app.forms.JoinForm;
@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,18 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-@RestController
+@RestController("AppApiController")
 @RequestMapping("api")
 @RequiredArgsConstructor
 @ConditionalOnWebApplication
-public class AppApiC {
+public class AppApi {
 
-    private final AppApi api;
+    private final leo.lija.app.AppApi api;
     private final TaskExecutor executor;
     private final Captcha captcha;
 
     @GetMapping("/show/{fullId}")
-    public CompletableFuture<Map<String, Object>> show(@PathVariable String fullId) {
+    public CompletableFuture<Map<String, Object>> show(@PathVariable String fullId, Authentication authentication, HttpSession session) {
         return CompletableFuture.supplyAsync(() -> api.show(fullId), executor);
     }
 

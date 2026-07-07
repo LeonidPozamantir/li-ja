@@ -12,6 +12,9 @@ spring:
     static-path-pattern: /assets/**
 
 server:
+  servlet:
+    session:
+      timeout: 3600
   tomcat:
     connection-timeout: 2s
 

@@ -1,5 +1,6 @@
 package leo.lija.app.lobby;
 
+import leo.lija.app.HubRef;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.DbGame;
 import leo.lija.app.entities.Entry;
@@ -19,7 +20,7 @@ import java.util.function.Consumer;
 
 @Service("lobbyHub")
 @ConditionalOnWebApplication
-public class Hub extends HubActor<Member> implements leo.lija.app.Hub {
+public class Hub extends HubActor<Member> implements HubRef {
 
     private final Messenger messenger;
     private final History history;

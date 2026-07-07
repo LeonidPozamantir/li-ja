@@ -18,12 +18,12 @@ import java.util.function.Function;
 
 @RestController
 @ConditionalOnWebApplication
-public class AppC extends BaseController {
+public class App extends BaseController {
 
     private final Hand hand;
     private final Socket gameSocket;
 
-    public AppC(Hand hand, @Qualifier("gameSocket") Socket gameSocket) {
+    public App(Hand hand, @Qualifier("gameSocket") Socket gameSocket) {
         this.hand = hand;
         this.gameSocket = gameSocket;
     }

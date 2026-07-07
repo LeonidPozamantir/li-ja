@@ -5,13 +5,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -27,6 +32,9 @@ public class User {
     private boolean engine;
     private boolean isChatBan;
     private boolean enabled;
+    private List<String> roles;
+    private String password;
+    private String salt;
 
     public boolean disabled() {
         return !enabled;

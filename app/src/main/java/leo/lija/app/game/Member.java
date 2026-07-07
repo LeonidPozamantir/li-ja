@@ -13,7 +13,7 @@ public abstract class Member extends SocketMember {
     protected final PovRef ref;
     protected final boolean owner;
 
-    public Member(String uid, Optional<String> username, PovRef ref, boolean owner) {
+    protected Member(String uid, Optional<String> username, PovRef ref, boolean owner) {
         super(uid, username);
         this.ref = ref;
         this.owner = owner;

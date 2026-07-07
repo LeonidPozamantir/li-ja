@@ -23,7 +23,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @ConditionalOnWebApplication
-public class LobbyC extends BaseController {
+public class Lobby extends BaseController {
 
     private final Api api;
     private final Preload preloader;

@@ -1,5 +1,6 @@
 package leo.lija.app.game;
 
+import leo.lija.app.HubRef;
 import leo.lija.app.config.SocketIOService;
 import leo.lija.app.entities.event.Event;
 import leo.lija.app.socket.HubActor;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @Slf4j
-public class HubMaster implements leo.lija.app.Hub {
+public class HubMaster implements HubRef {
 
     private final SocketIOService socketIOService;
     private final Supplier<History> makeHistory;

@@ -1,7 +1,6 @@
 package leo.lija.app.controllers;
 
 import io.vavr.Tuple3;
-import leo.lija.app.Captcha;
 import leo.lija.chess.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController("CaptchaController")
 @RequestMapping("api/captcha")
 @RequiredArgsConstructor
-public class CaptchaC {
+public class Captcha {
 
-    private final Captcha captcha;
+    private final leo.lija.app.Captcha captcha;
 
     @GetMapping("/create")
     public Map<String, String> create() {

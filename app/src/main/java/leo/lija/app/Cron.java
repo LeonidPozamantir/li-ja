@@ -58,13 +58,13 @@ public class Cron {
             gameHubMaster.broom();
         });
 
-        spawn(Duration.ofSeconds(3), reporting::update);
+        spawn(Duration.ofSeconds(5), reporting::update);
 
         spawn(Duration.ofSeconds(1), () -> CompletableFuture.runAsync(() -> lobbyHub.withHooks(hookMemo::putAll), actionsExecutor)
             .orTimeout(TIMEOUT, TimeUnit.MILLISECONDS));
 
         spawn(Duration.ofSeconds(2), () -> {
-            int nb = hubs().stream().mapToInt(Hub::getNbMembers).sum();
+            int nb = hubs().stream().mapToInt(HubRef::getNbMembers).sum();
             hubs().forEach(h -> h.nbMembers(nb));
         });
 
@@ -91,7 +91,7 @@ public class Cron {
         remoteAi.diagnose();
     }
 
-    private List<Hub> hubs() {
+    private List<HubRef> hubs() {
         return List.of(siteHub, lobbyHub, gameHubMaster);
     }
 

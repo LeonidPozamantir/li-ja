@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
-public class AiC {
+public class Ai {
 
     private final TaskExecutor executor;
     private final CraftyServer craftyServer;
