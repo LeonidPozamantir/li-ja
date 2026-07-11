@@ -53,8 +53,7 @@ ai:
   remote:
     url:
 
-moretime:
-  seconds: 15
+moretime.seconds: 15
 
 async:
   actions:
@@ -63,3 +62,5 @@ async:
   websockets:
     parallelism: 64
     max-size: 1024
+
+application.langs: en, ru, he
